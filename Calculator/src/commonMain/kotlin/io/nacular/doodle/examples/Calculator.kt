@@ -51,7 +51,7 @@ class Calculator(
         private val defaultWidth get() = textMetrics.width("0", font)
 
         // Text inset from the left/right edge of the output
-        private val inset = 0.0 //by lazy { (clear.width - defaultWidth) / 2 }
+        private val inset by lazy { (clear.width - defaultWidth) / 2 }
 
         // Transform used to scale text down as it grows beyond window width
         private var textTransform = Identity
@@ -71,6 +71,7 @@ class Calculator(
                 val textWidth   = textMetrics.width(field, font)
                 val windowWidth = width - inset * 2
 
+                // use transform when text grows beyond window width
                 textTransform = when {
                     textWidth > windowWidth -> (windowWidth/textWidth).let { Identity.scale(x = it, y = it, around = Point(width / 2, height)) }
                     else                    -> Identity
@@ -93,6 +94,7 @@ class Calculator(
                 Point(x, height - it.height)
             }
 
+            // scaling, if present, is applied to the canvas before text rendered
             canvas.transform(textTransform) {
                 text(text, at = textPosition, font = font, color = foregroundColor ?: White)
             }
@@ -181,7 +183,6 @@ class Calculator(
             output.number *= 0.01
         }
     }
-//    @JsName("decimal")
     val decimal = func(".", background = numberColor, foreground = White).apply {
         fired += {
             if (decimalPlace == 1) {
@@ -193,7 +194,7 @@ class Calculator(
             }
         }
     }
-    @JsName("=")
+    @JsName("eq")
     val `=` = func("=", operatorColor, White).apply {
         fired += {
             compute()

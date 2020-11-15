@@ -7,9 +7,6 @@ kotlin {
     jvmTargets()
 
     val mockkVersion     : String by project
-    val junitVersion     : String by project
-    val log4jVersion     : String by project
-    val logbackVersion   : String by project
     val mockkJsVersion   : String by project
     val doodleVersion    : String by project
     val coroutinesVersion: String by project
@@ -43,11 +40,7 @@ kotlin {
 
         jvm().compilations["test"].defaultSourceSet {
             dependencies {
-                implementation("junit:junit:$junitVersion")
                 implementation(kotlin("test-junit"))
-
-                implementation("org.slf4j:slf4j-api:$log4jVersion")
-                implementation("ch.qos.logback:logback-classic:$logbackVersion")
                 implementation("io.mockk:mockk:$mockkVersion")
             }
         }

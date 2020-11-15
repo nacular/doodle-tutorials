@@ -18,6 +18,7 @@ class CalculatorApp(
         numberFormatter: NumberFormatter
 ): Application {
     init {
+        // creat and display a single Calculator
         display += Calculator(fontDetector, textMetrics, numberFormatter).apply {
             // layout the Display whenever the Calculator's size preferences are updated.
             // this allows us to constrain its size to match its ideal size (which it sets).
