@@ -1,4 +1,4 @@
-package io.nacular.examples
+package io.nacular.doodle.examples
 
 import io.nacular.doodle.application.Modules.Companion.PointerModule
 import io.nacular.doodle.application.application

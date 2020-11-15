@@ -1,4 +1,4 @@
-package io.nacular.examples
+package io.nacular.doodle.examples
 
 /**
  * Created by Nicholas Eddy on 8/19/20.

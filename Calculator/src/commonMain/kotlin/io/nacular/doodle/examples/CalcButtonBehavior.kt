@@ -1,4 +1,4 @@
-package io.nacular.examples
+package io.nacular.doodle.examples
 
 import io.nacular.doodle.controls.buttons.Button
 import io.nacular.doodle.controls.theme.CommonTextButtonBehavior

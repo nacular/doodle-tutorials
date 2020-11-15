@@ -3,8 +3,8 @@ import io.nacular.doodle.application.Modules
 import io.nacular.doodle.application.application
 import io.nacular.doodle.drawing.FontDetector
 import io.nacular.doodle.drawing.impl.FontDetectorImpl
-import io.nacular.examples.CalculatorApp
-import io.nacular.examples.NumberFormatterImpl
+import io.nacular.doodle.examples.CalculatorApp
+import io.nacular.doodle.examples.NumberFormatterImpl
 import org.kodein.di.Kodein
 import org.kodein.di.erased.bind
 import org.kodein.di.erased.instance

@@ -20,9 +20,9 @@ kotlin {
                 implementation(kotlin("stdlib-common"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:$coroutinesVersion")
 
-                api ("io.nacular.doodle:core:$doodleVersion"     )
-                api ("io.nacular.doodle:browser:$doodleVersion"  )
-                api ("io.nacular.doodle:controls:$doodleVersion" )
+                api ("io.nacular.doodle:core:$doodleVersion"    )
+                api ("io.nacular.doodle:browser:$doodleVersion" )
+                api ("io.nacular.doodle:controls:$doodleVersion")
             }
         }
 

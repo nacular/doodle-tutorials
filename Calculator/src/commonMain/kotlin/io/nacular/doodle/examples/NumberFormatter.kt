@@ -1,4 +1,4 @@
-package io.nacular.examples
+package io.nacular.doodle.examples
 
 /**
  * Provides number formatting

@@ -1,4 +1,4 @@
-package io.nacular.examples
+package io.nacular.doodle.examples
 
 import io.nacular.doodle.controls.buttons.Button
 import io.nacular.doodle.controls.buttons.ButtonGroup
@@ -29,6 +29,7 @@ import io.nacular.doodle.layout.constrain
 import io.nacular.doodle.system.Cursor.Companion.Pointer
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlin.js.JsName
 
 /**
  * Simple calculator with basic math operations.
@@ -50,7 +51,7 @@ class Calculator(
         private val defaultWidth get() = textMetrics.width("0", font)
 
         // Text inset from the left/right edge of the output
-        private val inset by lazy { (clear.width - defaultWidth) / 2 }
+        private val inset = 0.0 //by lazy { (clear.width - defaultWidth) / 2 }
 
         // Transform used to scale text down as it grows beyond window width
         private var textTransform = Identity
@@ -98,7 +99,7 @@ class Calculator(
         }
     }
 
-    private inner class OperatorButton(text: String, background: Color = operatorColor, foreground: Color = White, private val method: Double.(Double) -> Double): ToggleButton(text) {
+    inner class OperatorButton(text: String, background: Color = operatorColor, foreground: Color = White, private val method: Double.(Double) -> Double): ToggleButton(text) {
         init {
             configure(this, background, foreground)
 
@@ -109,7 +110,7 @@ class Calculator(
             }
         }
 
-        operator fun invoke(left: Double, right: Double) = method(left, right)
+        internal operator fun invoke(left: Double, right: Double) = method(left, right)
     }
 
     // endregion
@@ -129,10 +130,10 @@ class Calculator(
 
             when (field) {
                 null -> {
-                    div.selected   = false
-                    times.selected = false
-                    minus.selected = false
-                    plus.selected  = false
+                    `÷`.selected   = false
+                    `*`.selected = false
+                    `-`.selected = false
+                    `+`.selected  = false
                 }
             }
         }
@@ -150,19 +151,20 @@ class Calculator(
 
     private val output = Output()
 
-    private val div   = OperatorButton("÷", method = Double::div  )
-    private val times = OperatorButton("x", method = Double::times)
-    private val minus = OperatorButton("-", method = Double::minus)
-    private val plus  = OperatorButton("+", method = Double::plus )
+    val result get() = output.number
 
-    private val clear = func("AC").apply {
+    @JsName("div"  ) val `÷` = OperatorButton("÷", method = Double::div  )
+    @JsName("times") val `*` = OperatorButton("x", method = Double::times)
+    @JsName("minus") val `-` = OperatorButton("-", method = Double::minus)
+    @JsName("plus" ) val `+` = OperatorButton("+", method = Double::plus )
+
+    val clear  = func("AC" ).apply {
         fired += {
             output.number = 0.0
             clearInternalState()
         }
     }
-
-    private val negate = func("+/-").apply {
+    val negate = func("+/-").apply {
         fired += {
             if (reset) { output.number = 0.0 }
 
@@ -173,13 +175,14 @@ class Calculator(
         }
     }
 
-    private val percent = func("%").apply {
+    @JsName("percent")
+    val `%` = func("%").apply {
         fired += {
             output.number *= 0.01
         }
     }
-
-    private val decimal = func(".", background = numberColor).apply {
+//    @JsName("decimal")
+    val decimal = func(".", background = numberColor, foreground = White).apply {
         fired += {
             if (decimalPlace == 1) {
                 if (reset) { output.number = 0.0 }
@@ -190,13 +193,24 @@ class Calculator(
             }
         }
     }
-
-    private val eq = func("=", operatorColor, White).apply {
+    @JsName("=")
+    val `=` = func("=", operatorColor, White).apply {
         fired += {
             compute()
             clearInternalState()
         }
     }
+
+    @JsName("nine" ) val `9` = number(9)
+    @JsName("eight") val `8` = number(8)
+    @JsName("seven") val `7` = number(7)
+    @JsName("six"  ) val `6` = number(6)
+    @JsName("five" ) val `5` = number(5)
+    @JsName("four" ) val `4` = number(4)
+    @JsName("three") val `3` = number(3)
+    @JsName("two"  ) val `2` = number(2)
+    @JsName("one"  ) val `1` = number(1)
+    @JsName("zero" ) val `0` = number(0)
 
     // endregion
 
@@ -227,7 +241,6 @@ class Calculator(
         behavior        = CalcButtonBehavior(textMetrics)
         foregroundColor = foreground
         backgroundColor = background
-
     }
 
     // endregion
@@ -285,9 +298,9 @@ class Calculator(
             output.font = fonts(it) { size = 72; weight = 100 }
 
             fonts(it) { size -= 5; weight = 100 }.let { smallerFont ->
-                clear.font   = smallerFont
-                negate.font  = smallerFont
-                percent.font = smallerFont
+                clear.font  = smallerFont
+                negate.font = smallerFont
+                `%`.font    = smallerFont
             }
         }
     }
@@ -296,17 +309,17 @@ class Calculator(
         GlobalScope.launch {
             loadFonts()
 
-            ButtonGroup(allowDeselectAll = true, buttons = *arrayOf(div, times, minus, plus))
+            ButtonGroup(allowDeselectAll = true, buttons = *arrayOf(`÷`, `*`, `-`, `+`))
 
             val outputHeight  = 100.0
             val buttonSpacing =  10.0
 
             val gridPanel = GridPanel().apply {
-                add(clear,     0, 0); add(negate,    0, 1); add(percent,   0, 2); add(div,   0, 3)
-                add(number(7), 1, 0); add(number(8), 1, 1); add(number(9), 1, 2); add(times, 1, 3)
-                add(number(4), 2, 0); add(number(5), 2, 1); add(number(6), 2, 2); add(minus, 2, 3)
-                add(number(1), 3, 0); add(number(2), 3, 1); add(number(3), 3, 2); add(plus,  3, 3)
-                add(number(0), 4, 0,  columnSpan = 2     ); add(decimal,   4, 2); add(eq,    4, 3)
+                add(clear, 0, 0); add(negate, 0, 1); add(`%`, 0, 2); add(`÷`, 0, 3)
+                add(`7`,   1, 0); add(`8`,    1, 1); add(`9`, 1, 2); add(`*`, 1, 3)
+                add(`4`,   2, 0); add(`5`,    2, 1); add(`6`, 2, 2); add(`-`, 2, 3)
+                add(`1`,   3, 0); add(`2`,    3, 1); add(`3`, 3, 2); add(`+`, 3, 3)
+                add(`0`,   4, 0,  columnSpan = 2  ); add(decimal, 4, 2); add(`=`,  4, 3)
 
                 verticalSpacing   = buttonSpacing
                 horizontalSpacing = buttonSpacing
