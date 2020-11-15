@@ -68,8 +68,9 @@ kotlin {
 
 ## Defining Our Application
 
-All Doodle apps must implement the [`Application`]() interface. The framework will then initialize our app via the constructor. Our
-app will be fairly simple: just create an instance of our calculator and add it to the display.
+All Doodle apps must implement the [`Application`](https://github.com/nacular/doodle/blob/master/Core/src/commonMain/kotlin/io/nacular/doodle/application/Application.kt#L4)
+interface. The framework will then initialize our app via the constructor. Our app will be fairly simple: just create
+an instance of our calculator and add it to the display.
 
 Doodle apps can be defined in `commonMain`, since they do not require any platform-specific dependencies. Therefore, we will do
 the same and place ours in `commonMain/kotlin/io/nacular/doodle/examples`.
@@ -119,8 +120,9 @@ The `application` function is used to launch top-level apps. It takes a list of 
 app being launched. This lambda is within a Kodein injection context, which means we can inject dependencies into our app via
 `instance`, `provider`, etc.
 
-Notice that we have included the [`PointerModule`](). This is needed to enable mouse or pointer interactions. Our app will not
-directly know we loaded this module, but pointer related events will only work because we have.
+Notice that we have included the [`PointerModule`](https://github.com/nacular/doodle/blob/master/Browser/src/jsMain/kotlin/io/nacular/doodle/application/Modules.kt#L62).
+This is needed to enable mouse or pointer interactions. Our app will not directly know we loaded this module, but pointer
+related events will only work because we have.
 
 ?> Check out Kodein to learn more about how it handles dependency injection.
 
@@ -132,10 +134,10 @@ about an HTML element. And the reason is to support use-cases where apps are emb
 
 ## The Calculator View
 
-We will implement our calculator as a single [`View`]() that manages its state directly. This makes sense for simple use-cases,
-but might not be the right choice for larger apps.
+We will implement our calculator as a single [`View`](https://github.com/nacular/doodle/blob/master/Core/src/commonMain/kotlin/io/nacular/doodle/core/View.kt#L65)
+that manages its state directly. This makes sense for simple use-cases, but might not be the right choice for larger apps.
 
-This View will be broken into a hierarchy of views, with two top-level items: a custom output and a [`GridPanel`]().
+This View will be broken into a hierarchy of views, with two top-level items: a custom output and a [`GridPanel`](https://github.com/nacular/doodle/blob/master/Controls/src/commonMain/kotlin/io/nacular/doodle/controls/panels/GridPanel.kt#L42).
 
 <br>
 <img src="calc-top2.png" alt="doodle" style="">
@@ -150,8 +152,8 @@ proper alignment and scaling to avoid any clipping.
 ?> Notice how the output text starts off center aligned with the operator buttons; and how it shrinks as the number grows
 beyond the screen size.
 
-Take a look at the [**Output**]() class, and you will see it has a `text` property that it tracks the width of. It also
-uses `textTransform` to perform the text scaling.
+Take a look at the [**Output**](https://github.com/nacular/doodle-tutorials/blob/master/Calculator/src/commonMain/kotlin/io/nacular/doodle/examples/Calculator.kt#L48)
+class, and you will see it has a `text` property that it tracks the width of. It also uses `textTransform` to perform the text scaling.
 
 ```kotlin
 private inner class Output: View() {
@@ -207,7 +209,7 @@ constructor injection.
 
 That results in a constructor as follows:
 
-[**Calculator.kt**]()
+[**Calculator.kt**](https://github.com/nacular/doodle-tutorials/blob/master/Calculator/src/commonMain/kotlin/io/nacular/doodle/examples/Calculator.kt#L35)
 
 ```kotlin
 class Calculator(
@@ -266,10 +268,10 @@ We define a new `Module` to do so because it has dependencies that can be inject
 
 ## The Buttons
 
-We can manage the set of buttons within the calculator with a [`GridPanel`](). This way we get the layout support it provides.
+We can manage the set of buttons within the calculator with a `GridPanel`. This way we get the layout support it provides.
 This results in the following initialization for `Calculator`.
 
-[**Calculator.kt**]()
+[**Calculator.kt**](https://github.com/nacular/doodle-tutorials/blob/master/Calculator/src/commonMain/kotlin/io/nacular/doodle/examples/Calculator.kt#L35)
 
 ```kotlin
 class Calculator(/*...*/): View() {
