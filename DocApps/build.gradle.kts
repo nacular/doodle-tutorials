@@ -11,7 +11,7 @@ kotlin {
         }
 
         dceTask {
-            keep("doodle-tutorials-docapps.calculator")
+            keep("doodle-tutorials-DocApps.calculator")
         }
     }
 

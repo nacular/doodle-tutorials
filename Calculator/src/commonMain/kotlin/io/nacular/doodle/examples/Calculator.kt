@@ -51,7 +51,7 @@ class Calculator(
         private val defaultWidth get() = textMetrics.width("0", font)
 
         // Text inset from the left/right edge of the output
-        private val inset by lazy { (clear.width - defaultWidth) / 2 }
+        private val inset = 0 //by lazy { (clear.width - defaultWidth) / 2 }
 
         // Transform used to scale text down as it grows beyond window width
         private var textTransform = Identity
@@ -222,7 +222,6 @@ class Calculator(
     private fun number(number: Int                                                               ) = button("$number", background = numberColor).apply {
         fired += {
             committedOperator = activeOperator
-            activeOperator    = null
 
             val newDigit = (if (negated) -1 else 1) * number.toDouble()
 
