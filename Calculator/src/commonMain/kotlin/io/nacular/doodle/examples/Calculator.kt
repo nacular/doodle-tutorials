@@ -27,6 +27,7 @@ import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.layout.constant
 import io.nacular.doodle.layout.constrain
 import io.nacular.doodle.system.Cursor.Companion.Pointer
+import io.nacular.doodle.utils.roundToNearest
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlin.js.JsName
@@ -51,7 +52,7 @@ class Calculator(
         private val defaultWidth get() = textMetrics.width("0", font)
 
         // Text inset from the left/right edge of the output
-        private val inset = 0 //by lazy { (clear.width - defaultWidth) / 2 }
+        private val inset by lazy { (clear.width - defaultWidth) / 2 }
 
         // Transform used to scale text down as it grows beyond window width
         private var textTransform = Identity
@@ -228,7 +229,7 @@ class Calculator(
             output.number = when {
                 reset             -> number.toDouble()
                 decimalPlace == 1 -> output.number * 10 + newDigit
-                else              -> (output.number + newDigit / decimalPlace).also { decimalPlace *= 10 }
+                else              -> (output.number + newDigit / decimalPlace).roundToNearest(1.0 / decimalPlace).also { decimalPlace *= 10 }
             }
 
             reset = false

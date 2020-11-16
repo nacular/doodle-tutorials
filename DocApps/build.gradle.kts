@@ -21,10 +21,19 @@ kotlin {
     }
 }
 
-tasks.register<Copy>("copyOutput") {
-    val outputFile  = project.tasks.getByName("browserProductionWebpack", KotlinWebpack::class).outputFile
-    val dirToArchive = "$buildDir/../../docs"
+setupDocInstall("Development")
+setupDocInstall("Production" )
 
-    from(outputFile)
-    into(dirToArchive)
+fun setupDocInstall(suffix: String) {
+    tasks.register<Copy>("installDocApps$suffix") {
+        val webPack = project.tasks.getByName("browser${suffix}Webpack", KotlinWebpack::class)
+
+        dependsOn(webPack)
+
+        val outputFile  = webPack.outputFile
+        val dirToArchive = "$buildDir/../../docs"
+
+        from(outputFile)
+        into(dirToArchive)
+    }
 }

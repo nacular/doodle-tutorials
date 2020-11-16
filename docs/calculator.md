@@ -333,3 +333,51 @@ class Calculator(/*...*/): View() {
 
 The initialization steps are: **(1) load fonts**, **(2) setup buttons in GridPanel**, **(3) add Output and grid as children**,
 **(4) configure the layout**.
+
+This example uses non-standard/recommended property names for buttons to improve readability slightly. This also makes tests a little
+simpler to understand.
+
+## Button Styling
+
+The calculator buttons come in a few different color schemes. But they all share the same [`Behavior`](https://github.com/nacular/doodle/blob/master/Core/src/commonMain/kotlin/io/nacular/doodle/core/Behavior.kt#L7),
+defined by [`CalcButtonBehavior`](https://github.com/nacular/doodle-tutorials/blob/master/Calculator/src/commonMain/kotlin/io/nacular/doodle/examples/CalcButtonBehavior.kt#L16).
+Buttons--like many Views--let you define their look-and-feel using a `Behavior`. Ours is fairly simple; it draws the rounded rectangle
+for the button background and centers the text above it. These are both managed with the right color based on the button's state.
+It gets state tracking and text positiong for free via its base class: `CommonTextButtonBehavior`.
+
+## Custom Hit Detection
+
+`CalcButtonBehavior` provides a rounded style for our buttons. But the default hit-detection for Views is tied to their rectangular
+bounds. We can fix this by writing custom pointer hit-detection in our behavior.
+
+```kotlin
+class CalcButtonBehavior(textMetrics: TextMetrics): CommonTextButtonBehavior<Button>(textMetrics) {
+    //...
+
+    override fun contains(view: Button, point: Point): Boolean {
+        val radius      = view.height / 2
+        val leftCircle  = Circle(center = Point(view.x + radius,            view.center.y), radius = radius)
+        val rightCircle = Circle(center = Point(view.bounds.right - radius, view.center.y), radius = radius)
+
+        return when {
+            point.x < radius              -> point in leftCircle
+            point.x > view.width - radius -> point in rightCircle
+            else                          -> point in view.bounds
+        }
+    }
+}
+```
+
+The `contains(Button, Point)` method is called by `Button` to check whether the pointer is within its bounds. This logic ensures
+the pointer will only "hit" our button when it goes within the rounded rectangle.
+
+?> The `contains` check provides a `Point` in the View's **parent's** coordinates.
+
+## Testing
+
+Common code testing is one reason to use a multi-platform setup. Doodle is designed to avoid platform specific dependencies except in the
+small amount of launch code. This means we can easily test `Calculator` and the other components by writing tests in `commonTest`
+and running them on the JVM target. One advantage is the speed of running these tests, since there are no external dependencies.
+
+The tests in [`CalculatorTests`](https://github.com/nacular/doodle-tutorials/blob/master/Calculator/src/commonTest/kotlin/io/nacular/doodle/examples/CalculatorTests.kt#L13)
+are a bit contrived, but they illustrate how you might validate various parts of your app.
