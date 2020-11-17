@@ -14,7 +14,7 @@ actual interface NumberFormatter {
  * NumberFormatter based on native JS impl.
  */
 class NumberFormatterImpl: NumberFormatter {
-    private val formatter = js("new Intl.NumberFormat('en-US', {maximumFractionDigits: 20})")
+    private val formatter = js("new Intl.NumberFormat('en-US', {maximumFractionDigits: 10})")
 
     override fun invoke(number: Int   ) = formatter.format(number)
     override fun invoke(number: Long  ) = formatter.format(number)

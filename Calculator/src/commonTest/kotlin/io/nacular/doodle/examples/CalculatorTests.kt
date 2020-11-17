@@ -29,7 +29,7 @@ class CalculatorTests {
     }
 
     @Test @JsName("negationToggles")
-    fun `- - 234 = 234`() {
+    fun `- - 2 3 4 = 234`() {
         expect(234.0) { compute { listOf(negate, negate, `2`, `3`, `4`, `=`) } }
     }
 

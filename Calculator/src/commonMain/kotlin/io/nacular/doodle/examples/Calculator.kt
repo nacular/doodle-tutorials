@@ -31,6 +31,7 @@ import io.nacular.doodle.utils.roundToNearest
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlin.js.JsName
+import kotlin.math.pow
 
 /**
  * Simple calculator with basic math operations.
@@ -145,7 +146,7 @@ class Calculator(
     private var negated           = false                   // tracks whether number is negative
     private var leftValue         = null as Double?         // left-side operand
     private var rightValue        = null as Double?         // right-side operand
-    private var decimalPlace      = 1                       // tracks decimal place for fractions
+    private var decimalPlace      = 0                       // tracks decimal place for fractions
     private var committedOperator = null as OperatorButton? // operator to be applied to left and right values
 
     // endregion
@@ -186,12 +187,12 @@ class Calculator(
     }
     val decimal = func(".", background = numberColor, foreground = White).apply {
         fired += {
-            if (decimalPlace == 1) {
+            if (decimalPlace == 0) {
                 if (reset) { output.number = 0.0 }
 
                 reset        = false
                 output.text += "."   // bit of a hack/short-cut since the number formatter should be used
-                decimalPlace = 10
+                decimalPlace = 1
             }
         }
     }
@@ -228,8 +229,13 @@ class Calculator(
 
             output.number = when {
                 reset             -> number.toDouble()
-                decimalPlace == 1 -> output.number * 10 + newDigit
-                else              -> (output.number + newDigit / decimalPlace).roundToNearest(1.0 / decimalPlace).also { decimalPlace *= 10 }
+                decimalPlace == 0 -> output.number * 10 + newDigit
+                decimalPlace < 10 -> {
+                    val fraction = 1 / 10.0.pow(decimalPlace)
+
+                    (output.number + newDigit * fraction).roundToNearest(fraction).also { ++decimalPlace }
+                }
+                else              -> output.number
             }
 
             reset = false
@@ -269,7 +275,7 @@ class Calculator(
         }
 
         reset        = true
-        decimalPlace = 1
+        decimalPlace = 0
     }
 
     /**
@@ -277,9 +283,10 @@ class Calculator(
      */
     private fun clearInternalState() {
         reset             = true
+        negated           = false
         leftValue         = null
         rightValue        = null
-        decimalPlace      = 1
+        decimalPlace      = 0
         activeOperator    = null
         committedOperator = null
 
