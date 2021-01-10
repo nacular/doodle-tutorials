@@ -20,5 +20,6 @@ rootProject.name = "doodle-tutorials"
 
 include(
     "Calculator",
+    "Todo",
     "DocApps"
 )
