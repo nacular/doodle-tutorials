@@ -16,7 +16,7 @@ import io.nacular.doodle.drawing.Color.Companion.Darkgray
 import io.nacular.doodle.drawing.Color.Companion.Lightgray
 import io.nacular.doodle.drawing.Color.Companion.Orange
 import io.nacular.doodle.drawing.Color.Companion.White
-import io.nacular.doodle.drawing.FontDetector
+import io.nacular.doodle.drawing.FontLoader
 import io.nacular.doodle.drawing.TextMetrics
 import io.nacular.doodle.drawing.darker
 import io.nacular.doodle.drawing.lighter
@@ -41,7 +41,7 @@ import kotlin.math.pow
  * @property numberFormatter used to display number output
  */
 class Calculator(
-        private val fonts          : FontDetector,
+        private val fonts          : FontLoader,
         private val textMetrics    : TextMetrics,
         private val numberFormatter: NumberFormatter
 ): View() {
@@ -329,8 +329,8 @@ class Calculator(
                 add(`1`,   3, 0); add(`2`,    3, 1); add(`3`, 3, 2); add(`+`, 3, 3)
                 add(`0`,   4, 0,  columnSpan = 2  ); add(decimal, 4, 2); add(`=`,  4, 3)
 
-                verticalSpacing   = buttonSpacing
-                horizontalSpacing = buttonSpacing
+                verticalSpacing   = { buttonSpacing }
+                horizontalSpacing = { buttonSpacing }
             }
 
             children += listOf(output, gridPanel)

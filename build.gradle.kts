@@ -9,11 +9,12 @@ buildscript {
 
     dependencies {
         classpath ("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+        classpath ("org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion")
     }
 }
 
 plugins {
-    kotlin("multiplatform")
+    kotlin("multiplatform") apply false
 }
 
 allprojects {

@@ -1,5 +1,6 @@
 plugins {
-    kotlin("multiplatform")
+    kotlin("multiplatform"       )
+    kotlin("plugin.serialization")
 }
 
 kotlin {
@@ -16,6 +17,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("stdlib-common"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:$coroutinesVersion")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
 
                 api ("io.nacular.doodle:core:$doodleVersion"    )
                 api ("io.nacular.doodle:browser:$doodleVersion" )

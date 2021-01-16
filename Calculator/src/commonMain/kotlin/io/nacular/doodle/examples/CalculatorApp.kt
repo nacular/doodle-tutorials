@@ -3,7 +3,7 @@ package io.nacular.doodle.examples
 import io.nacular.doodle.application.Application
 import io.nacular.doodle.core.Display
 import io.nacular.doodle.core.plusAssign
-import io.nacular.doodle.drawing.FontDetector
+import io.nacular.doodle.drawing.FontLoader
 import io.nacular.doodle.drawing.TextMetrics
 import io.nacular.doodle.layout.constant
 import io.nacular.doodle.layout.constrain
@@ -14,7 +14,7 @@ import io.nacular.doodle.layout.constrain
 class CalculatorApp(
         display        : Display,
         textMetrics    : TextMetrics,
-        fontDetector   : FontDetector,
+        fontDetector   : FontLoader,
         numberFormatter: NumberFormatter
 ): Application {
     init {

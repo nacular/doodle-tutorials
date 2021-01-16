@@ -5,13 +5,15 @@ plugins {
 }
 
 kotlin {
-    kotlin.target.browser {
-        testTask {
-            enabled = false
-        }
+    js {
+        browser {
+            testTask {
+                enabled = false
+            }
 
-        dceTask {
-            keep("doodle-tutorials-DocApps.calculator")
+            dceTask {
+                keep("doodle-tutorials-DocApps.calculator")
+            }
         }
     }
 
