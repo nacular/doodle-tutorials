@@ -27,7 +27,7 @@ import io.nacular.doodle.theme.ThemeManager
 import io.nacular.doodle.theme.adhoc.DynamicTheme
 import io.nacular.doodle.theme.basic.list.*
 import io.nacular.doodle.utils.Encoder
-import io.nacular.doodle.utils.HorizontalAlignment.Left
+import io.nacular.doodle.utils.HorizontalAlignment.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -64,6 +64,7 @@ class CreationBox(private val focusManager: FocusManager, font: Font, placeHolde
             }
         }
 
+        height    = 65.0
         children += button
         children += TextField().apply {
             this.font        = font
@@ -87,7 +88,7 @@ class CreationBox(private val focusManager: FocusManager, font: Font, placeHolde
         }
 
         dataStore.tasksChanged += {
-            button.visible = it.size > 0
+            button.visible = !it.isEmpty
             button.rerender()
         }
 
@@ -181,7 +182,16 @@ class TaskView(task: Task, dataStore: DataStore, toggleBackground: Image, select
     }
 }
 
-data class TodoConfig(val largeFont: Font, val mediumFont: Font, val italicFont: Font, val checkBackground: Image, val checkImage: Image)
+data class TodoConfig(
+        val largeFont      : Font,
+        val mediumFont     : Font,
+        val smallFont      : Font,
+        val italicFont     : Font,
+        val footerFont     : Font,
+        val boldFooterFont : Font,
+        val checkBackground: Image,
+        val checkImage     : Image
+)
 
 class TaskEditOperation(focusManager: FocusManager?,
                         list        : MutableList<Task, *>,
@@ -205,6 +215,120 @@ class TaskEditOperation(focusManager: FocusManager?,
             it.right  = parent.right
             it.height = parent.height
         }
+    }
+}
+
+class FooterInfo(private val textMetrics: TextMetrics, private val config: TodoConfig): View() {
+    private fun footerLabel(text: String) = Label(text).apply {
+        font            = config.footerFont
+        fitText         = setOf(TextFit.Height)
+        acceptsThemes   = false
+        foregroundColor = Color(0xBFBFBFu)
+        backgroundColor = null
+        behavior        = object: CommonLabelBehavior(textMetrics) {
+            override fun render(view: Label, canvas: Canvas) {
+                canvas.outerShadow(vertical = 1.0, blurRadius = 0.0, color = White opacity 0.5f) {
+                    super.render(view, this)
+                }
+            }
+        }
+    }
+
+    private fun linkLabel(text: String, linkText: String, url: String) = container {
+        val link  = HyperLink(url, linkText).apply { foregroundColor = Color(0xBFBFBFu); font = config.boldFooterFont }
+        children += listOf(footerLabel(text), link)
+        layout    = HorizontalFlowLayout(justification = Center) then {
+            height = children.maxOf { it.height }
+        }
+    }
+
+    init {
+        children += footerLabel("Double-click to edit a todo")
+        children += linkLabel("Created by ", "Nick Eddy", "https://github.com/pusolito")
+        children += linkLabel("Part of ", "TodoMVC", "http://todomvc.com")
+
+        layout = ListLayout(widthSource = Parent, spacing = 10) then {
+            height = children.lastOrNull()?.bounds?.bottom ?: 0.0
+        }
+    }
+}
+
+open class FooterButtonBehavior(private val textMetrics: TextMetrics, private val font: Font?): CommonTextButtonBehavior<Button>(textMetrics) {
+
+    override fun install(view: Button) {
+        super.install(view)
+
+        view.size = textMetrics.size(view.text, font).run { Size(width + 16, height + 8) }
+    }
+
+    override fun render(view: Button, canvas: Canvas) {
+        if (view.text.isNotBlank()) {
+            canvas.text(view.text, font(view), textPosition(view), ColorFill(Color(0x777777u)))
+        }
+    }
+}
+
+class FilterBox(private val textMetrics: TextMetrics, private val dataStore: DataStore, font: Font): View() {
+    private fun filterButton(text: String): ToggleButton = ToggleButton(text).apply {
+        behavior = object: FooterButtonBehavior(textMetrics, this@FilterBox.font) {
+            override fun render(view: Button, canvas: Canvas) {
+                if (view.model.pointerOver || view.model.selected) {
+                    canvas.rect(view.bounds.atOrigin.inset(0.5), radius = 3.0, stroke = Stroke(when {
+                        view.model.selected -> Color(0xAF2F2Fu) opacity 0.2f
+                        else                -> Color(0xAF2F2Fu) opacity 0.1f
+                    }))
+                }
+
+                super.render(view, canvas)
+            }
+        }
+    }
+
+    private fun updateLabel(label: Label) {
+        label.text = dataStore.active.size.let { active -> "$active ${if (active > 1) "Items" else "Item"} left" }
+    }
+
+    init {
+        this.font     = font
+
+        val label     = Label()
+        val all       = filterButton("All"            )
+        val active    = filterButton("Active"         )
+        val completed = filterButton("Completed"      )
+        val clearAll  = ToggleButton("Clear completed").apply {
+            behavior = FooterButtonBehavior(textMetrics, font)
+            fired += { dataStore.removeCompleted() }
+        }
+
+        updateLabel(label)
+        clearAll.visible = dataStore.completed.isNotEmpty()
+        visible = !dataStore.isEmpty
+
+        dataStore.tasksChanged += {
+            visible = !it.isEmpty
+            updateLabel(label)
+            clearAll.visible = it.completed.isNotEmpty()
+        }
+
+        height    = 41.0
+        children += listOf(label, all, active, completed, clearAll)
+
+        layout = constrain(label, all, active, completed, clearAll) { label, all_, active_, completed_, clearAll ->
+            val spacing = 6.0
+
+            listOf(label, all_, active_, completed_, clearAll).forEach { it.centerY = parent.centerY }
+
+            label.left     = parent.left  + 15
+            clearAll.right = parent.right - 15
+
+            all_.left       = parent.left + (parent.width - { all.width + active.width + completed.width + spacing * 2 }) / 2
+            active_.left    = all_.right    + spacing
+            completed_.left = active_.right + spacing
+        }
+    }
+
+    override fun render(canvas: Canvas) {
+        canvas.line(Point(y = 0.5), Point(width, 0.5), Stroke(Color(0xEDEDEDu)))
     }
 }
 
@@ -251,31 +375,34 @@ class Todo(focusManager: FocusManager, textMetrics: TextMetrics, config: TodoCon
                     editor = listEditor { list, row, _, current -> TaskEditOperation(focusManager, list, row, current) }
                 }
 
-                children += CreationBox(focusManager, config.mediumFont, config.italicFont, model).apply { height = 65.0 }
+                children += CreationBox(focusManager, config.mediumFont, config.italicFont, model)
                 children += list
+                children += FilterBox(textMetrics, model, config.smallFont)
 
-                val listLayout = ListLayout(widthSource = Parent)
-
-                layout = simpleLayout { container ->
-                    listLayout.layout(container)
-
-                    height = children[1].bounds.bottom
+                layout = ListLayout(widthSource = Parent) then {
+                    height = children.last { it.visible }?.bounds?.bottom ?: 0.0
                 }
             }
 
             override fun render(canvas: Canvas) {
                 canvas.outerShadow(vertical =  2.0, blurRadius =  4.0, color = Black opacity 0.2f) {
-                    outerShadow   (vertical = 25.0, blurRadius = 60.0, color = Black opacity 0.1f) {
+                    outerShadow   (vertical = 25.0, blurRadius = 50.0, color = Black opacity 0.1f) {
                         rect(bounds.atOrigin, color = White)
                     }
                 }
             }
         }
 
-        layout = constrain(children[0], children[1]) { header, contents ->
+        children += FooterInfo(textMetrics, config)
+
+        layout = constrain(children[0], children[1], children[2]) { header, contents, footer ->
+            header.top       = parent.top + 9
             header.centerX   = parent.centerX
-            contents.top     = header.bottom
+            contents.top     = header.bottom + 5
             contents.centerX = parent.centerX
+            footer.top       = contents.bottom + 65
+            footer.centerX   = parent.centerX
+            footer.width     = contents.width
         }
     }
 }
@@ -296,8 +423,11 @@ class TodoApp(display        : Display,
                 family = "Helvetica Neue"
             }
 
-            val mediumFont = fonts(largeFont ) { size  = 24     }
-            val italicFont = fonts(mediumFont) { style = Italic }
+            val mediumFont     = fonts(largeFont ) { size   = 24     }
+            val smallFont      = fonts(largeFont ) { size   = 14     }
+            val italicFont     = fonts(mediumFont) { style  = Italic }
+            val footerFont     = fonts(largeFont ) { size   = 10     }
+            val boldFooterFont = fonts(footerFont) { weight = 400    }
 
             val toggleBackground = images.load("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%22-10%20-18%20100%20135%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2250%22%20fill%3D%22none%22%20stroke%3D%22%23ededed%22%20stroke-width%3D%223%22/%3E%3C/svg%3E")
             val selectedImage    = images.load("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%22-10%20-18%20100%20135%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2250%22%20fill%3D%22none%22%20stroke%3D%22%23bddad5%22%20stroke-width%3D%223%22/%3E%3Cpath%20fill%3D%22%235dc2af%22%20d%3D%22M72%2025L42%2071%2027%2056l-4%204%2020%2020%2034-52z%22/%3E%3C/svg%3E")
@@ -310,7 +440,7 @@ class TodoApp(display        : Display,
                 }
             }
 
-            display += Todo(focusManager, textMetrics, TodoConfig(largeFont, mediumFont, italicFont,  toggleBackground!!, selectedImage!!), tasks)
+            display += Todo(focusManager, textMetrics, TodoConfig(largeFont, mediumFont, smallFont, italicFont, footerFont, boldFooterFont, toggleBackground!!, selectedImage!!), tasks)
             display.layout = constrain(display.children[0]) { fill(it) }
             display.fill(ColorFill(Color(0xF5F5F5u)))
         }

@@ -31,6 +31,7 @@ interface DataStore {
     fun markCompleted   (value: Task  )
     fun markAllActive   (             )
     fun markAllCompleted(             )
+    fun removeCompleted (             )
 }
 
 interface DataStoreListModel: DataStore, MutableListModel<Task> {
@@ -79,6 +80,10 @@ class SimpleDataStore private constructor(override val tasks: ObservableList<Tas
         tasks.indexOf(value).takeIf { it > -1 }?.let {
             set(it, Task(value.text, completed = true))
         }
+    }
+
+    override fun removeCompleted() {
+        tasks.removeAll(completed)
     }
 
     override val isEmpty get() = super<SimpleMutableListModel>.isEmpty
