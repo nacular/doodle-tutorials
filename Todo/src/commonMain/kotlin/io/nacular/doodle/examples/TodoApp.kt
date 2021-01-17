@@ -1,5 +1,4 @@
 @file:Suppress("EXPERIMENTAL_UNSIGNED_LITERALS")
-
 package io.nacular.doodle.examples
 
 import io.nacular.doodle.application.Application
@@ -23,6 +22,9 @@ import io.nacular.doodle.layout.*
 import io.nacular.doodle.layout.WidthSource.Parent
 import io.nacular.doodle.system.Cursor
 import io.nacular.doodle.system.Cursor.Companion.Default
+import io.nacular.doodle.text.TextDecoration
+import io.nacular.doodle.text.TextDecoration.Line.*
+import io.nacular.doodle.text.invoke
 import io.nacular.doodle.theme.ThemeManager
 import io.nacular.doodle.theme.adhoc.DynamicTheme
 import io.nacular.doodle.theme.basic.list.*
@@ -110,12 +112,18 @@ class CreationBox(private val focusManager: FocusManager, font: Font, placeHolde
     }
 }
 
+private val lineThrough = TextDecoration(lines = setOf(Through))
+private val underLine   = TextDecoration(lines = setOf(Under  ))
+
 class TaskView(task: Task, dataStore: DataStore, toggleBackground: Image, selectedImage: Image): View() {
     var task = task
         set(new) {
             field          = new
-            label.text     = new.text
             check.selected = field.completed
+            when {
+                field.completed -> label.styledText = (Color(0xD9D9D9u)) { lineThrough(new.text) }
+                else            -> label.text       = new.text
+            }
         }
 
     private val check = CheckBox().apply {
@@ -244,7 +252,7 @@ class FooterInfo(private val textMetrics: TextMetrics, private val config: TodoC
 
     init {
         children += footerLabel("Double-click to edit a todo")
-        children += linkLabel("Created by ", "Nick Eddy", "https://github.com/pusolito")
+        children += linkLabel("Created with ", "Doodle", "https://github.com/nacular/doodle")
         children += linkLabel("Part of ", "TodoMVC", "http://todomvc.com")
 
         layout = ListLayout(widthSource = Parent, spacing = 10) then {
@@ -253,12 +261,17 @@ class FooterInfo(private val textMetrics: TextMetrics, private val config: TodoC
     }
 }
 
-open class FooterButtonBehavior(private val textMetrics: TextMetrics, private val font: Font?): CommonTextButtonBehavior<Button>(textMetrics) {
+open class FooterButtonBehavior(
+        private val textMetrics: TextMetrics,
+        private val font       : Font?,
+        private val widthInset : Double = 16.0,
+        private val heightInset: Double =  8.0
+): CommonTextButtonBehavior<Button>(textMetrics) {
 
     override fun install(view: Button) {
         super.install(view)
 
-        view.size = textMetrics.size(view.text, font).run { Size(width + 16, height + 8) }
+        view.size = textMetrics.size(view.text, font).run { Size(width + widthInset, height + heightInset) }
     }
 
     override fun render(view: Button, canvas: Canvas) {
@@ -295,8 +308,18 @@ class FilterBox(private val textMetrics: TextMetrics, private val dataStore: Dat
         val all       = filterButton("All"            )
         val active    = filterButton("Active"         )
         val completed = filterButton("Completed"      )
-        val clearAll  = ToggleButton("Clear completed").apply {
-            behavior = FooterButtonBehavior(textMetrics, font)
+        val clearAll  = PushButton  ("Clear completed").apply {
+            behavior = object: FooterButtonBehavior(textMetrics, font, widthInset = 30.0) {
+                override fun render(view: Button, canvas: Canvas) {
+                    if (view.text.isNotBlank()) {
+                        val color = Color(0x777777u)
+                        when {
+                            model.pointerOver -> canvas.text(underLine { color { font(view)(view.text) } }, textPosition(view))
+                            else              -> canvas.text(view.text, font(view), textPosition(view), ColorFill(color))
+                        }
+                    }
+                }
+            }
             fired += { dataStore.removeCompleted() }
         }
 
@@ -318,8 +341,9 @@ class FilterBox(private val textMetrics: TextMetrics, private val dataStore: Dat
 
             listOf(label, all_, active_, completed_, clearAll).forEach { it.centerY = parent.centerY }
 
-            label.left     = parent.left  + 15
-            clearAll.right = parent.right - 15
+            label.left      = parent.left  + 15
+            clearAll.right  = parent.right
+            clearAll.height = parent.height
 
             all_.left       = parent.left + (parent.width - { all.width + active.width + completed.width + spacing * 2 }) / 2
             active_.left    = all_.right    + spacing
