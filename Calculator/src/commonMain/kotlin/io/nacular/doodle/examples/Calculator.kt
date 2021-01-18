@@ -289,7 +289,6 @@ class Calculator(
         decimalPlace      = 0
         activeOperator    = null
         committedOperator = null
-
     }
 
     /**

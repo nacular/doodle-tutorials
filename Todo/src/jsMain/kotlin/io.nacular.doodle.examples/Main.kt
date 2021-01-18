@@ -5,7 +5,6 @@ import io.nacular.doodle.application.Modules.Companion.KeyboardModule
 import io.nacular.doodle.application.Modules.Companion.PointerModule
 import io.nacular.doodle.application.application
 import io.nacular.doodle.drawing.Color
-import io.nacular.doodle.drawing.impl.NativeHyperLink
 import io.nacular.doodle.image.ImageLoader
 import io.nacular.doodle.image.impl.ImageLoaderImpl
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicLabelBehavior

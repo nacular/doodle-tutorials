@@ -5,6 +5,7 @@ import io.nacular.doodle.application.Application
 import io.nacular.doodle.controls.*
 import io.nacular.doodle.controls.buttons.*
 import io.nacular.doodle.controls.list.*
+import io.nacular.doodle.controls.list.MutableList
 import io.nacular.doodle.controls.text.*
 import io.nacular.doodle.controls.theme.*
 import io.nacular.doodle.core.*
@@ -15,6 +16,8 @@ import io.nacular.doodle.drawing.Color.Companion.White
 import io.nacular.doodle.drawing.Font
 import io.nacular.doodle.drawing.Font.Style.Italic
 import io.nacular.doodle.event.*
+import io.nacular.doodle.event.KeyListener.Companion.released as keyReleased
+import io.nacular.doodle.event.PointerListener.Companion.released
 import io.nacular.doodle.focus.FocusManager
 import io.nacular.doodle.geometry.*
 import io.nacular.doodle.image.*
@@ -76,14 +79,12 @@ class CreationBox(private val focusManager: FocusManager, font: Font, placeHolde
             placeHolderColor = Color(0xE6E6E6u)
             this.placeHolderFont = placeHolderFont
 
-            keyChanged += object: KeyListener {
-                override fun keyReleased(event: KeyEvent) {
-                    when {
-                        event.code == KeyCode.Enter && text.isNotBlank() -> {
-                            dataStore.add(text)
+            keyChanged += keyReleased { event ->
+                when {
+                    event.code == KeyCode.Enter && text.isNotBlank() -> {
+                        dataStore.add(text)
 
-                            text = ""
-                        }
+                        text = ""
                     }
                 }
             }
