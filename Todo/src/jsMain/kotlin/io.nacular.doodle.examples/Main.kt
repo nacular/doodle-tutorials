@@ -10,32 +10,10 @@ import io.nacular.doodle.image.impl.ImageLoaderImpl
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicLabelBehavior
 import io.nacular.doodle.theme.native.NativeTheme.Companion.NativeHyperLinkBehavior
 import io.nacular.doodle.theme.native.NativeTheme.Companion.NativeTextFieldBehavior
-import kotlinx.browser.localStorage
-import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.json.Json
 import org.kodein.di.Kodein.Module
 import org.kodein.di.erased.bind
 import org.kodein.di.erased.instance
 import org.kodein.di.erased.singleton
-import org.w3c.dom.get
-import org.w3c.dom.set
-
-/**
- * Creates a [TodoApp]
- */
-class LocalStorePersistence: PersistentStore {
-    private val name       = "doodle-todos"
-    private val serializer = ListSerializer(Task.serializer())
-
-    override fun loadTasks() = when (val stored = localStorage[name]) {
-        null -> emptyList()
-        else -> Json.decodeFromString(serializer, stored)
-    }
-
-    override fun save(tasks: List<Task>) {
-        localStorage[name] = Json.encodeToString(serializer, tasks)
-    }
-}
 
 fun main() {
     application(modules = listOf(
