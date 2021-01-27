@@ -4,7 +4,6 @@
      -webkit-transition: .2s;
     transition: .2s;
     line-height: initial;
-
 }
 
 .doodle div:focus {
@@ -18,4 +17,8 @@
 .doodle.hover {
     -webkit-box-shadow: 0 0 18px rgba(0,0,0,0.1), 0 2px 8px 0 rgba(0,0,0,0.1);
     box-shadow        : 0 0 18px rgba(0,0,0,0.1), 0 2px 8px 0 rgba(0,0,0,0.1);
+}
+
+.doodle img {
+    max-width: unset;
 }

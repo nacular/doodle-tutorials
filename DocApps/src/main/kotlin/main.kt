@@ -32,7 +32,7 @@ fun calculator(element: HTMLElement) {
 
 @JsName("todo")
 fun todo(element: HTMLElement) {
-    application(modules = listOf(
+    application(root = element, modules = listOf(
         FontModule,
         PointerModule,
         KeyboardModule,

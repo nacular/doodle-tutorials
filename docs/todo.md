@@ -5,7 +5,7 @@
 ```doodle
 {
     "border": false,
-    "height": "500px",
+    "height": "700px",
     "run"   : "DocApps.todo"
 }
 ```
