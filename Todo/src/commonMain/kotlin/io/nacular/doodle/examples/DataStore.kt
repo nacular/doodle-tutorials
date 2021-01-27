@@ -57,7 +57,7 @@ class SimpleDataStore private constructor(override val tasks: ObservableList<Tas
     override fun markAllCompleted() {
         tasks.batch {
             forEachIndexed { index, item ->
-                set(index, Task(item.text, completed = true))
+                setCompleted(this, item, index, true)
             }
         }
     }
@@ -65,20 +65,35 @@ class SimpleDataStore private constructor(override val tasks: ObservableList<Tas
     override fun markAllActive() {
         tasks.batch {
             forEachIndexed { index, item ->
-                set(index, Task(item.text, completed = false))
+                setCompleted(this, item, index, false)
             }
         }
     }
 
     override fun markActive(value: Task) {
         tasks.indexOf(value).takeIf { it > -1 }?.let {
-            set(it, Task(value.text, completed = false))
+            setCompleted(value, it, false)
         }
     }
 
     override fun markCompleted(value: Task) {
         tasks.indexOf(value).takeIf { it > -1 }?.let {
-            set(it, Task(value.text, completed = true))
+            setCompleted(value, it, true)
+        }
+    }
+
+    private fun setCompleted(task: Task, index: Int, completed: Boolean) {
+        if (this[index]?.completed != completed) {
+            set(index, Task(task.text, completed = completed))
+        }
+    }
+
+    private fun setCompleted(list: MutableList<Task>, task: Task, index: Int, completed: Boolean) {
+        if (list[index].completed != completed) {
+            when {
+                task.text.isBlank() -> list.removeAt(index)
+                else                -> list[index] = Task(task.text, completed = completed)
+            }
         }
     }
 

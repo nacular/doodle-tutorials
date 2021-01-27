@@ -9,4 +9,8 @@
 
 A collection of tutorials to help you learn how to use [Doodle](https://nacular.github.io/doodle).
 
+- #### [Calculator](/calculator)
+- #### [TodoMVC](/todo)
+
 - #### [Calculator](https://nacular.github.io/doodle-tutorials/#/calculator)
+- #### [TodoMVC](https://nacular.github.io/doodle-tutorials/#/todo)

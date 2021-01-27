@@ -6,6 +6,7 @@ import io.nacular.doodle.controls.*
 import io.nacular.doodle.controls.buttons.*
 import io.nacular.doodle.controls.list.*
 import io.nacular.doodle.controls.list.MutableList
+import io.nacular.doodle.controls.panels.ScrollPanel
 import io.nacular.doodle.controls.text.*
 import io.nacular.doodle.controls.theme.*
 import io.nacular.doodle.core.*
@@ -35,6 +36,7 @@ import io.nacular.doodle.utils.Encoder
 import io.nacular.doodle.utils.HorizontalAlignment.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlin.math.min
 
 class CreationBox(private val focusManager: FocusManager, font: Font, placeHolderFont: Font, dataStore: DataStore): View() {
     init {
@@ -82,7 +84,7 @@ class CreationBox(private val focusManager: FocusManager, font: Font, placeHolde
             keyChanged += keyReleased { event ->
                 when {
                     event.code == KeyCode.Enter && text.isNotBlank() -> {
-                        dataStore.add(text)
+                        dataStore.add(text.trim())
 
                         text = ""
                     }
@@ -359,14 +361,16 @@ class FilterBox(private val textMetrics: TextMetrics, private val dataStore: Dat
 
 class Todo(focusManager: FocusManager, textMetrics: TextMetrics, config: TodoConfig, model: DataStoreListModel): View() {
     init {
-        children += Label("todos").apply {
+        val header = Label("todos").apply {
             font            = config.largeFont
             foregroundColor = Color(0xAF2F2FU) opacity 0.15f
             acceptsThemes   = false
             behavior        = CommonLabelBehavior(textMetrics)
         }
 
-        children += object: View() {
+        val footer = FooterInfo(textMetrics, config)
+
+        val body = object: Container() {
             init {
                 width              = 550.0
                 clipCanvasToBounds = false
@@ -401,11 +405,37 @@ class Todo(focusManager: FocusManager, textMetrics: TextMetrics, config: TodoCon
                 }
 
                 children += CreationBox(focusManager, config.mediumFont, config.italicFont, model)
-                children += list
+                children += ScrollPanel(list).apply { contentWidthConstraints = { parent.width } }
                 children += FilterBox(textMetrics, model, config.smallFont)
 
-                layout = ListLayout(widthSource = Parent) then {
-                    height = children.last { it.visible }?.bounds?.bottom ?: 0.0
+                layout = constrain(children[0], children[1], children[2]) { input, panel, filter ->
+                    input.top     = parent.top
+                    input.width   = parent.width
+                    panel.top     = input.bottom
+                    panel.width   = parent.width
+                    panel.height  = parent.height - input.height - filter.height
+                    filter.bottom = parent.bottom
+                    filter.width  = parent.width
+                } then {
+                    val oldHeight = height
+                    height = min(
+                            children[0].height + list.height + (children[2].takeIf { it.visible }?.height ?: 0.0),
+                            parent!!.height - (y + footer.height + 65 + 5)
+                    )
+
+                    if (oldHeight != height) doLayout()
+                }
+
+                list.itemsChanged += { _, removed, added, moved ->
+                    if (added.size == 1 && moved.isEmpty() && removed.size <= 1) {
+                        list.scrollTo(added.keys.first())
+                    }
+                }
+
+                list.boundsChanged += { _, old, new ->
+                    if (old.width != new.width || old.height != new.height) {
+                        this@Todo.relayout()
+                    }
                 }
             }
 
@@ -418,7 +448,7 @@ class Todo(focusManager: FocusManager, textMetrics: TextMetrics, config: TodoCon
             }
         }
 
-        children += FooterInfo(textMetrics, config)
+        children += listOf(header, body, footer)
 
         layout = constrain(children[0], children[1], children[2]) { header, contents, footer ->
             header.top       = parent.top + 9
@@ -428,6 +458,8 @@ class Todo(focusManager: FocusManager, textMetrics: TextMetrics, config: TodoCon
             footer.top       = contents.bottom + 65
             footer.centerX   = parent.centerX
             footer.width     = contents.width
+        } then {
+            body.relayout()
         }
     }
 }

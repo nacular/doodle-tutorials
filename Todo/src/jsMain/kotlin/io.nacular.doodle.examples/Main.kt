@@ -9,7 +9,8 @@ import io.nacular.doodle.image.ImageLoader
 import io.nacular.doodle.image.impl.ImageLoaderImpl
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicLabelBehavior
 import io.nacular.doodle.theme.native.NativeTheme.Companion.NativeHyperLinkBehavior
-import io.nacular.doodle.theme.native.NativeTheme.Companion.NativeTextFieldBehavior
+import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeScrollPanelBehavior
+import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeTextFieldBehavior
 import org.kodein.di.Kodein.Module
 import org.kodein.di.erased.bind
 import org.kodein.di.erased.instance
@@ -21,7 +22,7 @@ fun main() {
         PointerModule,
         KeyboardModule,
         basicLabelBehavior(foregroundColor = Color(0x4D4D4Du)),
-        NativeTextFieldBehavior,
+        nativeTextFieldBehavior(),
         NativeHyperLinkBehavior,
         Module(name = "AppModule") {
             bind<ImageLoader    >() with singleton { ImageLoaderImpl      (instance(), instance()) }

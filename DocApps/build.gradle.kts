@@ -13,6 +13,7 @@ kotlin {
 
             dceTask {
                 keep("doodle-tutorials-DocApps.calculator")
+                keep("doodle-tutorials-DocApps.todo"      )
             }
         }
     }
@@ -20,6 +21,7 @@ kotlin {
     dependencies {
         implementation ("org.jetbrains.kotlin:kotlin-stdlib-js")
         implementation (project(":Calculator"))
+        implementation (project(":Todo"      ))
     }
 }
 
