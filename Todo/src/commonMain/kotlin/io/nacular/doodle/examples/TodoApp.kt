@@ -5,7 +5,6 @@ import io.nacular.doodle.application.Application
 import io.nacular.doodle.controls.*
 import io.nacular.doodle.controls.buttons.*
 import io.nacular.doodle.controls.list.*
-import io.nacular.doodle.controls.list.MutableList
 import io.nacular.doodle.controls.panels.ScrollPanel
 import io.nacular.doodle.controls.text.*
 import io.nacular.doodle.controls.theme.*
@@ -14,19 +13,22 @@ import io.nacular.doodle.drawing.*
 import io.nacular.doodle.drawing.Color.Companion.Black
 import io.nacular.doodle.drawing.Color.Companion.Transparent
 import io.nacular.doodle.drawing.Color.Companion.White
-import io.nacular.doodle.drawing.Font
 import io.nacular.doodle.drawing.Font.Style.Italic
 import io.nacular.doodle.event.*
-import io.nacular.doodle.event.KeyListener.Companion.released as keyReleased
+import io.nacular.doodle.event.KeyCode.Companion.Enter
 import io.nacular.doodle.event.PointerListener.Companion.released
+import io.nacular.doodle.examples.DataStore.DataStoreListModel
+import io.nacular.doodle.examples.DataStore.Filter
+import io.nacular.doodle.examples.DataStore.Filter.*
 import io.nacular.doodle.focus.FocusManager
 import io.nacular.doodle.geometry.*
 import io.nacular.doodle.image.*
 import io.nacular.doodle.layout.*
 import io.nacular.doodle.layout.WidthSource.Parent
-import io.nacular.doodle.system.Cursor
 import io.nacular.doodle.system.Cursor.Companion.Default
-import io.nacular.doodle.text.TextDecoration
+import io.nacular.doodle.system.Cursor.Companion.Text
+import io.nacular.doodle.text.TextDecoration.Companion.LineThrough
+import io.nacular.doodle.text.TextDecoration.Companion.UnderLine
 import io.nacular.doodle.text.TextDecoration.Line.*
 import io.nacular.doodle.text.invoke
 import io.nacular.doodle.theme.ThemeManager
@@ -34,180 +36,26 @@ import io.nacular.doodle.theme.adhoc.DynamicTheme
 import io.nacular.doodle.theme.basic.list.*
 import io.nacular.doodle.utils.Encoder
 import io.nacular.doodle.utils.HorizontalAlignment.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import io.nacular.doodle.utils.VerticalAlignment.Bottom
+import io.nacular.measured.units.Angle.Companion.degrees
+import io.nacular.measured.units.times
+import kotlinx.coroutines.*
 import kotlin.math.min
-
-class CreationBox(private val focusManager: FocusManager, font: Font, placeHolderFont: Font, dataStore: DataStore): View() {
-    init {
-        val color = Color(0x4D4D4Du)
-
-        val button = PushButton().apply {
-            cursor = Default
-            width  = 60.0
-            fired += { when {
-                dataStore.active.isNotEmpty() -> dataStore.markAllCompleted()
-                else                          -> dataStore.markAllActive   ()
-            } }
-            visible   = !dataStore.isEmpty
-            focusable = false
-            behavior  = simpleButtonRenderer { button, canvas ->
-                val thickness = 4.0
-                val polyBounds = button.bounds.atOrigin.inset(Insets(top = 27.0, bottom = 27.0, left = 22.0, right = 22.0))
-
-                val poly = ConvexPolygon(
-                    Point(polyBounds.center.x, polyBounds.bottom),
-                    Point(polyBounds.x, polyBounds.y + thickness),
-                    polyBounds.position,
-                    Point(polyBounds.center.x, polyBounds.bottom - thickness),
-                    Point(polyBounds.right, polyBounds.y),
-                    Point(polyBounds.right, polyBounds.y + thickness)
-                )
-
-                canvas.poly(poly, color = when {
-                    dataStore.active.isEmpty() -> Color(0x737373u)
-                    else                       -> Color(0xE6E6E6u)
-                })
-            }
-        }
-
-        height    = 65.0
-        children += button
-        children += TextField().apply {
-            this.font        = font
-            borderVisible    = false
-            foregroundColor  = color
-            placeHolder      = "What needs to be done?"
-            placeHolderColor = Color(0xE6E6E6u)
-            this.placeHolderFont = placeHolderFont
-
-            keyChanged += keyReleased { event ->
-                when {
-                    event.code == KeyCode.Enter && text.isNotBlank() -> {
-                        dataStore.add(text.trim())
-
-                        text = ""
-                    }
-                }
-            }
-        }
-
-        dataStore.tasksChanged += {
-            button.visible = !it.isEmpty
-            button.rerender()
-        }
-
-        layout = constrain(button, children[1]) { button, textField ->
-            button.height    = parent.height
-            textField.height = button.height
-            textField.left   = button.right
-            textField.right  = parent.right
-        }
-        cursor = Cursor.Text
-
-        pointerChanged += released {
-            focusManager.requestFocus(children[1])
-        }
-    }
-
-    override fun addedToDisplay() {
-        focusManager.requestFocus(children[1])
-    }
-}
-
-private val lineThrough = TextDecoration(lines = setOf(Through))
-private val underLine   = TextDecoration(lines = setOf(Under  ))
-
-class TaskView(task: Task, dataStore: DataStore, toggleBackground: Image, selectedImage: Image): View() {
-    var task = task
-        set(new) {
-            field          = new
-            check.selected = field.completed
-            when {
-                field.completed -> label.styledText = (Color(0xD9D9D9u)) { lineThrough(new.text) }
-                else            -> label.text       = new.text
-            }
-        }
-
-    private val check = CheckBox().apply {
-        selectedChanged += { _,_,selected ->
-            when (selected) {
-                true -> dataStore.markCompleted(this@TaskView.task)
-                else -> dataStore.markActive   (this@TaskView.task)
-            }
-        }
-
-        val source = Rectangle(6, 0, 34, 40)
-
-        behavior = simpleButtonRenderer { button, canvas ->
-            val destination = button.bounds.atOrigin.inset(Insets(left = 13.0, right = 13.0, top = 9.0, bottom = 9.0))
-
-            if (button.selected) canvas.image(selectedImage, source = source, destination = destination)
-
-            canvas.image(toggleBackground, source = source, destination = destination)
-        }
-    }
-
-    private val label = Label(task.text).apply {
-        fitText             = emptySet()
-        horizontalAlignment = Left
-    }
-
-    private val delete = PushButton().apply {
-        visible    = false
-        focusable  = false
-        fired     += { dataStore.remove(this@TaskView.task) }
-        behavior   = simpleButtonRenderer { button, canvas ->
-            val iconBounds = bounds.atOrigin.inset(Insets(top = 22.0, bottom = 22.0, left = 23.0, right = 23.0))
-
-            val color = when {
-                button.model.pointerOver -> Color(0xAF5B5Eu) // TODO: Animate instead
-                else                     -> Color(0xCC9A9Au)
-            }
-
-            canvas.line(iconBounds.position, Point(iconBounds.right, iconBounds.bottom), Stroke(color))
-            canvas.line(Point(iconBounds.right, iconBounds.y), Point(iconBounds.x, iconBounds.bottom), Stroke(color))
-        }
-    }
-
-    init {
-        children += listOf(check, label, delete)
-
-        layout = constrain(check, label, delete) { check, label, delete ->
-            check.width   = constant(60.0)
-            check.height  = parent.height
-            label.left    = check.right
-            label.right   = delete.left
-            label.height  = check.height
-            delete.width  = check.width
-            delete.right  = parent.right
-            delete.height = label.height
-        }
-
-        pointerChanged += object: PointerListener {
-            override fun entered(event: PointerEvent) { delete.visible = true  }
-            override fun exited (event: PointerEvent) { delete.visible = false }
-        }
-
-        this.task = task
-    }
-}
+import kotlin.properties.Delegates.observable
+import io.nacular.doodle.event.KeyListener.Companion.released as keyReleased
 
 data class TodoConfig(
-        val largeFont      : Font,
-        val mediumFont     : Font,
-        val smallFont      : Font,
-        val italicFont     : Font,
+        val listFont       : Font,
+        val titleFont      : Font,
+        val filterFont     : Font,
         val footerFont     : Font,
         val boldFooterFont : Font,
+        val checkForeground: Image,
         val checkBackground: Image,
-        val checkImage     : Image
+        val placeHolderFont: Font
 )
 
-class TaskEditOperation(focusManager: FocusManager?,
-                        list        : MutableList<Task, *>,
-                        row         : Task,
-                        current     : View): TextEditOperation<Task>(focusManager, TaskEncoder(row.completed), list, row, current) {
+class TaskEditOperation(focusManager: FocusManager?, list: MutableList<Task, *>, task: Task, current: View): TextEditOperation<Task>(focusManager, TaskEncoder(task.completed), list, task, current) {
     private class TaskEncoder(private val completed: Boolean = false): Encoder<Task, String> {
         override fun decode(b: String) = Task(b, completed)
         override fun encode(a: Task  ) = a.text
@@ -217,231 +65,333 @@ class TaskEditOperation(focusManager: FocusManager?,
         textField.fitText         = emptySet()
         textField.backgroundColor = Transparent
     }
-//    override val cancelOnFocusLost = true
+
     override fun invoke() = container {
         children += textField
-        layout    = constrain(textField) {
-            it.top    = parent.top  +  1
-            it.left   = parent.left + 58
-            it.right  = parent.right
-            it.height = parent.height
-        }
+        layout    = constrain(textField) { fill(Insets(top = 1.0, left = 58.0, bottom = 1.0))(it) }
     }
 }
 
-class FooterInfo(private val textMetrics: TextMetrics, private val config: TodoConfig): View() {
-    private fun footerLabel(text: String) = Label(text).apply {
-        font            = config.footerFont
-        fitText         = setOf(TextFit.Height)
-        acceptsThemes   = false
-        foregroundColor = Color(0xBFBFBFu)
-        backgroundColor = null
-        behavior        = object: CommonLabelBehavior(textMetrics) {
-            override fun render(view: Label, canvas: Canvas) {
-                canvas.outerShadow(vertical = 1.0, blurRadius = 0.0, color = White opacity 0.5f) {
-                    super.render(view, this)
-                }
+class Todo(private val focusManager: FocusManager,
+           private val textMetrics : TextMetrics,
+           private val linkStyler  : NativeLinkStyler,
+           private val dataStore   : DataStore,
+           private val config      : TodoConfig): View() {
+    private inner class TaskRow(task: Task): View() {
+        var task: Task by observable(task) { _,_,new ->
+            check.selected = new.completed
+            when {
+                new.completed -> label.styledText = (Color(0xD9D9D9u)) { LineThrough(new.text) }
+                else          -> label.text       = new.text
+            }
+        }
+
+        private val check = CheckBox().apply {
+            selectedChanged += { _,_,_ -> dataStore.mark(this@TaskRow.task, completed = selected) }
+
+            val imageSubRect = Rectangle(6, 0, 34, 40)
+
+            behavior = simpleButtonRenderer { button, canvas ->
+                val destination = button.bounds.atOrigin.inset(Insets(left = 13.0, right = 13.0, top = 9.0, bottom = 9.0))
+
+                if (button.selected) canvas.image(config.checkForeground, source = imageSubRect, destination = destination)
+
+                canvas.image(config.checkBackground, source = imageSubRect, destination = destination)
+            }
+        }
+
+        private val label = Label(task.text, horizontalAlignment = Left).apply { fitText = emptySet() }
+
+        private val delete = PushButton().apply {
+            fired    += { dataStore.remove(this@TaskRow.task) }
+            visible   = false
+            behavior  = simpleButtonRenderer { button, canvas ->
+                val iconBounds = bounds.atOrigin.inset(Insets(top = 22.0, bottom = 22.0, left = 23.0, right = 23.0))
+
+                val stroke = Stroke(when {
+                    button.model.pointerOver -> Color(0xAF5B5Eu) // TODO: Animate instead
+                    else                     -> Color(0xCC9A9Au)
+                })
+
+                canvas.line(iconBounds.position, Point(iconBounds.right, iconBounds.bottom), stroke)
+                canvas.line(Point(iconBounds.right, iconBounds.y), Point(iconBounds.x, iconBounds.bottom), stroke)
+            }
+        }
+
+        init {
+            this.task = task
+            children += listOf   (check, label, delete)
+            layout    = constrain(check, label, delete) { check, label, delete ->
+                listOf(check, label, delete).forEach { it.height = parent.height  }
+                listOf(check,        delete).forEach { it.width  = constant(60.0) }
+                label.left   = check.right
+                label.right  = delete.left
+                delete.right = parent.right
+            }
+
+            pointerChanged += object: PointerListener {
+                override fun entered(event: PointerEvent) { delete.visible = true  }
+                override fun exited (event: PointerEvent) { delete.visible = false }
             }
         }
     }
 
-    private fun linkLabel(text: String, linkText: String, url: String) = container {
-        val link  = HyperLink(url, linkText).apply { foregroundColor = Color(0xBFBFBFu); font = config.boldFooterFont }
-        children += listOf(footerLabel(text), link)
-        layout    = HorizontalFlowLayout(justification = Center) then {
-            height = children.maxOf { it.height }
-        }
-    }
-
-    init {
-        children += footerLabel("Double-click to edit a todo")
-        children += linkLabel("Created with ", "Doodle", "https://github.com/nacular/doodle")
-        children += linkLabel("Part of ", "TodoMVC", "http://todomvc.com")
-
-        layout = ListLayout(widthSource = Parent, spacing = 10) then {
-            height = children.lastOrNull()?.bounds?.bottom ?: 0.0
-        }
-    }
-}
-
-open class FooterButtonBehavior(
-        private val textMetrics: TextMetrics,
-        private val font       : Font?,
-        private val widthInset : Double = 16.0,
-        private val heightInset: Double =  8.0
-): CommonTextButtonBehavior<Button>(textMetrics) {
-
-    override fun install(view: Button) {
-        super.install(view)
-
-        view.size = textMetrics.size(view.text, font).run { Size(width + widthInset, height + heightInset) }
-    }
-
-    override fun render(view: Button, canvas: Canvas) {
-        if (view.text.isNotBlank()) {
-            canvas.text(view.text, font(view), textPosition(view), ColorFill(Color(0x777777u)))
-        }
-    }
-}
-
-class FilterBox(private val textMetrics: TextMetrics, private val dataStore: DataStore, font: Font): View() {
-    private fun filterButton(text: String): ToggleButton = ToggleButton(text).apply {
-        behavior = object: FooterButtonBehavior(textMetrics, this@FilterBox.font) {
-            override fun render(view: Button, canvas: Canvas) {
-                if (view.model.pointerOver || view.model.selected) {
-                    canvas.rect(view.bounds.atOrigin.inset(0.5), radius = 3.0, stroke = Stroke(when {
-                        view.model.selected -> Color(0xAF2F2Fu) opacity 0.2f
-                        else                -> Color(0xAF2F2Fu) opacity 0.1f
-                    }))
+    private inner class CreationBox: View() {
+        init {
+            cursor    = Text
+            height    = 65.0
+            children += PushButton("❯").apply {
+                font     = config.listFont
+                width    = 60.0
+                fired   += { dataStore.markAll(completed = dataStore.active.isNotEmpty()) }
+                cursor   = Default
+                visible  = !dataStore.isEmpty
+                behavior = simpleTextButtonRenderer(textMetrics) { button, canvas ->
+                    canvas.rotate(around = Point(button.width/2, button.height/2), by = 90 * degrees) {
+                        text(button.text, font(button), textPosition(button), if (dataStore.active.isEmpty()) Color(0x737373u) else Color(0xE6E6E6u))
+                    }
                 }
 
-                super.render(view, canvas)
+                dataStore.changed += {
+                    visible = !it.isEmpty
+                    rerender()
+                }
             }
-        }
-    }
 
-    private fun updateLabel(label: Label) {
-        label.text = dataStore.active.size.let { active -> "$active ${if (active > 1) "Items" else "Item"} left" }
-    }
-
-    init {
-        this.font     = font
-
-        val label     = Label()
-        val all       = filterButton("All"            )
-        val active    = filterButton("Active"         )
-        val completed = filterButton("Completed"      )
-        val clearAll  = PushButton  ("Clear completed").apply {
-            behavior = object: FooterButtonBehavior(textMetrics, font, widthInset = 30.0) {
-                override fun render(view: Button, canvas: Canvas) {
-                    if (view.text.isNotBlank()) {
-                        val color = Color(0x777777u)
-                        when {
-                            model.pointerOver -> canvas.text(underLine { color { font(view)(view.text) } }, textPosition(view))
-                            else              -> canvas.text(view.text, font(view), textPosition(view), ColorFill(color))
-                        }
+            children += TextField().apply {
+                font              = config.listFont
+                placeHolder       = "What needs to be done?"
+                borderVisible     = false
+                placeHolderFont   = config.placeHolderFont
+                foregroundColor   = Color(0x4D4D4Du)
+                placeHolderColor  = Color(0xE6E6E6u)
+                keyChanged       += keyReleased { event ->
+                    if (event.code == Enter && text.isNotBlank()) {
+                        dataStore.add(Task(text.trim()))
+                        text = ""
                     }
                 }
             }
+
+            layout = constrain(children[0], children[1]) { button, textField ->
+                listOf(button, textField).forEach { it.height = parent.height }
+                textField.left  = button.right
+                textField.right = parent.right
+            }
+
+            pointerChanged += released { focusManager.requestFocus(children[1]) }
+        }
+
+        override fun addedToDisplay() { focusManager.requestFocus(children[1]) }
+    }
+
+    private inner class FilterBox: View() {
+        private fun filterButtonBehavior(widthInset: Double = 16.0, renderBlock: CommonTextButtonBehavior<HyperLink>.(HyperLink, Canvas) -> Unit): Behavior<Button> = object: CommonTextButtonBehavior<HyperLink>(textMetrics) {
+            override fun install(view: HyperLink) {
+                super.install(view)
+                view.size = textMetrics.size(view.text, config.filterFont).run { Size(width + widthInset, height + 8.0) }
+            }
+
+            override fun render(view: HyperLink, canvas: Canvas) {
+                renderBlock(this, view, canvas)
+                canvas.text(view.text, font(view), textPosition(view), ColorFill(Color(0x777777u)))
+            }
+        } as Behavior<Button>
+
+        private fun filterButton(url: String, text: String, filter: Filter? = null) = HyperLink(url, text).apply {
+            font            = config.filterFont
+            acceptsThemes   = false
+            foregroundColor = Color(0x777777u)
+            behavior        = linkStyler(this, filterButtonBehavior { hyperLink, canvas ->
+                val selected = hyperLink.model.selected || dataStore.filter == filter
+                if (hyperLink.model.pointerOver || selected) {
+                    canvas.rect(hyperLink.bounds.atOrigin.inset(0.5), radius = 3.0, stroke = Stroke(when {
+                        selected -> Color(0xAF2F2Fu) opacity 0.2f
+                        else     -> Color(0xAF2F2Fu) opacity 0.1f
+                    }))
+                }
+            }) as Behavior<Button>
+
+            dataStore.filterChanged += { rerender() }
+        }
+
+        private val label    = Label()
+        private val clearAll = PushButton("Clear completed").apply {
+            behavior = filterButtonBehavior(widthInset = 30.0) { view, canvas ->
+                val color = Color(0x777777u)
+                when {
+                    model.pointerOver -> canvas.text(UnderLine { color { font(view)(view.text) } }, textPosition(view))
+                    else              -> canvas.text(view.text, font(view), textPosition(view), ColorFill(color))
+                }
+            }
+
             fired += { dataStore.removeCompleted() }
         }
 
-        updateLabel(label)
-        clearAll.visible = dataStore.completed.isNotEmpty()
-        visible = !dataStore.isEmpty
-
-        dataStore.tasksChanged += {
-            visible = !it.isEmpty
-            updateLabel(label)
-            clearAll.visible = it.completed.isNotEmpty()
+        private fun update() {
+            clearAll.visible = dataStore.completed.isNotEmpty()
+            visible    = !dataStore.isEmpty
+            label.text = dataStore.active.size.let { active -> "$active ${if (active > 1) "Items" else "Item"} left" }
         }
 
-        height    = 41.0
-        children += listOf(label, all, active, completed, clearAll)
+        init {
+            update()
+            val all       = filterButton("#/", "All")
+            val active    = filterButton("#/active", "Active", Active)
+            val completed = filterButton("#/completed", "Completed", Completed)
+            dataStore.changed += { update() }
+            font      = config.filterFont
+            height    = 41.0
+            children += listOf(label, all, active, completed, clearAll)
+            layout    = constrain(label, all, active, completed, clearAll) { label, all_, active_, completed_, clearAll ->
+                listOf(label, all_, active_, completed_, clearAll).forEach { it.centerY = parent.centerY }
+                val spacing     = 6.0
+                label.left      = parent.left  + 15
+                clearAll.right  = parent.right
+                clearAll.height = parent.height
+                all_.left        = parent.left + (parent.width - { all.width + active.width + completed.width + spacing * 2 }) / 2
+                active_.left     = all_.right    + spacing
+                completed_.left  = active_.right + spacing
+            }
+        }
 
-        layout = constrain(label, all, active, completed, clearAll) { label, all_, active_, completed_, clearAll ->
-            val spacing = 6.0
-
-            listOf(label, all_, active_, completed_, clearAll).forEach { it.centerY = parent.centerY }
-
-            label.left      = parent.left  + 15
-            clearAll.right  = parent.right
-            clearAll.height = parent.height
-
-            all_.left       = parent.left + (parent.width - { all.width + active.width + completed.width + spacing * 2 }) / 2
-            active_.left    = all_.right    + spacing
-            completed_.left = active_.right + spacing
+        override fun render(canvas: Canvas) {
+            canvas.line(Point(y = 0.5), Point(width, 0.5), Stroke(Color(0xEDEDEDu)))
         }
     }
 
-    override fun render(canvas: Canvas) {
-        canvas.line(Point(y = 0.5), Point(width, 0.5), Stroke(Color(0xEDEDEDu)))
-    }
-}
+    private inner class Footer: View() {
+        private fun footerLabel(text: String) = Label(text).apply {
+            font            = config.footerFont
+            fitText         = setOf(TextFit.Height)
+            acceptsThemes   = false
+            foregroundColor = Color(0xBFBFBFu)
+            behavior        = object: CommonLabelBehavior(textMetrics) {
+                override fun render(view: Label, canvas: Canvas) {
+                    canvas.outerShadow(vertical = 1.0, blurRadius = 0.0, color = White opacity 0.5f) {
+                        super.render(view, this)
+                    }
+                }
+            }
+        }
 
-class Todo(focusManager: FocusManager, textMetrics: TextMetrics, config: TodoConfig, model: DataStoreListModel): View() {
+        private fun linkLabel(text: String, linkText: String, url: String) = container {
+            val link = HyperLink(url, linkText).apply {
+                font            = config.boldFooterFont
+                acceptsThemes   = false
+                foregroundColor = Color(0xBFBFBFu)
+                behavior        = linkStyler(this, object: CommonTextButtonBehavior<HyperLink>(textMetrics) {
+                    override fun install(view: HyperLink) {
+                        super.install(view)
+                        size = textMetrics.size(view.text, view.font)
+                    }
+
+                    override fun render(view: HyperLink, canvas: Canvas) {
+                        val styledText = view.foregroundColor { view.font(view.text) }.let {
+                            if (view.model.pointerOver) UnderLine{ it } else it
+                        }
+
+                        canvas.outerShadow(vertical = 1.0, blurRadius = 0.0, color = White opacity 0.5f) {
+                            text(styledText, at = textPosition(view))
+                        }
+                    }
+                }) as Behavior<Button>
+            }
+
+            children += listOf(footerLabel(text), link)
+            layout    = HorizontalFlowLayout(justification = Center, verticalAlignment = Bottom, horizontalSpacing = 0.0) then {
+                height = children.maxOf { it.height }
+            }
+        }
+
+        init {
+            children += footerLabel("Double-click to edit a todo")
+            children += linkLabel  ("Created with ", "Doodle", "https://github.com/nacular/doodle")
+            children += linkLabel  ("Part of ", "TodoMVC", "http://todomvc.com")
+
+            layout = ListLayout(widthSource = Parent, spacing = 10) then {
+                height = children.last().bounds.bottom
+            }
+        }
+    }
+
     init {
         val header = Label("todos").apply {
-            font            = config.largeFont
-            foregroundColor = Color(0xAF2F2FU) opacity 0.15f
-            acceptsThemes   = false
+            font            = config.titleFont
             behavior        = CommonLabelBehavior(textMetrics)
+            acceptsThemes   = false
+            foregroundColor = Color(0xAF2F2FU) opacity 0.15f
         }
-
-        val footer = FooterInfo(textMetrics, config)
-
-        val body = object: Container() {
+        val footer = Footer()
+        val body   = object: Container() {
             init {
                 width              = 550.0
                 clipCanvasToBounds = false
 
                 val visualizer = itemVisualizer<Task, IndexedIem> { item, previous, _ ->
                     when (previous) {
-                        is TaskView -> previous.also { it.task = item }
-                        else        -> TaskView(item, model, config.checkBackground, config.checkImage)
+                        is TaskRow -> previous.also { it.task = item }
+                        else       -> TaskRow(item)
                     }
                 }
 
-                val list = MutableList(model, itemVisualizer = visualizer).apply {
+                val list = MutableList(DataStoreListModel(dataStore), itemVisualizer = visualizer).apply {
                     val rowHeight = 58.0
-                    font          = config.mediumFont
+                    font          = config.listFont
                     cellAlignment = fill
-                    behavior      = BasicListBehavior(
-                            focusManager,
-                            basicItemGenerator {
-                                pointerChanged += released {
-                                    if (it.clickCount >= 2) {
-                                        (list as? MutableList<Task, *>)?.startEditing(index)
-                                        it.consume()
-                                    }
+                    editor        = listEditor { list, row, _, current -> TaskEditOperation(focusManager, list, row, current) }
+                    behavior      = BasicListBehavior(focusManager,
+                        basicItemGenerator {
+                            pointerChanged += released { event ->
+                                if (event.clickCount >= 2) {
+                                    this@apply.startEditing(index)
+                                    event.consume()
                                 }
-                            },
-                            PatternFill(Size(10.0, rowHeight)) {
-                                line(Point(0.0, 1.0), Point(10.0, 1.0), Stroke(Color(0xEDEDEDu)))
-                            },
-                            rowHeight)
+                            }
+                        },
+                        PatternFill(Size(10.0, rowHeight)) {
+                            line(Point(y = 1), Point(10, 1), Stroke(Color(0xEDEDEDu)))
+                        },
+                        rowHeight)
 
-                    editor = listEditor { list, row, _, current -> TaskEditOperation(focusManager, list, row, current) }
+                    itemsChanged += { _, removed, added, moved ->
+                        if (added.size == 1 && moved.isEmpty() && removed.size <= 1) {
+                            scrollTo(added.keys.first())
+                        }
+                    }
+
+                    boundsChanged += { _, old, new ->
+                        if (old.width != new.width || old.height != new.height) {
+                            this@Todo.relayout()
+                        }
+                    }
                 }
 
-                children += CreationBox(focusManager, config.mediumFont, config.italicFont, model)
-                children += ScrollPanel(list).apply { contentWidthConstraints = { parent.width } }
-                children += FilterBox(textMetrics, model, config.smallFont)
+                children += listOf(CreationBox(), ScrollPanel(list).apply { contentWidthConstraints = { parent.width } }, FilterBox())
 
                 layout = constrain(children[0], children[1], children[2]) { input, panel, filter ->
+                    listOf(input, panel, filter).forEach { it.width = parent.width }
                     input.top     = parent.top
-                    input.width   = parent.width
                     panel.top     = input.bottom
-                    panel.width   = parent.width
                     panel.height  = parent.height - input.height - filter.height
                     filter.bottom = parent.bottom
-                    filter.width  = parent.width
                 } then {
                     val oldHeight = height
-                    height = min(
-                            children[0].height + list.height + (children[2].takeIf { it.visible }?.height ?: 0.0),
-                            parent!!.height - (y + footer.height + 65 + 5)
-                    )
+
+                    height = min(children[0].height + list.height + (children[2].takeIf { it.visible }?.height ?: 0.0),
+                            parent!!.height - (y + footer.height + 65 + 5))
 
                     if (oldHeight != height) doLayout()
-                }
-
-                list.itemsChanged += { _, removed, added, moved ->
-                    if (added.size == 1 && moved.isEmpty() && removed.size <= 1) {
-                        list.scrollTo(added.keys.first())
-                    }
-                }
-
-                list.boundsChanged += { _, old, new ->
-                    if (old.width != new.width || old.height != new.height) {
-                        this@Todo.relayout()
-                    }
                 }
             }
 
             override fun render(canvas: Canvas) {
                 canvas.outerShadow(vertical =  2.0, blurRadius =  4.0, color = Black opacity 0.2f) {
                     outerShadow   (vertical = 25.0, blurRadius = 50.0, color = Black opacity 0.1f) {
+                        if (!dataStore.isEmpty) {
+                            rect(bounds.atOrigin.inset(Insets(top = height, left = 8.0, right = 8.0, bottom = -8.0)), color = White)
+                            rect(bounds.atOrigin.inset(Insets(top = height, left = 4.0, right = 4.0, bottom = -4.0)), color = White)
+                        }
                         rect(bounds.atOrigin, color = White)
                     }
                 }
@@ -450,54 +400,54 @@ class Todo(focusManager: FocusManager, textMetrics: TextMetrics, config: TodoCon
 
         children += listOf(header, body, footer)
 
-        layout = constrain(children[0], children[1], children[2]) { header, contents, footer ->
-            header.top       = parent.top + 9
-            header.centerX   = parent.centerX
-            contents.top     = header.bottom + 5
-            contents.centerX = parent.centerX
-            footer.top       = contents.bottom + 65
-            footer.centerX   = parent.centerX
-            footer.width     = contents.width
+        layout = constrain(header, body, footer) { header, contents, footer ->
+            listOf(header, contents, footer).forEach { it.centerX = parent.centerX }
+            header.top   = parent.top      +  9
+            contents.top = header.bottom   +  5
+            footer.top   = contents.bottom + 65
+            footer.width = contents.width
         } then {
             body.relayout()
         }
     }
 }
 
-class TodoApp(display        : Display,
-              fonts          : FontLoader,
-              images         : ImageLoader,
-              persistentStore: PersistentStore,
-              focusManager   : FocusManager,
-              textMetrics    : TextMetrics,
-              themes         : ThemeManager,
-              theme          : DynamicTheme): Application {
+class TodoApp(display         : Display,
+              fonts           : FontLoader,
+              images          : ImageLoader,
+              router          : Router,
+              themes          : ThemeManager,
+              dataStore       : DataStore,
+              textMetrics     : TextMetrics,
+              focusManager    : FocusManager,
+              nativeLinkStyler: NativeLinkStyler,
+              theme           : DynamicTheme): Application {
     init {
         GlobalScope.launch {
-            val largeFont = fonts {
-                size   = 100
-                weight = 100
-                family = "Helvetica Neue"
-            }
+            val titleFont  = fonts { family = "Helvetica Neue"; size = 100; weight = 100 }
+            val listFont   = fonts(titleFont) { size = 24 }
+            val footerFont = fonts(titleFont) { size = 10 }
 
-            val mediumFont     = fonts(largeFont ) { size   = 24     }
-            val smallFont      = fonts(largeFont ) { size   = 14     }
-            val italicFont     = fonts(mediumFont) { style  = Italic }
-            val footerFont     = fonts(largeFont ) { size   = 10     }
-            val boldFooterFont = fonts(footerFont) { weight = 400    }
+            val config = TodoConfig(
+                    listFont        = listFont,
+                    titleFont       = titleFont,
+                    filterFont      = fonts(titleFont ) { size   = 14     },
+                    footerFont      = footerFont,
+                    boldFooterFont  = fonts(footerFont) { weight = 400    },
+                    checkForeground      = images.load("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%22-10%20-18%20100%20135%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2250%22%20fill%3D%22none%22%20stroke%3D%22%23bddad5%22%20stroke-width%3D%223%22/%3E%3Cpath%20fill%3D%22%235dc2af%22%20d%3D%22M72%2025L42%2071%2027%2056l-4%204%2020%2020%2034-52z%22/%3E%3C/svg%3E")!!,
+                    checkBackground = images.load("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%22-10%20-18%20100%20135%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2250%22%20fill%3D%22none%22%20stroke%3D%22%23ededed%22%20stroke-width%3D%223%22/%3E%3C/svg%3E")!!,
+                    placeHolderFont = fonts(listFont  ) { style  = Italic }
+            )
 
-            val toggleBackground = images.load("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%22-10%20-18%20100%20135%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2250%22%20fill%3D%22none%22%20stroke%3D%22%23ededed%22%20stroke-width%3D%223%22/%3E%3C/svg%3E")
-            val selectedImage    = images.load("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%22-10%20-18%20100%20135%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2250%22%20fill%3D%22none%22%20stroke%3D%22%23bddad5%22%20stroke-width%3D%223%22/%3E%3Cpath%20fill%3D%22%235dc2af%22%20d%3D%22M72%2025L42%2071%2027%2056l-4%204%2020%2020%2034-52z%22/%3E%3C/svg%3E")
+            router["/"         ] = { dataStore.filter = null      }
+            router["/active"   ] = { dataStore.filter = Active    }
+            router["/completed"] = { dataStore.filter = Completed }
+            router.notify()
 
             themes.selected = theme
 
-            val tasks = SimpleDataStore(persistentStore.loadTasks()).apply {
-                tasksChanged += {
-                    persistentStore.save(tasks)
-                }
-            }
+            display += Todo(focusManager, textMetrics, nativeLinkStyler, dataStore, config)
 
-            display += Todo(focusManager, textMetrics, TodoConfig(largeFont, mediumFont, smallFont, italicFont, footerFont, boldFooterFont, toggleBackground!!, selectedImage!!), tasks)
             display.layout = constrain(display.children[0]) { fill(it) }
             display.fill(ColorFill(Color(0xF5F5F5u)))
         }

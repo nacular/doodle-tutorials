@@ -1,12 +1,14 @@
 package io.nacular.doodle.examples
 
-import io.nacular.doodle.controls.MutableListModel
 import io.nacular.doodle.controls.SimpleMutableListModel
 import io.nacular.doodle.utils.ChangeObserver
+import io.nacular.doodle.utils.FilteredList
 import io.nacular.doodle.utils.ObservableList
 import io.nacular.doodle.utils.Pool
 import io.nacular.doodle.utils.SetPool
 import kotlinx.serialization.Serializable
+import kotlin.properties.Delegates
+import kotlin.properties.Delegates.observable
 
 interface PersistentStore {
     fun loadTasks(                 ): List<Task>
@@ -14,97 +16,72 @@ interface PersistentStore {
 }
 
 @Serializable
-class Task(val text: String, val completed: Boolean = false)
-
-interface DataStore {
-    val size     : Int        get() = tasks.size
-    val tasks    : List<Task>
-    val active   : List<Task> get() = tasks.filter { !it.completed }
-    val isEmpty  : Boolean    get() = tasks.isEmpty()
-    val completed: List<Task> get() = tasks.filter { it.completed  }
-
-    val tasksChanged: Pool<ChangeObserver<DataStore>>
-
-    fun add             (value: String): Task
-    fun remove          (value: Task  )
-    fun markActive      (value: Task  )
-    fun markCompleted   (value: Task  )
-    fun markAllActive   (             )
-    fun markAllCompleted(             )
-    fun removeCompleted (             )
+class Task(val text: String, val completed: Boolean = false) {
+    override fun toString() = "$text${if (completed) " [completed]" else ""}]"
 }
 
-interface DataStoreListModel: DataStore, MutableListModel<Task> {
-    override val size   : Int     get() = super.size
-    override val isEmpty: Boolean get() = super<DataStore>.isEmpty
-}
+class DataStore private constructor(private val tasks: ObservableList<Task>, private val filteredTasks: FilteredList<Task>) {
+    class DataStoreListModel(dataStore: DataStore): SimpleMutableListModel<Task>(dataStore.filteredTasks)
 
-class SimpleDataStore private constructor(override val tasks: ObservableList<Task>): SimpleMutableListModel<Task>(tasks), DataStoreListModel {
+    sealed class Filter(internal val operation: (Task) -> Boolean) {
+        object Active   : Filter({ !it.completed })
+        object Completed: Filter({  it.completed })
+    }
 
-    override val tasksChanged = SetPool<ChangeObserver<DataStore>>()
+    var filter: Filter? by observable(null) { _,_,new ->
+        filteredTasks.filter = new?.operation
+        (filterChanged as SetPool).forEach { it(this) }
+    }
+
+    val isEmpty   get() = tasks.isEmpty()
+    val active    get() = tasks.filter { !it.completed }
+    val completed get() = tasks.filter { it.completed  }
+
+    val changed      : Pool<ChangeObserver<DataStore>> = SetPool()
+    val filterChanged: Pool<ChangeObserver<DataStore>> = SetPool()
 
     init {
-        tasks.changed += { _,_,_,_ -> tasksChanged.forEach { it(this) } }
+        tasks.changed += { _,_,_,_ ->
+            (changed as SetPool).forEach { it(this) }
+        }
     }
 
-    override fun add(value: String) = Task(value).also { super.add(it) }
+    fun add   (            task: Task) { tasks.add   (task) }
+    fun remove(            task: Task) { tasks.remove(task) }
+    fun set   (index: Int, task: Task) = set(tasks, index, task)
 
-    override fun set(index: Int, value: Task) = when {
-        value.text.isBlank() -> removeAt(index)
-        else                 -> super.set(index, value)
+    fun mark(task: Task, completed: Boolean) {
+        tasks.indexOf(task).takeIf { it > -1 }?.let { setCompleted(tasks, task, it, completed) }
     }
 
-    override fun markAllCompleted() {
+    fun markAll(completed: Boolean) {
         tasks.batch {
-            forEachIndexed { index, item ->
-                setCompleted(this, item, index, true)
-            }
+            forEachIndexed { index, item -> setCompleted(this, item, index, completed) }
         }
     }
 
-    override fun markAllActive() {
-        tasks.batch {
-            forEachIndexed { index, item ->
-                setCompleted(this, item, index, false)
-            }
-        }
-    }
-
-    override fun markActive(value: Task) {
-        tasks.indexOf(value).takeIf { it > -1 }?.let {
-            setCompleted(value, it, false)
-        }
-    }
-
-    override fun markCompleted(value: Task) {
-        tasks.indexOf(value).takeIf { it > -1 }?.let {
-            setCompleted(value, it, true)
-        }
-    }
-
-    private fun setCompleted(task: Task, index: Int, completed: Boolean) {
-        if (this[index]?.completed != completed) {
-            set(index, Task(task.text, completed = completed))
-        }
-    }
+    fun removeCompleted() { tasks.batch { removeAll { it.completed } } }
 
     private fun setCompleted(list: MutableList<Task>, task: Task, index: Int, completed: Boolean) {
         if (list[index].completed != completed) {
-            when {
-                task.text.isBlank() -> list.removeAt(index)
-                else                -> list[index] = Task(task.text, completed = completed)
-            }
+            set(list, index, Task(task.text, completed = completed))
         }
     }
 
-    override fun removeCompleted() {
-        tasks.removeAll(completed)
+    private fun set(tasks: MutableList<Task>, index: Int, task: Task) = when {
+        task.text.isBlank() -> tasks.removeAt(index)
+        else                -> tasks.set(index, task)
     }
 
-    override val isEmpty get() = super<SimpleMutableListModel>.isEmpty
-    override val size    get() = super<SimpleMutableListModel>.size
-
     companion object {
-        operator fun invoke(list: List<Task> = emptyList()): SimpleDataStore = SimpleDataStore(ObservableList(list))
+        operator fun invoke(persistentStore: PersistentStore): DataStore {
+            val tasks = ObservableList(persistentStore.loadTasks()).apply {
+                changed += { _, _, _, _ ->
+                    persistentStore.save(this)
+                }
+            }
+
+            return DataStore(tasks, FilteredList(tasks))
+        }
     }
 }
