@@ -20,11 +20,12 @@ fun main() {
     application(modules = listOf(FontModule, PointerModule, KeyboardModule, basicLabelBehavior(),
         nativeTextFieldBehavior(), nativeHyperLinkBehavior(), nativeScrollPanelBehavior(smoothScrolling = true),
         Module(name = "AppModule") {
-            bind<ImageLoader>     () with singleton { ImageLoaderImpl      (instance(), instance()) }
-            bind<PersistentStore> () with singleton { LocalStorePersistence(                      ) }
-            bind<NativeLinkStyler>() with singleton { NativeLinkStylerImpl (instance()            ) }
-            bind<DataStore>       () with singleton { DataStore            (instance()            ) }
-            bind<Router>          () with singleton { TrivialRouter        (window                ) }
+            bind<ImageLoader>         () with singleton { ImageLoaderImpl         (instance(), instance()            ) }
+            bind<PersistentStore>     () with singleton { LocalStorePersistence   (                                  ) }
+            bind<NativeLinkStyler>    () with singleton { NativeLinkStylerImpl    (instance()                        ) }
+            bind<DataStore>           () with singleton { DataStore               (instance()                        ) }
+            bind<Router>              () with singleton { TrivialRouter           (window                            ) }
+            bind<FilterButtonProvider>() with singleton { LinkFilterButtonProvider(instance(), instance(), instance()) }
         }
     )) {
         // load app

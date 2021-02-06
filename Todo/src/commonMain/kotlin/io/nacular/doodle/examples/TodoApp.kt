@@ -46,7 +46,7 @@ import kotlin.properties.Delegates.observable
 import io.nacular.doodle.event.KeyListener.Companion.released as keyReleased
 
 interface FilterButtonProvider {
-    operator fun invoke(dataStore: DataStore, text: String, filter: Filter? = null, behavior: Behavior<Button>): Button
+    operator fun invoke(text: String, filter: Filter? = null, behavior: Behavior<Button>): Button
 }
 
 private data class TodoConfig(
@@ -77,8 +77,15 @@ private class TaskEditOperation(focusManager: FocusManager?, list: MutableList<T
     }
 }
 
-private class LinkFilterButtonProvider(private val linkStyler: NativeLinkStyler): FilterButtonProvider {
-    override fun invoke(dataStore: DataStore, text: String, filter: Filter?, behavior: Behavior<Button>): Button {
+internal class LinkFilterButtonProvider(private val dataStore: DataStore, router: Router, private val linkStyler: NativeLinkStyler): FilterButtonProvider {
+    init {
+        router["/"         ] = { dataStore.filter = null      }
+        router["/active"   ] = { dataStore.filter = Active    }
+        router["/completed"] = { dataStore.filter = Completed }
+        router.fireAction()
+    }
+
+    override fun invoke(text: String, filter: Filter?, behavior: Behavior<Button>): Button {
         val url = when (filter) {
             Active    -> "#/active"
             Completed -> "#/completed"
@@ -94,11 +101,11 @@ private class LinkFilterButtonProvider(private val linkStyler: NativeLinkStyler)
 }
 
 private class Todo(private val config              : TodoConfig,
-           private val dataStore           : DataStore,
-           private val linkStyler          : NativeLinkStyler,
-           private val textMetrics         : TextMetrics,
-           private val focusManager        : FocusManager,
-           private val filterButtonProvider: FilterButtonProvider): View() {
+                   private val dataStore           : DataStore,
+                   private val linkStyler          : NativeLinkStyler,
+                   private val textMetrics         : TextMetrics,
+                   private val focusManager        : FocusManager,
+                   private val filterButtonProvider: FilterButtonProvider): View() {
     private inner class TaskRow(task: Task): View() {
         var task: Task by observable(task) { _,_,new ->
             check.selected = new.completed
@@ -220,7 +227,7 @@ private class Todo(private val config              : TodoConfig,
             }
         } as Behavior<Button>
 
-        private fun filterButton(text: String, filter: Filter? = null) = filterButtonProvider(dataStore, text, filter, filterButtonBehavior { hyperLink, canvas ->
+        private fun filterButton(text: String, filter: Filter? = null) = filterButtonProvider(text, filter, filterButtonBehavior { hyperLink, canvas ->
             val selected = hyperLink.model.selected || dataStore.filter == filter
             if (hyperLink.model.pointerOver || selected) {
                 canvas.rect(hyperLink.bounds.atOrigin.inset(0.5), radius = 3.0, stroke = Stroke(when {
@@ -432,20 +439,19 @@ private class Todo(private val config              : TodoConfig,
 
 class TodoApp(display             : Display,
               fonts               : FontLoader,
-              images              : ImageLoader,
-              router              : Router,
+              theme               : DynamicTheme,
               themes              : ThemeManager,
+              images              : ImageLoader,
               dataStore           : DataStore,
               linkStyler          : NativeLinkStyler,
               textMetrics         : TextMetrics,
               focusManager        : FocusManager,
-              theme               : DynamicTheme,
-              filterButtonProvider: FilterButtonProvider? = null,): Application {
+              filterButtonProvider: FilterButtonProvider): Application {
     init {
         GlobalScope.launch {
-            val titleFont  = fonts { family = "Helvetica Neue"; size = 100; weight = 100 }
-            val listFont   = fonts(titleFont) { size = 24 }
-            val footerFont = fonts(titleFont) { size = 10 }
+            val titleFont  = fonts            { family = "Helvetica Neue"; size = 100; weight = 100 }
+            val listFont   = fonts(titleFont) {                            size =  24               }
+            val footerFont = fonts(titleFont) {                            size =  10               }
 
             val config = TodoConfig(
                     listFont        = listFont,
@@ -453,19 +459,14 @@ class TodoApp(display             : Display,
                     filterFont      = fonts(titleFont ) { size   = 14     },
                     footerFont      = footerFont,
                     boldFooterFont  = fonts(footerFont) { weight = 400    },
-                    checkForeground      = images.load("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%22-10%20-18%20100%20135%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2250%22%20fill%3D%22none%22%20stroke%3D%22%23bddad5%22%20stroke-width%3D%223%22/%3E%3Cpath%20fill%3D%22%235dc2af%22%20d%3D%22M72%2025L42%2071%2027%2056l-4%204%2020%2020%2034-52z%22/%3E%3C/svg%3E")!!,
+                    checkForeground = images.load("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%22-10%20-18%20100%20135%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2250%22%20fill%3D%22none%22%20stroke%3D%22%23bddad5%22%20stroke-width%3D%223%22/%3E%3Cpath%20fill%3D%22%235dc2af%22%20d%3D%22M72%2025L42%2071%2027%2056l-4%204%2020%2020%2034-52z%22/%3E%3C/svg%3E")!!,
                     checkBackground = images.load("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%22-10%20-18%20100%20135%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2250%22%20fill%3D%22none%22%20stroke%3D%22%23ededed%22%20stroke-width%3D%223%22/%3E%3C/svg%3E")!!,
                     placeHolderFont = fonts(listFont  ) { style  = Italic }
             )
 
-            router["/"         ] = { dataStore.filter = null      }
-            router["/active"   ] = { dataStore.filter = Active    }
-            router["/completed"] = { dataStore.filter = Completed }
-            router.fireAction()
-
             themes.selected = theme
 
-            display += Todo(config, dataStore, linkStyler, textMetrics, focusManager, filterButtonProvider ?: LinkFilterButtonProvider(linkStyler))
+            display += Todo(config, dataStore, linkStyler, textMetrics, focusManager, filterButtonProvider)
 
             display.layout = constrain(display.children[0]) { fill(it) }
             display.fill(ColorFill(Color(0xF5F5F5u)))

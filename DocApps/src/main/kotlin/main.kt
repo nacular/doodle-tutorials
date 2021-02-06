@@ -39,8 +39,8 @@ fun calculator(element: HTMLElement) {
 
 @JsName("todo")
 fun todo(element: HTMLElement) {
-    class EmbeddedFilterButtonProvider: FilterButtonProvider {
-        override fun invoke(dataStore: DataStore, text: String, filter: DataStore.Filter?, behavior: Behavior<Button>) = PushButton(text).apply {
+    class EmbeddedFilterButtonProvider(private val dataStore: DataStore): FilterButtonProvider {
+        override fun invoke(text: String, filter: DataStore.Filter?, behavior: Behavior<Button>) = PushButton(text).apply {
             this.behavior               = behavior
             this.acceptsThemes          = false
             fired += { dataStore.filter = filter }
@@ -52,14 +52,16 @@ fun todo(element: HTMLElement) {
     application(root = element, modules = listOf(FontModule, PointerModule, KeyboardModule, basicLabelBehavior(),
             nativeTextFieldBehavior(), nativeHyperLinkBehavior(), nativeScrollPanelBehavior(smoothScrolling = true),
             Module(name = "AppModule") {
-                bind<ImageLoader>     () with singleton { ImageLoaderImpl      (instance(), instance()) }
-                bind<PersistentStore> () with singleton { LocalStorePersistence(                      ) }
-                bind<NativeLinkStyler>() with singleton { NativeLinkStylerImpl (instance()            ) }
-                bind<DataStore>       () with singleton { DataStore            (instance()            ) }
-                bind<Router>          () with singleton { TrivialRouter         (window                ) }
+                bind<ImageLoader>         () with singleton { ImageLoaderImpl             (instance(), instance()) }
+                bind<PersistentStore>     () with singleton { LocalStorePersistence       (                      ) }
+                bind<NativeLinkStyler>    () with singleton { NativeLinkStylerImpl        (instance()            ) }
+                bind<DataStore>           () with singleton { DataStore                   (instance()            ) }
+                bind<Router>              () with singleton { TrivialRouter               (window                ) }
+                bind<FilterButtonProvider>() with singleton { EmbeddedFilterButtonProvider(instance()            ) }
+
             }
     )) {
         // load app
-        TodoApp(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), EmbeddedFilterButtonProvider())
+        TodoApp(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance())
     }
 }

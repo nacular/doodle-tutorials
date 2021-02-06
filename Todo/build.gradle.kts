@@ -7,17 +7,18 @@ kotlin {
     jsTargets ()
     jvmTargets()
 
-    val mockkVersion     : String by project
-    val mockkJsVersion   : String by project
-    val doodleVersion    : String by project
-    val coroutinesVersion: String by project
+    val mockkVersion        : String by project
+    val doodleVersion       : String by project
+    val mockkJsVersion      : String by project
+    val coroutinesVersion   : String by project
+    val serializationVersion: String by project
 
     sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:$coroutinesVersion")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
 
                 api ("io.nacular.doodle:core:$doodleVersion"    )
                 api ("io.nacular.doodle:browser:$doodleVersion" )
