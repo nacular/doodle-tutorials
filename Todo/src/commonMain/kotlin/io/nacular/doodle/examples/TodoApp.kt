@@ -41,6 +41,7 @@ import io.nacular.doodle.utils.VerticalAlignment.Bottom
 import io.nacular.measured.units.Angle.Companion.degrees
 import io.nacular.measured.units.times
 import kotlinx.coroutines.*
+import kotlin.math.max
 import kotlin.math.min
 import kotlin.properties.Delegates.observable
 import io.nacular.doodle.event.KeyListener.Companion.released as keyReleased
@@ -350,7 +351,6 @@ private class Todo(private val config              : TodoConfig,
         val footer = Footer()
         val body   = object: Container() {
             init {
-                width              = 550.0
                 clipCanvasToBounds = false
 
                 val visualizer = itemVisualizer<Task, IndexedIem> { item, previous, _ ->
@@ -403,8 +403,10 @@ private class Todo(private val config              : TodoConfig,
                 } then {
                     val oldHeight = height
 
-                    height = min(children[0].height + list.height + (children[2].takeIf { it.visible }?.height ?: 0.0),
-                            parent!!.height - (y + footer.height + 65 + 5))
+                    val minHeight = children[0].height + (children[2].takeIf { it.visible }?.height ?: 0.0)
+
+                    height = max(min(children[0].height + list.height + (children[2].takeIf { it.visible }?.height ?: 0.0),
+                            parent!!.height - (y + footer.height + 65 + 5)), minHeight)
 
                     if (oldHeight != height) doLayout()
                 }
@@ -425,12 +427,13 @@ private class Todo(private val config              : TodoConfig,
 
         children += listOf(header, body, footer)
 
-        layout = constrain(header, body, footer) { header, contents, footer ->
-            listOf(header, contents, footer).forEach { it.centerX = parent.centerX }
+        layout = constrain(header, body, footer) { header, body, footer ->
+            listOf(header, body, footer).forEach { it.centerX = parent.centerX }
             header.top   = parent.top      +  9
-            contents.top = header.bottom   +  5
-            footer.top   = contents.bottom + 65
-            footer.width = contents.width
+            body.top     = header.bottom   +  5
+            body.width   = min(550.0, parent.width)
+            footer.top   = body.bottom + 65
+            footer.width = body.width
         } then {
             body.relayout()
         }
