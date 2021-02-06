@@ -6,7 +6,6 @@ import io.nacular.doodle.application.application
 import io.nacular.doodle.controls.buttons.Button
 import io.nacular.doodle.controls.buttons.PushButton
 import io.nacular.doodle.core.Behavior
-import io.nacular.doodle.drawing.Color
 import io.nacular.doodle.examples.CalculatorApp
 import io.nacular.doodle.examples.DataStore
 import io.nacular.doodle.examples.FilterButtonProvider
@@ -21,7 +20,7 @@ import io.nacular.doodle.examples.TrivialRouter
 import io.nacular.doodle.image.ImageLoader
 import io.nacular.doodle.image.impl.ImageLoaderImpl
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicLabelBehavior
-import io.nacular.doodle.theme.native.NativeTheme.Companion.NativeHyperLinkBehavior
+import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeHyperLinkBehavior
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeScrollPanelBehavior
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeTextFieldBehavior
 import kotlinx.browser.window
@@ -51,7 +50,7 @@ fun todo(element: HTMLElement) {
     }
 
     application(root = element, modules = listOf(FontModule, PointerModule, KeyboardModule, basicLabelBehavior(),
-            nativeTextFieldBehavior(), NativeHyperLinkBehavior, nativeScrollPanelBehavior(smoothScrolling = true),
+            nativeTextFieldBehavior(), nativeHyperLinkBehavior(), nativeScrollPanelBehavior(smoothScrolling = true),
             Module(name = "AppModule") {
                 bind<ImageLoader>     () with singleton { ImageLoaderImpl      (instance(), instance()) }
                 bind<PersistentStore> () with singleton { LocalStorePersistence(                      ) }

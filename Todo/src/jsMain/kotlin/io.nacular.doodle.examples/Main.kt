@@ -7,7 +7,7 @@ import io.nacular.doodle.application.application
 import io.nacular.doodle.image.ImageLoader
 import io.nacular.doodle.image.impl.ImageLoaderImpl
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicLabelBehavior
-import io.nacular.doodle.theme.native.NativeTheme.Companion.NativeHyperLinkBehavior
+import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeHyperLinkBehavior
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeScrollPanelBehavior
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeTextFieldBehavior
 import kotlinx.browser.window
@@ -18,7 +18,7 @@ import org.kodein.di.erased.singleton
 
 fun main() {
     application(modules = listOf(FontModule, PointerModule, KeyboardModule, basicLabelBehavior(),
-        nativeTextFieldBehavior(), NativeHyperLinkBehavior, nativeScrollPanelBehavior(smoothScrolling = true),
+        nativeTextFieldBehavior(), nativeHyperLinkBehavior(), nativeScrollPanelBehavior(smoothScrolling = true),
         Module(name = "AppModule") {
             bind<ImageLoader>     () with singleton { ImageLoaderImpl      (instance(), instance()) }
             bind<PersistentStore> () with singleton { LocalStorePersistence(                      ) }
