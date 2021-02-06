@@ -60,3 +60,6 @@ kotlin {
         }
     }
 }
+
+installFullScreenDemo("Development")
+installFullScreenDemo("Production" )

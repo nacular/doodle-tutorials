@@ -3,9 +3,13 @@ import io.nacular.doodle.application.Modules.Companion.FontModule
 import io.nacular.doodle.application.Modules.Companion.KeyboardModule
 import io.nacular.doodle.application.Modules.Companion.PointerModule
 import io.nacular.doodle.application.application
+import io.nacular.doodle.controls.buttons.Button
+import io.nacular.doodle.controls.buttons.PushButton
+import io.nacular.doodle.core.Behavior
 import io.nacular.doodle.drawing.Color
 import io.nacular.doodle.examples.CalculatorApp
 import io.nacular.doodle.examples.DataStore
+import io.nacular.doodle.examples.FilterButtonProvider
 import io.nacular.doodle.examples.LocalStorePersistence
 import io.nacular.doodle.examples.NativeLinkStyler
 import io.nacular.doodle.examples.NativeLinkStylerImpl
@@ -36,7 +40,17 @@ fun calculator(element: HTMLElement) {
 
 @JsName("todo")
 fun todo(element: HTMLElement) {
-    application(root = element, modules = listOf(FontModule, PointerModule, KeyboardModule, basicLabelBehavior(foregroundColor = Color(0x4D4D4Du)),
+    class EmbeddedFilterButtonProvider: FilterButtonProvider {
+        override fun invoke(dataStore: DataStore, text: String, filter: DataStore.Filter?, behavior: Behavior<Button>) = PushButton(text).apply {
+            this.behavior               = behavior
+            this.acceptsThemes          = false
+            fired += { dataStore.filter = filter }
+
+            dataStore.filterChanged += { rerender() }
+        }
+    }
+
+    application(root = element, modules = listOf(FontModule, PointerModule, KeyboardModule, basicLabelBehavior(),
             nativeTextFieldBehavior(), NativeHyperLinkBehavior, nativeScrollPanelBehavior(smoothScrolling = true),
             Module(name = "AppModule") {
                 bind<ImageLoader>     () with singleton { ImageLoaderImpl      (instance(), instance()) }
@@ -47,6 +61,6 @@ fun todo(element: HTMLElement) {
             }
     )) {
         // load app
-        TodoApp(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance())
+        TodoApp(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), EmbeddedFilterButtonProvider())
     }
 }

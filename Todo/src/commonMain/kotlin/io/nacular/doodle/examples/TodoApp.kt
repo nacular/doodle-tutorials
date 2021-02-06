@@ -5,6 +5,7 @@ import io.nacular.doodle.application.Application
 import io.nacular.doodle.controls.*
 import io.nacular.doodle.controls.buttons.*
 import io.nacular.doodle.controls.list.*
+import io.nacular.doodle.controls.list.MutableList
 import io.nacular.doodle.controls.panels.ScrollPanel
 import io.nacular.doodle.controls.text.*
 import io.nacular.doodle.controls.theme.*
@@ -44,7 +45,11 @@ import kotlin.math.min
 import kotlin.properties.Delegates.observable
 import io.nacular.doodle.event.KeyListener.Companion.released as keyReleased
 
-data class TodoConfig(
+interface FilterButtonProvider {
+    operator fun invoke(dataStore: DataStore, text: String, filter: Filter? = null, behavior: Behavior<Button>): Button
+}
+
+private data class TodoConfig(
         val listFont       : Font,
         val titleFont      : Font,
         val filterFont     : Font,
@@ -55,7 +60,7 @@ data class TodoConfig(
         val placeHolderFont: Font
 )
 
-class TaskEditOperation(focusManager: FocusManager?, list: MutableList<Task, *>, task: Task, current: View): TextEditOperation<Task>(focusManager, TaskEncoder(task.completed), list, task, current) {
+private class TaskEditOperation(focusManager: FocusManager?, list: MutableList<Task, *>, task: Task, current: View): TextEditOperation<Task>(focusManager, TaskEncoder(task.completed), list, task, current) {
     private class TaskEncoder(private val completed: Boolean = false): Encoder<Task, String> {
         override fun decode(b: String) = Task(b, completed)
         override fun encode(a: Task  ) = a.text
@@ -72,11 +77,28 @@ class TaskEditOperation(focusManager: FocusManager?, list: MutableList<Task, *>,
     }
 }
 
-class Todo(private val focusManager: FocusManager,
-           private val textMetrics : TextMetrics,
-           private val linkStyler  : NativeLinkStyler,
-           private val dataStore   : DataStore,
-           private val config      : TodoConfig): View() {
+private class LinkFilterButtonProvider(private val linkStyler: NativeLinkStyler): FilterButtonProvider {
+    override fun invoke(dataStore: DataStore, text: String, filter: Filter?, behavior: Behavior<Button>): Button {
+        val url = when (filter) {
+            Active    -> "#/active"
+            Completed -> "#/completed"
+            else      -> "#/"
+        }
+
+        return HyperLink(url = url, text = text).apply {
+            this.behavior            = linkStyler(this, behavior) as Behavior<Button>
+            this.acceptsThemes       = false
+            dataStore.filterChanged += { rerender() }
+        }
+    }
+}
+
+private class Todo(private val config              : TodoConfig,
+           private val dataStore           : DataStore,
+           private val linkStyler          : NativeLinkStyler,
+           private val textMetrics         : TextMetrics,
+           private val focusManager        : FocusManager,
+           private val filterButtonProvider: FilterButtonProvider): View() {
     private inner class TaskRow(task: Task): View() {
         var task: Task by observable(task) { _,_,new ->
             check.selected = new.completed
@@ -100,7 +122,7 @@ class Todo(private val focusManager: FocusManager,
             }
         }
 
-        private val label = Label(task.text, horizontalAlignment = Left).apply { fitText = emptySet() }
+        private val label = Label(task.text, horizontalAlignment = Left).apply { fitText = emptySet(); foregroundColor = Color(0x4D4D4Du) }
 
         private val delete = PushButton().apply {
             fired    += { dataStore.remove(this@TaskRow.task) }
@@ -198,25 +220,21 @@ class Todo(private val focusManager: FocusManager,
             }
         } as Behavior<Button>
 
-        private fun filterButton(url: String, text: String, filter: Filter? = null) = HyperLink(url, text).apply {
+        private fun filterButton(text: String, filter: Filter? = null) = filterButtonProvider(dataStore, text, filter, filterButtonBehavior { hyperLink, canvas ->
+            val selected = hyperLink.model.selected || dataStore.filter == filter
+            if (hyperLink.model.pointerOver || selected) {
+                canvas.rect(hyperLink.bounds.atOrigin.inset(0.5), radius = 3.0, stroke = Stroke(when {
+                    selected -> Color(0xAF2F2Fu) opacity 0.2f
+                    else     -> Color(0xAF2F2Fu) opacity 0.1f
+                }))
+            }
+        }).apply {
             font            = config.filterFont
-            acceptsThemes   = false
             foregroundColor = Color(0x777777u)
-            behavior        = linkStyler(this, filterButtonBehavior { hyperLink, canvas ->
-                val selected = hyperLink.model.selected || dataStore.filter == filter
-                if (hyperLink.model.pointerOver || selected) {
-                    canvas.rect(hyperLink.bounds.atOrigin.inset(0.5), radius = 3.0, stroke = Stroke(when {
-                        selected -> Color(0xAF2F2Fu) opacity 0.2f
-                        else     -> Color(0xAF2F2Fu) opacity 0.1f
-                    }))
-                }
-            }) as Behavior<Button>
-
-            dataStore.filterChanged += { rerender() }
         }
 
-        private val label    = Label()
-        private val clearAll = PushButton("Clear completed").apply {
+        private val itemsLeft = Label().apply { foregroundColor = Color(0x4D4D4Du) }
+        private val clearAll  = PushButton("Clear completed").apply {
             behavior = filterButtonBehavior(widthInset = 30.0) { view, canvas ->
                 val color = Color(0x777777u)
                 when {
@@ -231,19 +249,19 @@ class Todo(private val focusManager: FocusManager,
         private fun update() {
             clearAll.visible = dataStore.completed.isNotEmpty()
             visible    = !dataStore.isEmpty
-            label.text = dataStore.active.size.let { active -> "$active ${if (active > 1) "Items" else "Item"} left" }
+            itemsLeft.text = dataStore.active.size.let { active -> "$active ${if (active > 1) "Items" else "Item"} left" }
         }
 
         init {
             update()
-            val all       = filterButton("#/", "All")
-            val active    = filterButton("#/active", "Active", Active)
-            val completed = filterButton("#/completed", "Completed", Completed)
+            val all       = filterButton("All"                 )
+            val active    = filterButton("Active",    Active   )
+            val completed = filterButton("Completed", Completed)
             dataStore.changed += { update() }
             font      = config.filterFont
             height    = 41.0
-            children += listOf(label, all, active, completed, clearAll)
-            layout    = constrain(label, all, active, completed, clearAll) { label, all_, active_, completed_, clearAll ->
+            children += listOf(itemsLeft, all, active, completed, clearAll)
+            layout    = constrain(itemsLeft, all, active, completed, clearAll) { label, all_, active_, completed_, clearAll ->
                 listOf(label, all_, active_, completed_, clearAll).forEach { it.centerY = parent.centerY }
                 val spacing     = 6.0
                 label.left      = parent.left  + 15
@@ -412,16 +430,17 @@ class Todo(private val focusManager: FocusManager,
     }
 }
 
-class TodoApp(display         : Display,
-              fonts           : FontLoader,
-              images          : ImageLoader,
-              router          : Router,
-              themes          : ThemeManager,
-              dataStore       : DataStore,
-              textMetrics     : TextMetrics,
-              focusManager    : FocusManager,
-              nativeLinkStyler: NativeLinkStyler,
-              theme           : DynamicTheme): Application {
+class TodoApp(display             : Display,
+              fonts               : FontLoader,
+              images              : ImageLoader,
+              router              : Router,
+              themes              : ThemeManager,
+              dataStore           : DataStore,
+              linkStyler          : NativeLinkStyler,
+              textMetrics         : TextMetrics,
+              focusManager        : FocusManager,
+              theme               : DynamicTheme,
+              filterButtonProvider: FilterButtonProvider? = null,): Application {
     init {
         GlobalScope.launch {
             val titleFont  = fonts { family = "Helvetica Neue"; size = 100; weight = 100 }
@@ -442,11 +461,11 @@ class TodoApp(display         : Display,
             router["/"         ] = { dataStore.filter = null      }
             router["/active"   ] = { dataStore.filter = Active    }
             router["/completed"] = { dataStore.filter = Completed }
-            router.notify()
+            router.fireAction()
 
             themes.selected = theme
 
-            display += Todo(focusManager, textMetrics, nativeLinkStyler, dataStore, config)
+            display += Todo(config, dataStore, linkStyler, textMetrics, focusManager, filterButtonProvider ?: LinkFilterButtonProvider(linkStyler))
 
             display.layout = constrain(display.children[0]) { fill(it) }
             display.fill(ColorFill(Color(0xF5F5F5u)))

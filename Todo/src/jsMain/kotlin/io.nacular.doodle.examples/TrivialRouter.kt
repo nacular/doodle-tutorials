@@ -9,7 +9,7 @@ class TrivialRouter(private val window: Window): Router {
     private val routes = mutableMapOf<String, RouteHandler>()
 
     init {
-        window.onhashchange = { notify() }
+        window.onhashchange = { fireAction() }
     }
 
     override fun set(route: String, action: RouteHandler?) {
@@ -19,7 +19,7 @@ class TrivialRouter(private val window: Window): Router {
         }
     }
 
-    override fun notify() {
+    override fun fireAction() {
         val hash = window.location.hash.drop(1)
         routes[hash]?.let { it(hash) }
     }
