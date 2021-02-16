@@ -7,7 +7,7 @@ import org.w3c.dom.get
 import org.w3c.dom.set
 
 /**
- * Creates a [TodoApp]
+ * Simple [PersistentStore] based on LocalStore
  */
 class LocalStorePersistence: PersistentStore {
     private val name       = "doodle-todos"

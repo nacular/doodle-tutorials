@@ -3,7 +3,7 @@ package io.nacular.doodle.examples
 import org.w3c.dom.Window
 
 /**
- * Created by Nicholas Eddy on 1/28/21.
+ * Very simple router that uses a map to track routes.
  */
 class TrivialRouter(private val window: Window): Router {
     private val routes = mutableMapOf<String, RouteHandler>()
