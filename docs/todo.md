@@ -1,6 +1,15 @@
 # [Todo](https://github.com/nacular/doodle-tutorials/tree/master/Todo) Tutorial
 ----
 
+This tutorial shows how you might build the [TodoMVC](http://todomvc.com) app using Doodle. This version deviates from the
+official app spec in that (like all Doodle apps) it does not use CSS or HTML directly. Therefore, it
+does not include the assets provided by the official spec. Instead, it replicates the UX with Doodle
+primitives.
+
+This version is also designed to work well as an embedded app. The version below (unlike
+the full-screen version) does not use routing for the filters. This means there is no way to deep-link
+to a filter, like the full-screen version has. The launch code decides this by injecting a different
+strategy for creating the filter buttons, while the app itself is unaware of this difference.
 
 ```doodle
 {
@@ -17,7 +26,7 @@
 ## Project Setup
 
 We will use a multi-platform setup for this app. This is not necessary to use Doodle, but it lets us implement our code almost
-entirely in commonMain and our tests in commonTest. We will then be able to run these tests on the JVM target, which will
+entirely in `commonMain` and our tests in `commonTest`. We will then be able to run these tests on the JVM target, which will
 make their execution really fast and completely decoupled from the JS environment.
 
 [**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/Todo/build.gradle.kts)
@@ -128,8 +137,8 @@ fun main() {
 }
 ```
 
-The `application` function is used to launch top-level apps. It takes a list of modules to include and a lambda that builds the
-app being launched. This lambda is within a Kodein injection context, which means we can inject dependencies into our app via
+Use the `application` function to launch top-level apps. It takes a list of modules, and a lambda that builds the
+app. This lambda is within a Kodein injection context, which means we can inject dependencies into our app via
 `instance`, `provider`, etc.
 
 Notice that we have included several modules for our app. This includes one for fonts, pointer, keyboard, and several for various
@@ -141,7 +150,29 @@ directly in a new module. These are items with no built-in module, or items that
 ?> Check out Kodein to learn more about how it handles dependency injection.
 
 The `application` function also takes an optional HTML element within which the app will be hosted. The app will be hosted in
-`document.body` if no element is specified.
+`document.body` if you do not specify an element.
 
-App launching is the only part of our code that is platform-specific. This makes sense, since this is the only time we might care
-about an HTML element. And the reason is to support use-cases where apps are embedded into non-Doodle contexts.
+App launching is the only part of our code that is platform-specific; since it is the only time we might care
+about an HTML element. It also helps support embedding apps into non-Doodle contexts.
+
+## Supporting Docs Embedding
+
+These docs actually launch the app using a custom `main` with a slightly different set of inputs. The big difference is in
+`FilterButtonProvider` used. The docs inject a provider that creates `PushButton`s instead of `HyperLink`s for the filter
+controls. The app itself treats these the same. The end result is that the docs version does not use routing.
+
+```kotlin
+// Notice the element is provided for embedded version
+application(root = element, modules = listOf(FontModule, PointerModule, KeyboardModule, basicLabelBehavior(),
+        nativeTextFieldBehavior(), nativeHyperLinkBehavior(), nativeScrollPanelBehavior(smoothScrolling = true),
+        Module(name = "AppModule") {
+            // ...
+
+            // Different behavior for docs version
+            bind<FilterButtonProvider>() with singleton { EmbeddedFilterButtonProvider(instance()) }
+        }
+)) {
+    // load app just like full-screen
+    TodoApp(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance())
+}
+```

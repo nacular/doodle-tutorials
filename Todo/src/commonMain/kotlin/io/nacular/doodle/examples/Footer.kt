@@ -11,19 +11,16 @@ import io.nacular.doodle.core.View
 import io.nacular.doodle.core.container
 import io.nacular.doodle.core.then
 import io.nacular.doodle.drawing.Canvas
-import io.nacular.doodle.drawing.Color
 import io.nacular.doodle.drawing.Color.Companion.White
 import io.nacular.doodle.drawing.OuterShadow
 import io.nacular.doodle.drawing.TextMetrics
 import io.nacular.doodle.drawing.opacity
 import io.nacular.doodle.layout.HorizontalFlowLayout
 import io.nacular.doodle.layout.ListLayout
-import io.nacular.doodle.layout.WidthSource
+import io.nacular.doodle.layout.WidthSource.Parent
 import io.nacular.doodle.text.TextDecoration.Companion.UnderLine
 import io.nacular.doodle.text.invoke
-import io.nacular.doodle.utils.HorizontalAlignment
 import io.nacular.doodle.utils.HorizontalAlignment.Center
-import io.nacular.doodle.utils.VerticalAlignment
 import io.nacular.doodle.utils.VerticalAlignment.Bottom
 
 /**
@@ -61,6 +58,8 @@ class Footer(private val textMetrics: TextMetrics, private val linkStyler: Nativ
                     canvas.shadow(textShadow) { text(styledText, at = textPosition(view)) }
                 }
             }) as Behavior<Button>
+
+            size = textMetrics.size(this.text, font)
         }
 
         children += listOf(footerLabel(text), link)
@@ -74,7 +73,7 @@ class Footer(private val textMetrics: TextMetrics, private val linkStyler: Nativ
         children += linkLabel  ("Created with ", "Doodle", "https://github.com/nacular/doodle")
         children += linkLabel  ("Part of ", "TodoMVC", "http://todomvc.com")
 
-        layout = ListLayout(widthSource = WidthSource.Parent, spacing = 10) then {
+        layout = ListLayout(widthSource = Parent, spacing = 10) then {
             height = children.last().bounds.bottom
         }
     }
