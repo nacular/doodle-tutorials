@@ -258,9 +258,9 @@ class TodoApp(display             : Display,
     init {
         // Launch coroutine to fetch fonts/images
         GlobalScope.launch {
-            val titleFont  = fonts            { family = "Helvetica Neue"; size = 100; weight = 100 }
-            val listFont   = fonts(titleFont) {                            size =  24               }
-            val footerFont = fonts(titleFont) {                            size =  10               }
+            val titleFont  = fonts            { size = 100; weight = 100; family = "'Helvetica Neue', Helvetica, Arial, sans-serif" }
+            val listFont   = fonts(titleFont) { size =  24 }
+            val footerFont = fonts(titleFont) { size =  10 }
             val config     = TodoConfig(
                     listFont        = listFont,
                     titleFont       = titleFont,
