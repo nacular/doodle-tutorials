@@ -11,10 +11,10 @@ import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeHyperLinkBehav
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeScrollPanelBehavior
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeTextFieldBehavior
 import kotlinx.browser.window
-import org.kodein.di.Kodein.Module
-import org.kodein.di.erased.bind
-import org.kodein.di.erased.instance
-import org.kodein.di.erased.singleton
+import org.kodein.di.DI.Module
+import org.kodein.di.bind
+import org.kodein.di.instance
+import org.kodein.di.singleton
 
 fun main() {
     application(modules = listOf(FontModule, PointerModule, KeyboardModule, basicLabelBehavior(),
