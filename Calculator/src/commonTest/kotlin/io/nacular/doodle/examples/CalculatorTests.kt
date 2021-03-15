@@ -1,9 +1,11 @@
 package io.nacular.doodle.examples
 
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import io.nacular.doodle.controls.buttons.Button
+import io.nacular.doodle.drawing.Font
 import io.nacular.doodle.drawing.FontLoader
 import kotlin.js.JsName
 import kotlin.test.Test
@@ -53,8 +55,8 @@ class CalculatorTests {
         return calculator.result
     }
 
-    private fun fontDetector() = mockk<FontLoader>(relaxed = true)/*.also {
-        coEvery { it.invoke(any()       ) } returns mockk()
-        coEvery { it.invoke(any(), any()) } returns mockk()
-    }*/
+    private fun fontDetector() = mockk<FontLoader>(relaxed = true).also {
+        coEvery { it.invoke(any()             ) } returns mockk()
+        coEvery { it.invoke(any<Font>(), any()) } returns mockk()
+    }
 }
