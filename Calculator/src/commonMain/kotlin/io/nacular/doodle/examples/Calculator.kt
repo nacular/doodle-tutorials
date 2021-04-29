@@ -316,7 +316,7 @@ class Calculator(
         GlobalScope.launch {
             loadFonts()
 
-            ButtonGroup(allowDeselectAll = true, buttons = *arrayOf(`÷`, `*`, `-`, `+`))
+            ButtonGroup(allowDeselectAll = true, buttons = arrayOf(`÷`, `*`, `-`, `+`))
 
             val outputHeight  = 100.0
             val buttonSpacing =  10.0

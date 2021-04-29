@@ -8,7 +8,7 @@ import org.kodein.di.instance
 /**
  * Creates a [CalculatorApp]
  */
-fun main() {
+fun fullScreen() {
     application(modules = listOf(FontModule, PointerModule)) {
         // load app
         CalculatorApp(instance(), instance(), instance(), NumberFormatterImpl())

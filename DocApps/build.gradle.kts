@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 
 plugins {
-    id ("org.jetbrains.kotlin.js")
+    kotlin("js")
 }
 
 kotlin {
@@ -14,14 +14,15 @@ kotlin {
             dceTask {
                 keep("doodle-tutorials-DocApps.calculator")
                 keep("doodle-tutorials-DocApps.todo"      )
+                keep("doodle-tutorials-DocApps.photos"    )
             }
         }
     }
 
     dependencies {
-        implementation ("org.jetbrains.kotlin:kotlin-stdlib-js")
-        implementation (project(":Calculator"))
-        implementation (project(":Todo"      ))
+        implementation(project(":Calculator"))
+        implementation(project(":Todo"      ))
+        implementation(project(":Photos"    ))
     }
 }
 

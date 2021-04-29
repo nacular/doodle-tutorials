@@ -7,7 +7,6 @@ kotlin {
     jvmTargets()
 
     val mockkVersion     : String by project
-    val mockkJsVersion   : String by project
     val doodleVersion    : String by project
     val coroutinesVersion: String by project
 
@@ -17,9 +16,9 @@ kotlin {
                 implementation(kotlin("stdlib-common"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
 
-                api ("io.nacular.doodle:core:$doodleVersion"    )
-                api ("io.nacular.doodle:browser:$doodleVersion" )
-                api ("io.nacular.doodle:controls:$doodleVersion")
+                api("io.nacular.doodle:core:$doodleVersion"    )
+                api("io.nacular.doodle:browser:$doodleVersion" )
+                api("io.nacular.doodle:controls:$doodleVersion")
             }
         }
 
@@ -31,12 +30,6 @@ kotlin {
             }
         }
 
-        jvm().compilations["main"].defaultSourceSet {
-            dependencies {
-                implementation(kotlin("stdlib-jdk8"))
-            }
-        }
-
         jvm().compilations["test"].defaultSourceSet {
             dependencies {
                 implementation(kotlin("test-junit"))
@@ -44,20 +37,10 @@ kotlin {
             }
         }
 
-        js().compilations["main"].defaultSourceSet {
-            dependencies {
-                implementation(kotlin("stdlib-js"))
-            }
-        }
-
         js().compilations["test"].defaultSourceSet {
             dependencies {
                 implementation(kotlin("test-js"))
-                implementation("io.mockk:mockk-js:$mockkJsVersion")
             }
         }
     }
 }
-
-installFullScreenDemo("Development")
-installFullScreenDemo("Production" )

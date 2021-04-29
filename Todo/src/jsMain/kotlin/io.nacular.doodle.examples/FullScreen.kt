@@ -12,20 +12,19 @@ import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeScrollPanelBeh
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeTextFieldBehavior
 import kotlinx.browser.window
 import org.kodein.di.DI.Module
-import org.kodein.di.bind
+import org.kodein.di.bindSingleton
 import org.kodein.di.instance
-import org.kodein.di.singleton
 
-fun main() {
+fun fullscreen() {
     application(modules = listOf(FontModule, PointerModule, KeyboardModule, basicLabelBehavior(),
         nativeTextFieldBehavior(), nativeHyperLinkBehavior(), nativeScrollPanelBehavior(smoothScrolling = true),
         Module(name = "AppModule") {
-            bind<ImageLoader>         () with singleton { ImageLoaderImpl         (instance(), instance()            ) }
-            bind<PersistentStore>     () with singleton { LocalStorePersistence   (                                  ) }
-            bind<NativeLinkStyler>    () with singleton { NativeLinkStylerImpl    (instance()                        ) }
-            bind<DataStore>           () with singleton { DataStore               (instance()                        ) }
-            bind<Router>              () with singleton { TrivialRouter           (window                            ) }
-            bind<FilterButtonProvider>() with singleton { LinkFilterButtonProvider(instance(), instance(), instance()) }
+            bindSingleton<ImageLoader>          { ImageLoaderImpl         (instance(), instance()            ) }
+            bindSingleton<PersistentStore>      { LocalStorePersistence   (                                  ) }
+            bindSingleton<NativeLinkStyler>     { NativeLinkStylerImpl    (instance()                        ) }
+            bindSingleton                       { DataStore               (instance()                        ) }
+            bindSingleton<Router>               { TrivialRouter           (window                            ) }
+            bindSingleton<FilterButtonProvider> { LinkFilterButtonProvider(instance(), instance(), instance()) }
         }
     )) {
         // load app

@@ -7,7 +7,6 @@ import io.nacular.doodle.utils.ObservableList
 import io.nacular.doodle.utils.Pool
 import io.nacular.doodle.utils.SetPool
 import kotlinx.serialization.Serializable
-import kotlin.properties.Delegates
 import kotlin.properties.Delegates.observable
 
 interface PersistentStore {

@@ -1,5 +1,6 @@
 package io.nacular.doodle.examples
 
+import JsName
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -7,7 +8,6 @@ import io.mockk.spyk
 import io.nacular.doodle.controls.buttons.Button
 import io.nacular.doodle.drawing.Font
 import io.nacular.doodle.drawing.FontLoader
-import kotlin.js.JsName
 import kotlin.test.Test
 import kotlin.test.expect
 

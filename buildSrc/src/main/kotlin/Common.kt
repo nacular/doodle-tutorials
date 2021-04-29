@@ -35,7 +35,7 @@ fun KotlinTargetContainerWithPresetFunctions.jvmTargets() {
     jvm {
         compilations.all {
             kotlinOptions {
-                jvmTarget = "1.8"
+                jvmTarget        = "1.8"
                 freeCompilerArgs = listOf("-Xuse-experimental=kotlin.ExperimentalUnsignedTypes")
             }
         }
@@ -44,16 +44,16 @@ fun KotlinTargetContainerWithPresetFunctions.jvmTargets() {
 
 fun Project.installFullScreenDemo(suffix: String) {
     tasks.register<Copy>("installFullScreenDemo$suffix") {
-        val webPack = project.tasks.getByName("jsBrowser${suffix}Webpack", org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack::class)
+        val webPack = project.tasks.getByName("browser${suffix}Webpack", org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack::class)
 
         dependsOn(webPack)
 
-        val kotlinExtension = project.extensions.getByName("kotlin") as KotlinMultiplatformExtension
+        val kotlinExtension = project.extensions.getByName("kotlin") as KotlinJsProjectExtension
         val kotlinSourceSets = kotlinExtension.sourceSets
 
         val jsFile       = webPack.outputFile
-        val htmlFile     = kotlinSourceSets.getByName("jsMain").resources.single { it.name == "index.html" }
-        val docDirectory = "$buildDir/../../docs/${project.name.toLowerCase()}"
+        val htmlFile     = kotlinSourceSets.getByName("main").resources.single { it.name == "index.html" }
+        val docDirectory = "$buildDir/../../docs/${project.name.toLowerCase().removeSuffix("fullscreen")}"
 
         from(htmlFile, jsFile)
         into(docDirectory)
