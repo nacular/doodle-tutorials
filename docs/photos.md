@@ -55,7 +55,7 @@ kotlin {
 
 ---
 
-## Defining Our Application
+## The Application
 
 All Doodle apps must implement the [`Application`](https://github.com/nacular/doodle/blob/master/Core/src/commonMain/kotlin/io/nacular/doodle/application/Application.kt#L4)
 interface. The framework will then initialize our app via the constructor.
@@ -70,11 +70,9 @@ class PhotosApp(/*...*/): Application {
     init {
         // ...
 
-        val panelToggle // Button used to show/hide the panel
-        val panel       // Has controls for manipulating images
-
-        
-        val mainContainer = container {
+        val panelToggle                 // Button used to show/hide the panel
+        val panel                       // Has controls for manipulating images
+        val mainContainer = container { // container that holds images
             // ...
             
             dropReceiver = object: DropReceiver {
@@ -101,19 +99,19 @@ class PhotosApp(/*...*/): Application {
 
 ---
 
-## Defining Main + Fullscreen
+## Creating A Full Screen App
 
 Doodle apps can be [launched](https://nacular.github.io/doodle/#/applications) in a few different ways.
-For our purposes, we will create a `main` and run this [top-level](https://nacular.github.io/doodle/#/applications?id=top-level-apps) in full screen.
+We create a helper to launch the app in [full screen](https://nacular.github.io/doodle/#/applications?id=top-level-apps).
 
-[**Main.kt**](https://github.com/nacular/doodle-tutorials/blob/master/Photos/src/main/kotlin/io/nacular/doodle/examples/Main.kt#L22)
+[**FullScreen.kt**](https://github.com/nacular/doodle-tutorials/blob/master/Photos/src/main/kotlin/io/nacular/doodle/examples/FullScreen.kt#L22)
 
 ```kotlin
 package io.nacular.doodle.examples
 
 //...
 
-fun main() {
+fun fullscreen() {
     application(modules = listOf(
         FocusModule,
         KeyboardModule,
@@ -133,7 +131,7 @@ fun main() {
 }
 ```
 
-Use the `application` function to launch top-level apps. It takes a list of modules, and a lambda that builds the
+The `application` function launches apps. It takes a list of modules, and a lambda that builds the
 app. This lambda is within a Kodein injection context, which means we can inject dependencies into our app via
 `instance`, `provider`, etc.
 
@@ -153,8 +151,9 @@ about an HTML element. It also helps support embedding apps into non-Doodle cont
 
 ## Drag-drop Support
 
-Drag-drop support requires the DragDropModule to work. It then requires setting up drag/drop recognizers on the source/target Views. This app creates
-a main Container for this.
+Drag-drop support requires the [`DragDropModule`]() to work. It then requires setting up drag/drop recognizers on the source/target Views. We created
+the `mainContainer` for this. You can see that the `dropReceiver` property is set to a `DropReceiver` that controls how the `mainContainer` handles
+drop events.
 
 ```kotlin
 class PhotosApp(/*...*/ private val images: ImageLoader /*...*/): Application {
@@ -188,6 +187,61 @@ class PhotosApp(/*...*/ private val images: ImageLoader /*...*/): Application {
 }
 ```
 
-The DropReceiver specifies the supported file-types. It then checks that any drop event contains valid files before accepting it. The 
+Our `DropReceiver` specifies the supported file-types (jpg, jpeg, and png). It then checks that any drop event contains valid files before accepting it. The 
 `drop(event: DropEvent)` method is called when the user attempts the final drop. Here, the receiver fetches all the allowed files in the bundle,
 and tries to load and import each one. Notice that the receiver converts raw Image returned by `ImageLoader` into a `FixedAspectPhoto`.
+
+## Importing An Image
+
+We import images using a local `import` function inside the `mainContainer` creation block. This simplifies access to local state. The `import`
+function takes a photo, which is a `View`, and a location to place it.
+
+```kotlin
+val import = { photo: View, location: Point ->
+    
+}
+```
+
+Import resizes and centers the photo at the given point. It is center-rotates it between -15° and 15°. Finally, a listener is added to the `pressed`
+pointer event. This moves the photo to the foreground and updates the panel.
+
+```kotlin
+photo.width           = 400.0
+photo.position        = location - Point(photo.width / 2, photo.height / 2)
+photo.transform       = Identity.rotate(location, (Random.nextFloat() * 30 - 15) * degrees)
+photo.pointerChanged += pressed {
+    children.move(photo, to = children.size - 1)
+    panel.setPhoto(photo)
+}
+```
+
+Import also registers a custom gesture listener to support multi-touch scaling and rotations.
+
+```kotlin
+GestureRecognizer(photo).changed += object: GestureListener<GestureEvent> {
+    // ...
+
+    override fun started(event: GestureEvent) {
+        // capture initial state
+        event.consume()
+    }
+
+    override fun changed(event: GestureEvent) {
+        // 1) calculate rotation angle
+        // 2) update photo transform to include rotation
+        // 3) update photo bounds based on scaling
+        event.consume()
+    }
+
+    override fun ended(event: GestureEvent) {
+        // simply consume event
+        event.consume()
+    }
+}
+```
+
+`GestureRecognizer` takes a `View` and emits events whenever it detects motion from 2 or more pointers in that `View`. It also calculates
+a scale value by comparing the distance between the selected pointers over time.
+
+We register a listener that uses the events to update the photo's `transform` and `bounds`. The listener also consumes events to avoid
+them making it to subsequent pointer listeners.
