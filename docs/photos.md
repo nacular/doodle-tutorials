@@ -63,7 +63,7 @@ interface. The framework will then initialize our app via the constructor.
 The app's structure is fairly simple. It has a main Container that holds the images and supports drag-drop, and a panel with controls for manipulating
 a selected image.
 
-[**PhotosApp.kt**](https://github.com/nacular/doodle-tutorials/blob/master/PHotos/src/commonMain/kotlin/io/nacular/doodle/examples/PhotosApp.kt#L11)
+[**PhotosApp.kt**](https://github.com/nacular/doodle-tutorials/blob/master/Photos/src/commonMain/kotlin/io/nacular/doodle/examples/PhotosApp.kt#L11)
 
 ```kotlin
 class PhotosApp(/*...*/): Application {
@@ -215,6 +215,8 @@ photo.pointerChanged += pressed {
 }
 ```
 
+## Using Gestures
+
 Import also registers a custom gesture listener to support multi-touch scaling and rotations.
 
 ```kotlin
@@ -244,4 +246,49 @@ GestureRecognizer(photo).changed += object: GestureListener<GestureEvent> {
 a scale value by comparing the distance between the selected pointers over time.
 
 We register a listener that uses the events to update the photo's `transform` and `bounds`. The listener also consumes events to avoid
-them making it to subsequent pointer listeners.
+them making it to subsequent pointer listeners (the `Resizer` used for single pointer manipulation in this case).
+
+### Capturing Initial Gesture State
+
+We record the state of our photo and the pointers provided by the `GestureRecognizer` on the `started` event.
+
+```kotlin
+override fun started(event: GestureEvent) {
+    // Capture initial state to apply deltas with in `changed`
+    originalSize     = photo.size
+    originalCenter   = this@container.toLocal(event.center, photo)
+    originalVector   = event.initial[1].inParent(photo) - event.initial[0].inParent(photo)
+    originalPosition = photo.position
+    initialTransform = photo.transform
+
+    event.consume() // ensure event is consumed from Resizer
+}
+```
+
+### Handling Gesture Updates
+
+The values recorded in `started` are used--along with the new state--in the `changed` event to update the selected photo.
+
+```kotlin
+override fun changed(event: GestureEvent) {
+    val currentVector = event.current[1].inParent(photo) - event.current[0].inParent(photo)
+
+    // Angle between initial set of points and their current locations
+    val transformAngle = atan2(
+        originalVector.x * currentVector.y - originalVector.y * currentVector.x,
+        originalVector.x * currentVector.x + originalVector.y * currentVector.y
+    )
+
+    // Use transform for rotation
+    photo.transform = initialTransform.rotate(around = originalCenter, by = transformAngle)
+
+    // Use bounds to keep panel updated
+    photo.bounds = Rectangle(
+            originalPosition - ((originalPosition - originalCenter) * (1 - event.scale)),
+            originalSize * event.scale)
+
+    event.consume() // ensure event is consumed from Resizer
+}
+```
+
+`GestureRecognizer` calculates `event.scale` as the tracked pointers move within our photo.  
