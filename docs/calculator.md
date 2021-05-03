@@ -98,25 +98,27 @@ class CalculatorApp(display: Display): Application {
 
 ---
 
-## Defining Main + Fullscreen
+## Creating A Fullscreen App
 
 Doodle apps can be [launched](https://nacular.github.io/doodle/#/applications) in a few different ways.
-For our purposes, we will create a `main` and run this [top-level](https://nacular.github.io/doodle/#/applications?id=top-level-apps) in full screen.
+We create a helper to launch the app in [full screen](https://nacular.github.io/doodle/#/applications?id=top-level-apps).
 
-[**Main.kt**](https://github.com/nacular/doodle-tutorials/blob/master/Calculator/src/jsMain/kotlin/io/nacular/doodle/examples/Main.kt#L12)
+[**FullScreen.kt**](https://github.com/nacular/doodle-tutorials/blob/master/Calculator/src/jsMain/kotlin/io/nacular/doodle/examples/FullScreen.kt#L12)
 
 ```kotlin
 package io.nacular.doodle.examples
 
 //...
 
-fun main() {
+fun fullScreen() {
     application(modules = listOf(PointerModule)) {
         // load app
         CalculatorApp(instance()) // provide the Display
     }
 }
 ```
+?> Normally this would just be your `main` function. But `main` would prevent the app from being used as a library. Which
+is what happens to allow both an embedded (in the docs) and full-screen version.
 
 The `application` function is used to launch top-level apps. It takes a list of modules to include and a lambda that builds the
 app being launched. This lambda is within a Kodein injection context, which means we can inject dependencies into our app via

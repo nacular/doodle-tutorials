@@ -71,8 +71,7 @@ kotlin {
 ## Defining Our Application
 
 All Doodle apps must implement the [`Application`](https://github.com/nacular/doodle/blob/master/Core/src/commonMain/kotlin/io/nacular/doodle/application/Application.kt#L4)
-interface. The framework will then initialize our app via the constructor. Our app will be fairly simple: just create
-an instance of our calculator and add it to the display.
+interface. The framework will then initialize our app via the constructor.
 
 Doodle apps can be defined in `commonMain`, since they do not require any platform-specific dependencies. Therefore, we will do
 the same and place ours in `commonMain/kotlin/io/nacular/doodle/examples`.
@@ -107,19 +106,19 @@ class TodoApp(display: Display, /*...*/): Application {
 
 ---
 
-## Defining Main + Fullscreen
+## Creating A Fullscreen App
 
 Doodle apps can be [launched](https://nacular.github.io/doodle/#/applications) in a few different ways.
-For our purposes, we will create a `main` and run this [top-level](https://nacular.github.io/doodle/#/applications?id=top-level-apps) in full screen.
+We create a helper to launch the app in [full screen](https://nacular.github.io/doodle/#/applications?id=top-level-apps).
 
-[**Main.kt**](https://github.com/nacular/doodle-tutorials/blob/master/Todo/src/jsMain/kotlin/io/nacular/doodle/examples/Main.kt#L12)
+[**FullScreen.kt**](https://github.com/nacular/doodle-tutorials/blob/master/Todo/src/jsMain/kotlin/io/nacular/doodle/examples/FullScreen.kt#L12)
 
 ```kotlin
 package io.nacular.doodle.examples
 
 //...
 
-fun main() {
+fun fullScreen() {
     application(modules = listOf(FontModule, PointerModule, KeyboardModule, basicLabelBehavior(),
         nativeTextFieldBehavior(), nativeHyperLinkBehavior(), nativeScrollPanelBehavior(smoothScrolling = true),
         Module(name = "AppModule") {
@@ -136,6 +135,8 @@ fun main() {
     }
 }
 ```
+?> Normally this would just be your `main` function. But `main` would prevent the app from being used as a library. Which
+is what happens to allow both an embedded (in the docs) and full-screen version.
 
 Use the `application` function to launch top-level apps. It takes a list of modules, and a lambda that builds the
 app. This lambda is within a Kodein injection context, which means we can inject dependencies into our app via

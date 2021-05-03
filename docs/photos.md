@@ -131,6 +131,9 @@ fun fullscreen() {
 }
 ```
 
+?> Normally this would just be your `main` function. But `main` would prevent the app from being used as a library. Which
+is what happens to allow both an embedded (in the docs) and full-screen version.
+
 The `application` function launches apps. It takes a list of modules, and a lambda that builds the
 app. This lambda is within a Kodein injection context, which means we can inject dependencies into our app via
 `instance`, `provider`, etc.
