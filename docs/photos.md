@@ -253,7 +253,10 @@ them making it to subsequent pointer listeners (the `Resizer` used for single po
 
 ### Capturing Initial Gesture State
 
-We record the state of our photo and the pointers provided by the `GestureRecognizer` on the `started` event.
+We record the state of our photo, and the pointers provided by the `GestureRecognizer` on the `started` event. Notice that `GestureRecognizer`
+provides locations in the photo's local coordinate. This makes sense for a general-purpose utility and matches the way Doodle reports
+pointer events. We use these values to modify the photo's bounds though, which is defined in its parent's coordinates. So we map the points
+into the parent before our calculations.
 
 ```kotlin
 override fun started(event: GestureEvent) {
@@ -285,7 +288,7 @@ override fun changed(event: GestureEvent) {
     // Use transform for rotation
     photo.transform = initialTransform.rotate(around = originalCenter, by = transformAngle)
 
-    // Use bounds to keep panel updated
+    // Update bounds instead of scale transformation
     photo.bounds = Rectangle(
             originalPosition - ((originalPosition - originalCenter) * (1 - event.scale)),
             originalSize * event.scale)
@@ -293,5 +296,3 @@ override fun changed(event: GestureEvent) {
     event.consume() // ensure event is consumed from Resizer
 }
 ```
-
-`GestureRecognizer` calculates `event.scale` as the tracked pointers move within our photo.  
