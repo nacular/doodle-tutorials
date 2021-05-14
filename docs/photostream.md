@@ -6,7 +6,7 @@ We will build a simple Doodle app that displays an infinite stream of photos tha
 The photos will be shown in a list that continuously grows as the user scrolls to the bottom.
 
 <div style="text-align:center; margin: var(--code-block-margin)">
-    <video autoplay loop width="400px">
+    <video autoplay loop muted playsinline width="400px">
       <source type="video/mp4" src="photo_stream_desktop.mov"/>
       <p>Your browser does not support the video element.</p>
     </video>

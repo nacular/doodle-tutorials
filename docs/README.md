@@ -38,7 +38,7 @@ walkthroughs and source code.
 ### [PhotoStream](/photostream.md)
 
 <div style="text-align:center; margin: var(--code-block-margin)">
-    <video autoplay loop width="400px">
+    <video autoplay loop muted playsinline width="400px">
       <source type="video/mp4" src="photo_stream_desktop.mov"/>
       <p>Your browser does not support the video element.</p>
     </video>
