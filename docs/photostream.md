@@ -1,4 +1,4 @@
-# [Photo Stream]((https://github.com/nacular/doodle-tutorials/tree/master/PhotoStream)) Tutorial
+# [Photo Stream](https://github.com/nacular/doodle-tutorials/tree/master/PhotoStream) Tutorial
 
 ----
 
