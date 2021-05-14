@@ -1,4 +1,4 @@
-<div style="text-align: center"><img src="repo_image.png" alt="Doodle Tutorials" style="height:300px"></div>
+<div style="text-align: center"><img src="repo_image.png" alt="Doodle Tutorials" style="width:70%"></div>
 
 ---
 
