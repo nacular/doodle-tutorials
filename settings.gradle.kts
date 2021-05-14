@@ -7,5 +7,6 @@ include(
 "Photos",
 "PhotosFullScreen",
 "Todo",
-"TodoFullScreen"
+"TodoFullScreen",
+"PhotoStream"
 )

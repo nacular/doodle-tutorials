@@ -1,15 +1,11 @@
-<div align="center"><img src="doodle.svg" alt="doodle" style="height:100px;margin-bottom:50px"></div>
-<h1>Tutorials for learning Doodle</h1>
+<div style="text-align: center"><img src="repo_image.png" alt="Doodle Tutorials" style="height:300px"></div>
 
 ---
 
-[![Kotlin 1.4.31](https://img.shields.io/badge/Kotlin-1.4.31-blue.svg?style=for-the-badge&logo=kotlin)](http://kotlinlang.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://github.com/pusolito/doodle/blob/master/LICENSE)
-[![Chat: on slack](https://img.shields.io/badge/slack-doodle-green.svg?style=for-the-badge&logo=slack)](https://kotlinlang.slack.com/messages/doodle)
+A collection of live apps and tutorials to help you learn [Doodle](https://nacular.github.io/doodle). Play with the apps and check out their 
+walkthroughs and source code.
 
-A collection of tutorials to help you learn how to use [Doodle](https://nacular.github.io/doodle).
-
-## [Calculator](/calculator)
+### [Calculator](/calculator)
 
 ```doodle
 {
@@ -19,7 +15,7 @@ A collection of tutorials to help you learn how to use [Doodle](https://nacular.
 }
 ```
 
-## [TodoMVC](/todo)
+### [TodoMVC](/todo)
 
 ```doodle
 {
@@ -29,7 +25,7 @@ A collection of tutorials to help you learn how to use [Doodle](https://nacular.
 }
 ```
 
-## [Photos](/photos)
+### [Photos](/photos)
 
 ```doodle
 {
@@ -38,3 +34,12 @@ A collection of tutorials to help you learn how to use [Doodle](https://nacular.
     "run"   : "DocApps.photos"
 }
 ```
+
+### [PhotoStream](/photostream.md)
+
+<div style="text-align:center; margin: var(--code-block-margin)">
+    <video autoplay loop width="400px">
+      <source type="video/mp4" src="photo_stream_desktop.mov"/>
+      <p>Your browser does not support the video element.</p>
+    </video>
+</div>

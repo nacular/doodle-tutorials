@@ -1,0 +1,303 @@
+# [Photo Stream]((https://github.com/nacular/doodle-tutorials/tree/master/PhotoStream)) Tutorial
+
+----
+
+We will build a simple Doodle app that displays an infinite stream of photos that are lazily loaded from [unsplash.com](https://unsplash.com).
+The photos will be shown in a list that continuously grows as the user scrolls to the bottom.
+
+<div style="text-align:center; margin: var(--code-block-margin)">
+    <video autoplay loop width="400px">
+      <source type="video/mp4" src="photo_stream_desktop.mov"/>
+      <p>Your browser does not support the video element.</p>
+    </video>
+</div>
+
+The first thing we need is an **Unsplash API** key. Take a look at their [developer documentation](https://unsplash.com/documentation) to obtain one.
+A key is required to make API requests and fetch image urls.
+
+## Project Setup
+
+We will use a JS only-setup for this app. Our app will use Ktor for the HTTP client and Kotlin Serialization to unmarshal the resulting JSON.
+We also need Kotlin's Coroutines library to load images asynchronously.
+
+[**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/PhotoStream/build.gradle.kts)
+
+```kotlin
+plugins {
+    kotlin("js"                  )
+    kotlin("plugin.serialization")
+}
+
+kotlin {
+    jsTargets()
+
+    val ktorVersion         : String by project
+    val doodleVersion       : String by project
+    val coroutinesVersion   : String by project
+    val serializationVersion: String by project
+
+    dependencies {
+        implementation("io.ktor:ktor-client-core:$ktorVersion"                                 )
+        implementation("io.ktor:ktor-client-serialization:$ktorVersion"                        )
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:$coroutinesVersion"   )
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
+
+        api("io.nacular.doodle:core:$doodleVersion"     )
+        api("io.nacular.doodle:browser:$doodleVersion"  )
+        api("io.nacular.doodle:controls:$doodleVersion" )
+        api("io.nacular.doodle:themes:$doodleVersion"   )
+    }
+}
+```
+
+## The Application
+
+Our application will be fairly simple. It will create a [`DynamicList`](https://github.com/nacular/doodle/blob/master/Controls/src/commonMain/kotlin/io/nacular/doodle/controls/list/DynamicList.kt#L19) 
+with a data model bound to Unsplash's APIs. This list will be within a [`ScrollPanel`](https://github.com/nacular/doodle/blob/master/Core/src/commonMain/kotlin/io/nacular/doodle/controls/panels/ScrollPanel.kt#L43) 
+that fits the [`Display`](https://github.com/nacular/doodle/blob/master/Core/src/commonMain/kotlin/io/nacular/doodle/core/Display.kt#L21) height.
+
+```kotlin
+class PhotoStreamApp(display    : Display,
+                     themes     : ThemeManager,
+                     theme      : DynamicTheme,
+                     httpClient : HttpClient,
+                     imageLoader: ImageLoader): Application {
+    init {
+        // For scroll panel behavior
+        themes.selected = theme
+        
+        val appScope    = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+        val imageHeight = 400.0
+
+        // List to hold images
+        val list = DynamicList(
+            model          = UnSplashDataModel(appScope, httpClient, imageLoader),
+            itemVisualizer = itemVisualizer { image, recycledView, _ -> when(recycledView) {
+                is CenterCroppedPhoto -> recycledView.also { recycledView.image = image }
+                else                  -> CenterCroppedPhoto(image)
+            } }
+        ).apply {
+            behavior      = BasicListBehavior(rowHeight = imageHeight)
+            cellAlignment = fill
+        }
+
+        display += ScrollPanel(list).apply {
+            // Ensure list's width is equal to scroll-panel's
+            contentWidthConstraints = { parent.width }
+        }
+
+        display.layout = constrain(display.children[0]) {
+            it.width   = min(parent.width, constant(imageHeight))
+            it.height  = parent.height
+            it.centerX = parent.centerX
+        }
+    }
+
+    override fun shutdown() {}
+}
+```
+
+DynamicList monitors its model for changes and updates whenever items are added, removed, or moved. This means we can simply change the underlying
+model to get a list that grows.
+
+?> `DynamicList`, like [`List`](https://github.com/nacular/doodle/blob/master/Controls/src/commonMain/kotlin/io/nacular/doodle/controls/list/List.kt#L98) 
+and [`MutableList`](https://github.com/nacular/doodle/blob/master/Controls/src/commonMain/kotlin/io/nacular/doodle/controls/list/MutableList.kt#L30) 
+recycle their contents to avoid rendering items that are not displayed. The `scrollCache` constructor parameter controls the amount of items in the 
+buffer. Passing nothing means we get a default of 10 items cached beyond what is visible.
+
+## Binding To Unsplash Data
+
+DynamicList requires a [`DynamicListModel`](https://github.com/nacular/doodle/blob/master/Controls/src/commonMain/kotlin/io/nacular/doodle/controls/ListModel.kt#L40) 
+to hold its data, so we need to create one that binds to Unsplash.
+
+```kotlin
+class UnSplashDataModel(private val accessToken: String = "YOUR_ACCESS_TOKEN", /*...*/): DynamicListModel<Image> {
+    // ...
+
+    private var currentPage: Int by observable(-1) { /*...*/ }
+
+    private val pageSize               = 5
+    private val unsplashLocation get() = "https://api.unsplash.com/photos/?client_id=$accessToken&page=$currentPage&per_page=$pageSize"
+
+    override val size get() = loadedImages.size
+
+    override val changed = SetPool<ModelObserver<Image>>()
+
+    // Internal list used to cache images loaded from unsplash
+    private val loadedImages = ObservableList<Image>()
+
+    override fun get(index: Int): Image? = loadedImages.getOrNull(index).also {
+        // ...
+    }
+
+    override fun contains(value: Image           ) = value in loadedImages
+    override fun iterator(                       ) = loadedImages.iterator()
+    override fun section (range: ClosedRange<Int>) = loadedImages.subList(range.start, range.endInclusive + 1)
+}
+```
+
+Our model will cache a local [`ObservableList`](https://github.com/nacular/doodle/blob/master/Core/src/commonMain/kotlin/io/nacular/doodle/utils/Observables.kt#L41) 
+of images via `loadedImages`. This list will provide the model state our list uses to render. The model will then fetch paginated images 
+from Unsplash and load the resulting urls asynchronously into this list.
+
+We track the `currentPage` and `pageSize` to fetch a growing list of pages from Unsplash. We fetch a new page whenever the `currentPage` is 
+updated.
+
+```kotlin
+class UnSplashDataModel(private val scope: CoroutineScope, /*...*/): DynamicListModel<Image> {
+    // ...
+
+    private var httpRequestJob: Job? by observable(null) { _,old,_ ->
+        old?.cancel()
+    }
+    
+    private var currentPage: Int by observable(-1) { _,_ ->
+        fetchActive    = true
+        httpRequestJob = scope.launch {
+            val results = client.get<List<UnsplashPhoto>>(unsplashLocation)
+    
+            loadedImages.addAll(results.mapNotNull { imageLoader.load(it.urls.small) })
+    
+            fetchActive = false
+    
+            if (nextPageNeeded) {
+                nextPageNeeded  = false
+                currentPage    += 1
+            }
+        }
+    }
+
+    // ...
+}
+```
+
+Fetches are performed using Ktor's HttpClient configured to read JSON data. These reads are done via Kotlin Serialization into the `UnsplashPhoto` 
+data class. We only use the `small` value in the `urls` property from the JSON response, so our data classes are much simpler than the full 
+Unsplash API.
+
+```kotlin
+class UnSplashDataModel(httpClient: HttpClient, /*...*/): DynamicListModel<Image> {
+    // ...
+
+    @Serializable
+    data class Urls(val small: String)
+
+    @Serializable
+    data class UnsplashPhoto(val id: String, val urls: Urls)
+
+    // HTTP client configured to read JSON  returned from unsplash
+    private val client = httpClient.config {
+        install(JsonFeature) {
+            serializer = KotlinxSerializer(Json { ignoreUnknownKeys = true })
+        }
+    }
+
+    // ...
+}
+```
+
+Our `loadedImages` list triggers an event whenever we add a new set of images to it. We use this fact to notify of changes to the model, which get 
+reflected by the `DynamicList`.
+
+```kotlin
+class UnSplashDataModel(/*...*/): DynamicListModel<Image> {
+    // ...
+
+    override val changed = SetPool<ModelObserver<Image>>()
+
+    // Internal list used to cache images loaded from unsplash
+    private val loadedImages = ObservableList<Image>().also {
+        it.changed += { _ ,removed, added, moved ->
+            // notify model observers whenever the underlying list changes (due to image loads)
+            changed.forEach {
+                it(this, removed, added, moved)
+            }
+        }
+    }
+
+    // ...
+}
+```
+
+Finally, we need to decide when to fetch more images. We do this whenever `get` is called on the last image of the model. This happens when
+the `DynamicList` needs to present that image, and is a good indication that it has reached the end.
+
+```kotlin
+class UnSplashDataModel(/*...*/): DynamicListModel<Image> {
+    // ...
+
+    override fun get(index: Int): Image? = loadedImages.getOrNull(index).also {
+        // Load the next page if the last image is fetched from the model
+        if (index == size - 1) {
+            when {
+                fetchActive -> nextPageNeeded  = true
+                else        -> currentPage    += 1
+            }
+        }
+    }
+
+    // ...
+}
+```
+
+## Presenting The Images
+
+Our `DynamicList` holds a list of `Image` items, but these are not `View`s. Which means we need a way of visualizing them. Many Doodle containers 
+use this concept of an [`ItemVisualizer`](https://github.com/nacular/doodle/blob/master/Controls/src/commonMain/kotlin/io/nacular/doodle/controls/ItemVisualizer.kt#L13). 
+It is essentially a class that maps from some type `T` to `View` based on a set of inputs. `DynamicList` takes an `itemVisualizer` in its 
+constructor that can be used by is `behavior` to render the contents of each row. Our app uses the `BasicListBehavior` to configure our list. 
+Internally, that behavior takes the list's visualizer and creates a new `View` that is wrapped in another that represents the row itself. So it 
+is sufficient to specify a visualizer that renders our images.
+
+?> It is also possible to change the way `BasicListBehavior` (and any `ListBehavior`) represents its rows by specifying it's [`RowGenerator`](https://github.com/nacular/doodle/blob/master/Controls/src/commonMain/kotlin/io/nacular/doodle/controls/list/List.kt#L47).
+
+```kotlin
+class PhotoStreamApp(/*...*/): Application {
+    init {
+        // ...
+
+        val list = DynamicList(
+            model          = UnSplashDataModel(appScope, httpClient, imageLoader),
+            itemVisualizer = itemVisualizer { image, recycledView, _ -> when(recycledView) {
+                is CenterCroppedPhoto -> recycledView.also { recycledView.image = image }
+                else                  -> CenterCroppedPhoto(image)
+            } }
+        ).apply {
+            behavior      = BasicListBehavior(rowHeight = imageHeight)
+            cellAlignment = fill
+        }
+    }
+
+    // ...
+}
+``` 
+
+?> `ItemVisualizer` is designed to support recycling. Each invocation may provide a recycled View that might be reusable for the new item. This lets 
+us reuse the `CenterCroppedPhoto` instances as the list scrolls.
+
+We will render each image as with a center-crop using `CenterCroppedPhoto`. This class holds an image that it renders with a centered square crop. The
+crop square's length is equal to the image's width or height (whichever is smaller). That center region is then scaled to fit the cropped photo View's 
+bounds.
+
+```kotlin
+class CenterCroppedPhoto(image: Image): View() {
+    private lateinit var centerCrop: Rectangle
+
+    var image: Image = image
+        set(new) {
+            field        = new
+            val cropSize = min(image.width, image.height)
+            centerCrop   = Rectangle((image.width - cropSize) / 2, (image.height - cropSize) / 2, cropSize, cropSize)
+
+            rerender()
+        }
+
+    init {
+        this.image = image // ensure setter called, so centerCrop initialized
+    }
+
+    override fun render(canvas: Canvas) {
+        canvas.image(image, source = centerCrop, destination = bounds.atOrigin)
+    }
+}
+```
