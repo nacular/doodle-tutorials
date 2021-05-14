@@ -19,7 +19,7 @@ plugins {
 
 allprojects {
     repositories {
-        maven       { url = uri("http://dl.bintray.com/kotlin/kotlin-eap") }
+        maven       { url = uri("https://dl.bintray.com/kotlin/kotlin-eap") }
         mavenLocal  ()
         mavenCentral()
         jcenter     ()
