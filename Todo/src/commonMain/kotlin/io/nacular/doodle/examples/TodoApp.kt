@@ -130,11 +130,11 @@ private class TaskEditOperation(focusManager: FocusManager?, list: MutableList<T
  * @property filterButtonProvider used to create the filter buttons
  */
 private class TodoView(private val config              : TodoConfig,
-                   private val dataStore           : DataStore,
-                   private val linkStyler          : NativeLinkStyler,
-                   private val textMetrics         : TextMetrics,
-                   private val focusManager        : FocusManager,
-                   private val filterButtonProvider: FilterButtonProvider): View() {
+                       private val dataStore           : DataStore,
+                       private val linkStyler          : NativeLinkStyler,
+                       private val textMetrics         : TextMetrics,
+                       private val focusManager        : FocusManager,
+                       private val filterButtonProvider: FilterButtonProvider): View() {
 
     init {
         val header = Label("todos").apply {
@@ -246,6 +246,7 @@ private class TodoView(private val config              : TodoConfig,
  * Todo App based on TodoMVC
  */
 class TodoApp(display             : Display,
+              uiDispatcher        : CoroutineDispatcher,
               fonts               : FontLoader,
               theme               : DynamicTheme,
               themes              : ThemeManager,
@@ -256,9 +257,11 @@ class TodoApp(display             : Display,
               focusManager        : FocusManager,
               filterButtonProvider: FilterButtonProvider): Application {
     init {
+        val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
         // Launch coroutine to fetch fonts/images
-        GlobalScope.launch {
-            val titleFont  = fonts            { size = 100; weight = 100; family = "'Helvetica Neue', Helvetica, Arial, sans-serif" }
+        appScope.launch(uiDispatcher) {
+            val titleFont  = fonts            { size = 100; weight = 100; families = listOf("Helvetica Neue", "Helvetica", "Arial", "sans-serif") }
             val listFont   = fonts(titleFont) { size =  24 }
             val footerFont = fonts(titleFont) { size =  10 }
             val config     = TodoConfig(

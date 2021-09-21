@@ -28,7 +28,7 @@ import io.nacular.doodle.layout.constant
 import io.nacular.doodle.layout.constrain
 import io.nacular.doodle.system.Cursor.Companion.Pointer
 import io.nacular.doodle.utils.roundToNearest
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.js.JsName
 import kotlin.math.pow
@@ -37,11 +37,13 @@ import kotlin.math.pow
  * Simple calculator with basic math operations.
  *
  * @property fonts           used to find fonts
+ * @param    appScope        used to run coroutines
  * @property textMetrics     used to measure text
  * @property numberFormatter used to display number output
  */
 class Calculator(
         private val fonts          : FontLoader,
+                    appScope       : CoroutineScope,
         private val textMetrics    : TextMetrics,
         private val numberFormatter: NumberFormatter
 ): View() {
@@ -295,25 +297,28 @@ class Calculator(
      * Updates font for [output] and function buttons using different sizes and weights than the given [font].
      */
     private suspend fun loadFonts() {
-        font = fonts {
+        font = fonts("Roboto-Regular.ttf") {
             family = "Roboto"
             weight = 400
             size   = 32
         }
 
-        font?.let {
-            output.font = fonts(it) { size = 72; weight = 100 }
-
-            fonts(it) { size -= 5; weight = 100 }.let { smallerFont ->
-                clear.font  = smallerFont
-                negate.font = smallerFont
-                `%`.font    = smallerFont
+        font?.let { font ->
+            fonts("Roboto-Light.ttf") {
+                family = "Roboto"
+                size   = font.size - 5
+                weight = 100
+            }.let { lightFont ->
+                output.font = fonts(lightFont) { size = 72 }
+                clear.font  = lightFont
+                negate.font = lightFont
+                `%`.font    = lightFont
             }
         }
     }
 
     init {
-        GlobalScope.launch {
+        appScope.launch {
             loadFonts()
 
             ButtonGroup(allowDeselectAll = true, buttons = arrayOf(`÷`, `*`, `-`, `+`))

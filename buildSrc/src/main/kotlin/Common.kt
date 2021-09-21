@@ -43,19 +43,22 @@ fun KotlinTargetContainerWithPresetFunctions.jvmTargets() {
 }
 
 fun Project.installFullScreenDemo(suffix: String) {
-    tasks.register<Copy>("installFullScreenDemo$suffix") {
-        val webPack = project.tasks.getByName("browser${suffix}Webpack", org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack::class)
+    try {
+        val webPack = project.tasks.getByName("jsBrowser${suffix}Webpack", org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack::class)
 
-        dependsOn(webPack)
+        tasks.register<Copy>("installFullScreenDemo$suffix") {
+            dependsOn(webPack)
 
-        val kotlinExtension = project.extensions.getByName("kotlin") as KotlinJsProjectExtension
-        val kotlinSourceSets = kotlinExtension.sourceSets
+            val kotlinExtension = project.extensions.getByName("kotlin") as KotlinMultiplatformExtension
+            val kotlinSourceSets = kotlinExtension.sourceSets
 
-        val jsFile       = webPack.outputFile
-        val htmlFile     = kotlinSourceSets.getByName("main").resources.single { it.name == "index.html" }
-        val docDirectory = "$buildDir/../../docs/${project.name.toLowerCase().removeSuffix("fullscreen")}"
+            val jsFile          = webPack.outputFile
+            val commonResources = kotlinSourceSets.getByName("commonMain").resources
+            val jsResources     = kotlinSourceSets.getByName("jsMain"    ).resources
+            val docDirectory    = "$buildDir/../../docs/${project.name.toLowerCase().removeSuffix("runner")}"
 
-        from(htmlFile, jsFile)
-        into(docDirectory)
-    }
+            from(commonResources, jsResources, jsFile)
+            into(docDirectory)
+        }
+    } catch (ignored: Exception) {}
 }

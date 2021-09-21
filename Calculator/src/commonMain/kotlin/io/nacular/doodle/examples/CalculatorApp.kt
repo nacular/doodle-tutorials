@@ -7,6 +7,9 @@ import io.nacular.doodle.drawing.FontLoader
 import io.nacular.doodle.drawing.TextMetrics
 import io.nacular.doodle.layout.constant
 import io.nacular.doodle.layout.constrain
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 
 /**
  * Simple calculate app that places a [Calculator] at the center of the display.
@@ -18,8 +21,10 @@ class CalculatorApp(
         numberFormatter: NumberFormatter
 ): Application {
     init {
+        val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
         // creat and display a single Calculator
-        display += Calculator(fontDetector, textMetrics, numberFormatter).apply {
+        display += Calculator(fontDetector, appScope, textMetrics, numberFormatter).apply {
             // layout the Display whenever the Calculator's size preferences are updated.
             // this allows us to constrain its size to match its ideal size (which it sets).
             sizePreferencesChanged += { _,_,_ ->

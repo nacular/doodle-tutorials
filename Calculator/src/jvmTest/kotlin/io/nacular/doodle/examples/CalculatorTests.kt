@@ -8,6 +8,7 @@ import io.mockk.spyk
 import io.nacular.doodle.controls.buttons.Button
 import io.nacular.doodle.drawing.Font
 import io.nacular.doodle.drawing.FontLoader
+import kotlinx.coroutines.GlobalScope
 import kotlin.test.Test
 import kotlin.test.expect
 
@@ -46,7 +47,7 @@ class CalculatorTests {
     }
 
     private fun compute(block: Calculator.() -> List<Button>): Double {
-        val calculator = Calculator(fontDetector(), mockk(relaxed = true), mockk(relaxed = true))
+        val calculator = Calculator(fontDetector(), GlobalScope, mockk(relaxed = true), mockk(relaxed = true))
 
         block(calculator).forEach {
             spyk(it).apply { every { displayed } returns true }.click()

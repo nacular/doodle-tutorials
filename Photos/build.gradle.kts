@@ -1,20 +1,26 @@
 plugins {
-    kotlin("js")
+    kotlin("multiplatform")
 }
 
 kotlin {
-    jsTargets()
+    jsTargets ()
+    jvmTargets()
 
     val doodleVersion    : String by project
     val coroutinesVersion: String by project
 
-    dependencies {
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:$coroutinesVersion")
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                implementation(kotlin("stdlib-common"))
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
 
-        api("io.nacular.doodle:core:$doodleVersion"     )
-        api("io.nacular.doodle:browser:$doodleVersion"  )
-        api("io.nacular.doodle:controls:$doodleVersion" )
-        api("io.nacular.doodle:animation:$doodleVersion")
-        api("io.nacular.doodle:themes:$doodleVersion"   )
+                api("io.nacular.doodle:core:$doodleVersion")
+                api("io.nacular.doodle:browser:$doodleVersion")
+                api("io.nacular.doodle:controls:$doodleVersion")
+                api("io.nacular.doodle:animation:$doodleVersion")
+                api("io.nacular.doodle:themes:$doodleVersion")
+            }
+        }
     }
 }

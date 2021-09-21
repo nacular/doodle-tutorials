@@ -48,7 +48,7 @@ class FilterBox(private val config              : TodoConfig,
             // Draw text
             view.foregroundColor?.paint?.let { canvas.text(view.text, font(view), textPosition(view), it) }
         }
-    } as Behavior<Button>
+    }
 
     private fun filterButton(text: String, filter: DataStore.Filter? = null): Button {
         // Get new filter button from the provider, giving it a [Behavior] to install

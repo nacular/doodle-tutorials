@@ -4,12 +4,14 @@ import io.nacular.doodle.animation.impl.AnimatorImpl
 import io.nacular.doodle.application.Modules.Companion.DragDropModule
 import io.nacular.doodle.application.Modules.Companion.FocusModule
 import io.nacular.doodle.application.Modules.Companion.FontModule
+import io.nacular.doodle.application.Modules.Companion.ImageModule
 import io.nacular.doodle.application.Modules.Companion.KeyboardModule
 import io.nacular.doodle.application.Modules.Companion.PointerModule
 import io.nacular.doodle.application.application
 import io.nacular.doodle.controls.buttons.Button
 import io.nacular.doodle.controls.buttons.PushButton
 import io.nacular.doodle.core.Behavior
+import io.nacular.doodle.coroutines.Dispatchers
 import io.nacular.doodle.examples.CalculatorApp
 import io.nacular.doodle.examples.DataStore
 import io.nacular.doodle.examples.FilterButtonProvider
@@ -22,8 +24,6 @@ import io.nacular.doodle.examples.PhotosApp
 import io.nacular.doodle.examples.Router
 import io.nacular.doodle.examples.TodoApp
 import io.nacular.doodle.examples.TrivialRouter
-import io.nacular.doodle.image.ImageLoader
-import io.nacular.doodle.image.impl.ImageLoaderImpl
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicCircularProgressIndicatorBehavior
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicLabelBehavior
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicMutableSpinnerBehavior
@@ -55,10 +55,9 @@ fun todo(element: HTMLElement) {
         }
     }
 
-    application(root = element, modules = listOf(FontModule, PointerModule, KeyboardModule, basicLabelBehavior(),
+    application(root = element, modules = listOf(FontModule, ImageModule, PointerModule, KeyboardModule, basicLabelBehavior(),
             nativeTextFieldBehavior(), nativeHyperLinkBehavior(), nativeScrollPanelBehavior(smoothScrolling = true),
             Module(name = "AppModule") {
-                bindSingleton<ImageLoader>          { ImageLoaderImpl             (instance(), instance()) }
                 bindSingleton<PersistentStore>      { LocalStorePersistence       (                      ) }
                 bindSingleton<NativeLinkStyler>     { NativeLinkStylerImpl        (instance()            ) }
                 bindSingleton                       { DataStore                   (instance()            ) }
@@ -68,7 +67,7 @@ fun todo(element: HTMLElement) {
             }
     )) {
         // load app
-        TodoApp(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance())
+        TodoApp(instance(), Dispatchers.UI, instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance())
     }
 }
 
@@ -76,6 +75,7 @@ fun todo(element: HTMLElement) {
 fun photos(element: HTMLElement) {
     application(root = element, modules = listOf(
             FocusModule,
+            ImageModule,
             KeyboardModule,
             DragDropModule,
             basicLabelBehavior(),
@@ -83,8 +83,7 @@ fun photos(element: HTMLElement) {
             basicMutableSpinnerBehavior(),
             basicCircularProgressIndicatorBehavior(thickness = 18.0),
             Module(name = "AppModule") {
-                bindSingleton<Animator>    { AnimatorImpl   (instance(), instance()) }
-                bindSingleton<ImageLoader> { ImageLoaderImpl(instance(), instance()) }
+                bindSingleton<Animator> { AnimatorImpl   (instance(), instance()) }
             }
     )) {
         // load app

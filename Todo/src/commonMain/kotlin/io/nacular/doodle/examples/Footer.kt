@@ -52,7 +52,7 @@ class Footer(private val textMetrics: TextMetrics, private val linkStyler: Nativ
                 override fun render(view: HyperLink, canvas: Canvas) {
                     // Custom text styling, with underline on pointer-over
                     val styledText = view.foregroundColor { view.font(view.text) }.let {
-                        if (view.model.pointerOver) UnderLine{ it } else it
+                        if (view.model.pointerOver) UnderLine { it } else it
                     }
 
                     canvas.shadow(textShadow) { text(styledText, at = textPosition(view)) }
