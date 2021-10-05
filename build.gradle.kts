@@ -2,8 +2,6 @@ buildscript {
     val kotlinVersion: String by System.getProperties()
 
     repositories {
-        maven       { url = uri("https://dl.bintray.com/kotlin/kotlin-eap") }
-        maven       { url = uri("https://plugins.gradle.org/m2/"          ) }
         mavenCentral()
     }
 
@@ -19,7 +17,6 @@ plugins {
 
 allprojects {
     repositories {
-        maven       { url = uri("https://dl.bintray.com/kotlin/kotlin-eap"              ) }
         maven       { url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev") }
         mavenLocal  ()
         mavenCentral()

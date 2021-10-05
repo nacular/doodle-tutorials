@@ -35,7 +35,7 @@ fun setupDocInstall(suffix: String) {
 
         dependsOn(webPack)
 
-        val outputFile  = webPack.outputFile
+        val outputFile   = webPack.outputFile
         val dirToArchive = "$buildDir/../../docs"
 
         from(outputFile)

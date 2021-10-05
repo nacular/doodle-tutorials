@@ -308,7 +308,7 @@ class Calculator(
                 family = "Roboto"
                 size   = font.size - 5
                 weight = 100
-            }.let { lightFont ->
+            }?.let { lightFont ->
                 output.font = fonts(lightFont) { size = 72 }
                 clear.font  = lightFont
                 negate.font = lightFont

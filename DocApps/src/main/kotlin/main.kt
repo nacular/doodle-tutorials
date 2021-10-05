@@ -16,8 +16,6 @@ import io.nacular.doodle.examples.CalculatorApp
 import io.nacular.doodle.examples.DataStore
 import io.nacular.doodle.examples.FilterButtonProvider
 import io.nacular.doodle.examples.LocalStorePersistence
-import io.nacular.doodle.examples.NativeLinkStyler
-import io.nacular.doodle.examples.NativeLinkStylerImpl
 import io.nacular.doodle.examples.NumberFormatterImpl
 import io.nacular.doodle.examples.PersistentStore
 import io.nacular.doodle.examples.PhotosApp
@@ -59,7 +57,6 @@ fun todo(element: HTMLElement) {
             nativeTextFieldBehavior(), nativeHyperLinkBehavior(), nativeScrollPanelBehavior(smoothScrolling = true),
             Module(name = "AppModule") {
                 bindSingleton<PersistentStore>      { LocalStorePersistence       (                      ) }
-                bindSingleton<NativeLinkStyler>     { NativeLinkStylerImpl        (instance()            ) }
                 bindSingleton                       { DataStore                   (instance()            ) }
                 bindSingleton<Router>               { TrivialRouter               (window                ) }
                 bindSingleton<FilterButtonProvider> { EmbeddedFilterButtonProvider(instance()            ) }

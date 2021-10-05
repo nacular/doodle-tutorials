@@ -35,7 +35,6 @@ fun main() {
             nativeTextFieldBehavior(), nativeHyperLinkBehavior(), nativeScrollPanelBehavior(),
             DI.Module(name = "AppModule") {
                 bindSingleton<PersistentStore>      { FilePersistence()                        }
-                bindSingleton<NativeLinkStyler>     { NativeLinkStylerImpl(instance())         }
                 bindSingleton                       { DataStore(instance())                    }
                 bindSingleton<Router>               { TrivialRouter()                          }
                 bindSingleton<FilterButtonProvider> { EmbeddedFilterButtonProvider(instance()) }

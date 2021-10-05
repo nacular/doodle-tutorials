@@ -20,13 +20,14 @@ import io.nacular.doodle.layout.ListLayout
 import io.nacular.doodle.layout.WidthSource.Parent
 import io.nacular.doodle.text.TextDecoration.Companion.UnderLine
 import io.nacular.doodle.text.invoke
+import io.nacular.doodle.theme.native.NativeHyperLinkStyler
 import io.nacular.doodle.utils.HorizontalAlignment.Center
 import io.nacular.doodle.utils.VerticalAlignment.Bottom
 
 /**
  * Contains the links below the task list.
  */
-class Footer(private val textMetrics: TextMetrics, private val linkStyler: NativeLinkStyler, private val config: TodoConfig): View() {
+class Footer(private val textMetrics: TextMetrics, private val linkStyler: NativeHyperLinkStyler, private val config: TodoConfig): View() {
     private val textShadow = OuterShadow(vertical = 1.0, blurRadius = 0.0, color = White opacity 0.5f)
 
     // Plain text

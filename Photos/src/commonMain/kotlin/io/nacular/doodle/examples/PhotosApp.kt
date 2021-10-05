@@ -98,7 +98,6 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
                 else     -> Label("$item$suffix").apply {
                     font            = previous?.font
                     cursor          = Text
-                    fitText         = emptySet()
                     foregroundColor = previous?.foregroundColor
                     backgroundColor = previous?.backgroundColor ?: Transparent
 
@@ -426,6 +425,8 @@ class PhotosApp(display     : Display,
         }
 
         constrainPanel()
+
+        display.relayout()
     }
 
     override fun shutdown() {}

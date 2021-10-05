@@ -28,6 +28,7 @@ import io.nacular.doodle.text.TextDecoration.Line.*
 import io.nacular.doodle.theme.ThemeManager
 import io.nacular.doodle.theme.adhoc.DynamicTheme
 import io.nacular.doodle.theme.basic.list.*
+import io.nacular.doodle.theme.native.NativeHyperLinkStyler
 import io.nacular.doodle.utils.Encoder
 import io.nacular.doodle.utils.HorizontalAlignment.*
 import kotlinx.coroutines.*
@@ -49,7 +50,7 @@ interface FilterButtonProvider {
  * Default implementation intended for use when app is top-level. It handles routing and provides
  * hyperlinks for the filter buttons.
  */
-internal class LinkFilterButtonProvider(private val dataStore: DataStore, router: Router, private val linkStyler: NativeLinkStyler): FilterButtonProvider {
+internal class LinkFilterButtonProvider(private val dataStore: DataStore, router: Router, private val linkStyler: NativeHyperLinkStyler): FilterButtonProvider {
     init {
         router["/"         ] = { dataStore.filter = null      }
         router["/active"   ] = { dataStore.filter = Active    }
@@ -131,7 +132,7 @@ private class TaskEditOperation(focusManager: FocusManager?, list: MutableList<T
  */
 private class TodoView(private val config              : TodoConfig,
                        private val dataStore           : DataStore,
-                       private val linkStyler          : NativeLinkStyler,
+                       private val linkStyler          : NativeHyperLinkStyler,
                        private val textMetrics         : TextMetrics,
                        private val focusManager        : FocusManager,
                        private val filterButtonProvider: FilterButtonProvider): View() {
@@ -149,7 +150,7 @@ private class TodoView(private val config              : TodoConfig,
                 clipCanvasToBounds = false
 
                 // Maps tasks to TaskRow and updates them when recycled
-                val visualizer = itemVisualizer<Task, IndexedIem> { item, previous, _ ->
+                val visualizer = itemVisualizer<Task, IndexedItem> { item, previous, _ ->
                     when (previous) {
                         is TaskRow -> previous.also { it.task = item }
                         else       -> TaskRow(config, dataStore, item)
@@ -252,7 +253,7 @@ class TodoApp(display             : Display,
               themes              : ThemeManager,
               images              : ImageLoader,
               dataStore           : DataStore,
-              linkStyler          : NativeLinkStyler,
+              linkStyler          : NativeHyperLinkStyler,
               textMetrics         : TextMetrics,
               focusManager        : FocusManager,
               filterButtonProvider: FilterButtonProvider): Application {
@@ -261,16 +262,16 @@ class TodoApp(display             : Display,
 
         // Launch coroutine to fetch fonts/images
         appScope.launch(uiDispatcher) {
-            val titleFont  = fonts            { size = 100; weight = 100; families = listOf("Helvetica Neue", "Helvetica", "Arial", "sans-serif") }
-            val listFont   = fonts(titleFont) { size =  24 }
-            val footerFont = fonts(titleFont) { size =  10 }
+            val titleFont  = fonts            { size = 100; weight = 100; families = listOf("Helvetica Neue", "Helvetica", "Arial", "sans-serif") }!!
+            val listFont   = fonts(titleFont) { size =  24 }!!
+            val footerFont = fonts(titleFont) { size =  10 }!!
             val config     = TodoConfig(
                     listFont        = listFont,
                     titleFont       = titleFont,
                     footerFont      = footerFont,
-                    filterFont      = fonts(titleFont ) { size   = 14     },
-                    boldFooterFont  = fonts(footerFont) { weight = 400    },
-                    placeHolderFont = fonts(listFont  ) { style  = Italic },
+                    filterFont      = fonts(titleFont ) { size   = 14     }!!,
+                    boldFooterFont  = fonts(footerFont) { weight = 400    }!!,
+                    placeHolderFont = fonts(listFont  ) { style  = Italic }!!,
                     checkForeground = images.load("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%22-10%20-18%20100%20135%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2250%22%20fill%3D%22none%22%20stroke%3D%22%23bddad5%22%20stroke-width%3D%223%22/%3E%3Cpath%20fill%3D%22%235dc2af%22%20d%3D%22M72%2025L42%2071%2027%2056l-4%204%2020%2020%2034-52z%22/%3E%3C/svg%3E")!!,
                     checkBackground = images.load("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%22-10%20-18%20100%20135%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2250%22%20fill%3D%22none%22%20stroke%3D%22%23ededed%22%20stroke-width%3D%223%22/%3E%3C/svg%3E")!!
             )

@@ -32,7 +32,7 @@ class TaskRow(config: TodoConfig, dataStore: DataStore, task: Task): View() {
         check.selected = new.completed
         when {
             new.completed -> label.styledText = (config.taskCompletedColor) { TextDecoration.LineThrough(new.text) }
-            else          -> label.text = new.text
+            else          -> label.text       = new.text
         }
     }
 

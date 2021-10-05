@@ -20,7 +20,6 @@ fun fullscreen() {
         nativeTextFieldBehavior(), nativeHyperLinkBehavior(), nativeScrollPanelBehavior(smoothScrolling = true),
         Module(name = "AppModule") {
             bindSingleton<PersistentStore>      { LocalStorePersistence   (                                  ) }
-            bindSingleton<NativeLinkStyler>     { NativeLinkStylerImpl    (instance()                        ) }
             bindSingleton                       { DataStore               (instance()                        ) }
             bindSingleton<Router>               { TrivialRouter           (window                            ) }
             bindSingleton<FilterButtonProvider> { LinkFilterButtonProvider(instance(), instance(), instance()) }

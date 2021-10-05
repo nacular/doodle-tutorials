@@ -98,7 +98,14 @@ class CalculatorApp(display: Display): Application {
 
 ---
 
-## Creating A Fullscreen App
+## Launching on Web and Desktop
+
+Doodle apps can be [launched](https://nacular.github.io/doodle/#/applications) in a few different ways on Web and Desktop. We defined our app logic 
+in a multi-platform `Calculator` library (no `main` functions), so it can be used on both platforms. Notice that we are only using a library here because we also want
+to run the Calculator in our documentation app. That app will run it as an embedded Web app, which becomes easier if it is a library. Otherwise, 
+we could have defined our platform `main` functions directly in the `Calculator` module. Instead, we created a separate `CalculatorRunner` module that contains our `main` functions.
+
+## Creating A Fullscreen Web App
 
 Doodle apps can be [launched](https://nacular.github.io/doodle/#/applications) in a few different ways.
 We create a helper to launch the app in [full screen](https://nacular.github.io/doodle/#/applications?id=top-level-apps).
@@ -117,11 +124,11 @@ fun fullScreen() {
     }
 }
 ```
-?> Normally this would just be your `main` function. But `main` would prevent the app from being used as a library. Which
+?> Normally this would just be your `main` function, but this would prevent the app from being used as a library. Which
 is what happens to allow both an embedded (in the docs) and full-screen version.
 
-The `application` function is used to launch top-level apps. It takes a list of modules to include and a lambda that builds the
-app being launched. This lambda is within a Kodein injection context, which means we can inject dependencies into our app via
+Use the `application` function to launch top-level apps. It takes a list of modules to and a lambda that builds the
+app. This lambda is within a Kodein injection context, which means we can inject dependencies into our app via
 `instance`, `provider`, etc.
 
 Notice that we have included the [`PointerModule`](https://github.com/nacular/doodle/blob/master/Browser/src/jsMain/kotlin/io/nacular/doodle/application/Modules.kt#L62).
@@ -133,8 +140,8 @@ related events will only work because we have.
 The `application` function also takes an optional HTML element within which the app will be hosted. The app will be hosted in
 `document.body` if no element is specified.
 
-App launching is the only part of our code that is platform-specific. This makes sense, since this is the only time we might care
-about an HTML element. And the reason is to support use-cases where apps are embedded into non-Doodle contexts.
+App launching is the only part of our code that is platform-specific. This makes sense, since it is the only time we might need to know
+about an HTML element; say when embedding our app in a non-Doodle context.
 
 ## The Calculator View
 
@@ -168,7 +175,7 @@ private inner class Output: View() {
 
     //...
 
-    /** Text representation of [number] */
+    /** Text representation of number */
     var text = "0"
         set(new) {
             field = new
