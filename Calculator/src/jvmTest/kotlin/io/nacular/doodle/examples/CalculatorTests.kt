@@ -18,36 +18,36 @@ import kotlin.test.expect
 class CalculatorTests {
     @Test @JsName("test1")
     fun `1 + 4 5 = 46`() {
-        expect(46.0) { compute { listOf(`1`, `+`, `4`, `5`, `=`) } }
+        expect(46.0) { compute { listOf(`1`, plusButton, `4`, `5`, equalButton) } }
     }
 
     @Test @JsName("test2")
     fun `1 - + 4 5 = 46`() {
-        expect(46.0) { compute { listOf(`1`, `-`, `+`, `4`, `5`, `=`) } }
+        expect(46.0) { compute { listOf(`1`, minusButton, plusButton, `4`, `5`, equalButton) } }
     }
 
     @Test @JsName("simpleNegation")
     fun `- 1 = -1`() {
-        expect(-1.0) { compute { listOf(negate, `1`, `=`) } }
+        expect(-1.0) { compute { listOf(negate, `1`, equalButton) } }
     }
 
     @Test @JsName("negationToggles")
     fun `- - 2 3 4 = 234`() {
-        expect(234.0) { compute { listOf(negate, negate, `2`, `3`, `4`, `=`) } }
+        expect(234.0) { compute { listOf(negate, negate, `2`, `3`, `4`, equalButton) } }
     }
 
     @Test @JsName("decimals")
     fun `decimal 123 = _123`() {
-        expect(0.123) { compute { listOf(decimal, `1`, `2`, `3`, `=`) } }
+        expect(0.123) { compute { listOf(decimal, `1`, `2`, `3`, equalButton) } }
     }
 
     @Test @JsName("decimalIdempotent")
     fun `decimal decimal 123 = _123`() {
-        expect(0.123) { compute { listOf(decimal, decimal, `1`, `2`, `3`, `=`) } }
+        expect(0.123) { compute { listOf(decimal, decimal, `1`, `2`, `3`, equalButton) } }
     }
 
     private fun compute(block: Calculator.() -> List<Button>): Double {
-        val calculator = Calculator(fontDetector(), GlobalScope, mockk(relaxed = true), mockk(relaxed = true))
+        val calculator = Calculator(fontLoader(), GlobalScope, mockk(relaxed = true), mockk(relaxed = true))
 
         block(calculator).forEach {
             spyk(it).apply { every { displayed } returns true }.click()
@@ -56,8 +56,8 @@ class CalculatorTests {
         return calculator.result
     }
 
-    private fun fontDetector() = mockk<FontLoader>(relaxed = true).also {
-        coEvery { it.invoke(any()             ) } returns mockk()
-        coEvery { it.invoke(any<Font>(), any()) } returns mockk()
+    private fun fontLoader() = mockk<FontLoader>(relaxed = true).also {
+        coEvery { it(any()             ) } returns mockk()
+        coEvery { it(any<Font>(), any()) } returns mockk()
     }
 }

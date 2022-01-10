@@ -136,10 +136,10 @@ class Calculator(
 
             when (field) {
                 null -> {
-                    `÷`.selected   = false
-                    `*`.selected = false
-                    `-`.selected = false
-                    `+`.selected  = false
+                    divButtton.selected  = false
+                    timesButton.selected = false
+                    minusButton.selected = false
+                    plusButton.selected  = false
                 }
             }
         }
@@ -159,10 +159,10 @@ class Calculator(
 
     val result get() = output.number
 
-    @JsName("div"  ) val `÷` = OperatorButton("÷", method = Double::div  )
-    @JsName("times") val `*` = OperatorButton("x", method = Double::times)
-    @JsName("minus") val `-` = OperatorButton("-", method = Double::minus)
-    @JsName("plus" ) val `+` = OperatorButton("+", method = Double::plus )
+    val divButtton  = OperatorButton("÷", method = Double::div  )
+    val timesButton = OperatorButton("x", method = Double::times)
+    val minusButton = OperatorButton("-", method = Double::minus)
+    val plusButton  = OperatorButton("+", method = Double::plus )
 
     val clear  = func("AC" ).apply {
         fired += {
@@ -181,8 +181,7 @@ class Calculator(
         }
     }
 
-    @JsName("percent")
-    val `%` = func("%").apply {
+    val percentButton = func("%").apply {
         fired += {
             output.number *= 0.01
         }
@@ -198,8 +197,8 @@ class Calculator(
             }
         }
     }
-    @JsName("eq")
-    val `=` = func("=", operatorColor, White).apply {
+
+    val equalButton = func("=", operatorColor, White).apply {
         fired += {
             compute()
             clearInternalState()
@@ -309,10 +308,10 @@ class Calculator(
                 size   = font.size - 5
                 weight = 100
             }?.let { lightFont ->
-                output.font = fonts(lightFont) { size = 72 }
-                clear.font  = lightFont
-                negate.font = lightFont
-                `%`.font    = lightFont
+                output.font        = fonts(lightFont) { size = 72 }
+                clear.font         = lightFont
+                negate.font        = lightFont
+                percentButton.font = lightFont
             }
         }
     }
@@ -321,17 +320,17 @@ class Calculator(
         appScope.launch {
             loadFonts()
 
-            ButtonGroup(allowDeselectAll = true, buttons = arrayOf(`÷`, `*`, `-`, `+`))
+            ButtonGroup(allowDeselectAll = true, buttons = arrayOf(timesButton, timesButton, minusButton, plusButton))
 
             val outputHeight  = 100.0
             val buttonSpacing =  10.0
 
             val gridPanel = GridPanel().apply {
-                add(clear, 0, 0); add(negate, 0, 1); add(`%`, 0, 2); add(`÷`, 0, 3)
-                add(`7`,   1, 0); add(`8`,    1, 1); add(`9`, 1, 2); add(`*`, 1, 3)
-                add(`4`,   2, 0); add(`5`,    2, 1); add(`6`, 2, 2); add(`-`, 2, 3)
-                add(`1`,   3, 0); add(`2`,    3, 1); add(`3`, 3, 2); add(`+`, 3, 3)
-                add(`0`,   4, 0,  columnSpan = 2  ); add(decimal, 4, 2); add(`=`,  4, 3)
+                add(clear, 0, 0); add(negate, 0, 1); add(percentButton, 0, 2); add(divButtton,   0, 3)
+                add(`7`,   1, 0); add(`8`,    1, 1); add(`9`,           1, 2); add(timesButton,  1, 3)
+                add(`4`,   2, 0); add(`5`,    2, 1); add(`6`,           2, 2); add(minusButton,  2, 3)
+                add(`1`,   3, 0); add(`2`,    3, 1); add(`3`,           3, 2); add(plusButton,   3, 3)
+                add(`0`,   4, 0,  columnSpan = 2  ); add(decimal,       4, 2); add(equalButton,  4, 3)
 
                 verticalSpacing   = { buttonSpacing }
                 horizontalSpacing = { buttonSpacing }
