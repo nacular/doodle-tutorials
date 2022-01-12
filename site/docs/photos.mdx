@@ -1,0 +1,305 @@
+---
+title: Photos
+hide_title: true
+---
+import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
+
+# [Photos](https://github.com/nacular/doodle-tutorials/tree/master/Photos) Tutorial
+
+We will build a simple photo app that lets you view and manipulate images using a pointer or multi-touch. Images will be added to the app via drag-drop.
+You can then move, size, and rotate them with a mouse, pointer, touch, or via an info overlay.
+
+Here is the end result.
+
+<DoodleCodeBlock functionName="photos" height="700" />
+
+:::tip
+You can also see the full-screen app [here](https://nacular.github.io/doodle-tutorials/photos).
+:::
+
+---
+
+## Project Setup
+
+We will use a JS only-setup for this app.
+
+[**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/Photos/build.gradle.kts)
+
+```kotlin
+plugins {
+    kotlin("js")
+}
+
+kotlin {
+    jsTargets()
+
+    // Defined in gradle.properties
+    val doodleVersion    : String by project
+    val coroutinesVersion: String by project
+
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                implementation("org.jetbrains.kotlin:kotlin-stdlib-js")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:$coroutinesVersion") // async image loading
+
+                implementation("io.nacular.doodle:core:$doodleVersion"     ) // required for Doodle
+                implementation("io.nacular.doodle:browser:$doodleVersion"  ) // required for Doodle in the browser
+                implementation("io.nacular.doodle:controls:$doodleVersion" ) // provides things like buttons and panels
+                implementation("io.nacular.doodle:animation:$doodleVersion") // animations
+                implementation("io.nacular.doodle:themes:$doodleVersion"   ) // for Basic theme
+            }
+        }
+    }
+}
+```
+
+---
+
+## The Application
+
+All Doodle apps must implement the [`Application`](https://github.com/nacular/doodle/blob/master/Core/src/commonMain/kotlin/io/nacular/doodle/application/Application.kt#L4)
+interface. The framework will then initialize our app via the constructor.
+
+The app's structure is fairly simple. It has a main Container that holds the images and supports drag-drop, and a panel with controls for manipulating
+a selected image.
+
+[**PhotosApp.kt**](https://github.com/nacular/doodle-tutorials/blob/master/Photos/src/commonMain/kotlin/io/nacular/doodle/examples/PhotosApp.kt#L11)
+
+```kotlin
+class PhotosApp(/*...*/): Application {
+    init {
+        // ...
+
+        val panelToggle                 // Button used to show/hide the panel
+        val panel                       // Has controls for manipulating images
+        val mainContainer = container { // container that holds images
+            // ...
+
+            dropReceiver = object: DropReceiver {
+                // support drag-drop importing
+            }
+
+            GlobalScope.launch {
+                listOf("tetons.jpg", "earth.jpg").forEachIndexed { index, file ->
+                    // load default images
+                }
+            }
+        }
+
+        display += listOf(mainContainer, panel, panelToggle)
+
+        // ...
+    }
+
+    override fun shutdown() {}
+}
+```
+
+:::tip
+Notice that `shutdown` is a no-op, since we don't have any cleanup to do when the app closes.
+:::
+
+---
+
+## Creating A Full Screen App
+
+Doodle apps can be [launched](https://nacular.github.io/doodle/docs/applications) in a few different ways.
+We create a helper to launch the app in [full screen](https://nacular.github.io/doodle/docs/applications#top-level-apps).
+
+[**FullScreen.kt**](https://github.com/nacular/doodle-tutorials/blob/master/Photos/src/main/kotlin/io/nacular/doodle/examples/FullScreen.kt#L22)
+
+```kotlin
+package io.nacular.doodle.examples
+
+//...
+
+fun fullscreen() {
+    application(modules = listOf(
+        FocusModule,
+        KeyboardModule,
+        DragDropModule,
+        basicLabelBehavior(),
+        nativeTextFieldBehavior(spellCheck = false),
+        basicMutableSpinnerBehavior(),
+        basicCircularProgressIndicatorBehavior(thickness = 18.0),
+        Module(name = "AppModule") {
+            bindSingleton<Animator>    { AnimatorImpl   (instance(), instance()) }
+            bindSingleton<ImageLoader> { ImageLoaderImpl(instance(), instance()) }
+        }
+    )) {
+        // load app
+        PhotosApp(instance(), instance(), instance(), instance(), instance(), instance())
+    }
+}
+```
+
+:::tip
+Normally this would just be your `main` function. But `main` would prevent the app from being used as a library. Which
+is what happens to allow both an embedded (in the docs) and full-screen version.
+:::
+
+The `application` function launches apps. It takes a list of modules, and a lambda that builds the
+app. This lambda is within a Kodein injection context, which means we can inject dependencies into our app via
+`instance`, `provider`, etc.
+
+Notice that we have included several modules for our app. This includes one for focus, keyboard, drag-drop and several for various
+View [`Behaviors`](https://github.com/nacular/doodle/blob/master/Core/src/commonMain/kotlin/io/nacular/doodle/core/Behavior.kt#L7)
+(i.e. [`nativeTextFieldBehavior()`](https://github.com/nacular/doodle/blob/master/Browser/src/jsMain/kotlin/io/nacular/doodle/theme/native/NativeTheme.kt#L108))
+which loads the native behavior for TextFields. We also define some bindings directly in a new module. These are items with no
+built-in module, or items that only exist in our app code.
+
+:::tip
+Check out Kodein to learn more about how it handles dependency injection.
+:::
+
+The `application` function also takes an optional HTML element within which the app will be hosted. The app will be hosted in
+`document.body` if you do not specify an element.
+
+App launching is the only part of our code that is platform-specific; since it is the only time we might care
+about an HTML element. It also helps support embedding apps into non-Doodle contexts.
+
+## Drag-drop Support
+
+Drag-drop support requires the `DragDropModule` ([Browser](https://github.com/nacular/doodle/blob/master/Browser/src/jsMain/kotlin/io/nacular/doodle/application/Modules.kt#L94) or [Desktop](https://github.com/nacular/doodle/blob/master/Desktop/src/jvmMain/kotlin/io/nacular/doodle/application/Modules.kt#L81) to work. It then requires setting up drag/drop recognizers on the source/target Views. We created
+the `mainContainer` for this. You can see that the `dropReceiver` property is set to a `DropReceiver` that controls how the `mainContainer` handles
+drop events.
+
+```kotlin
+class PhotosApp(/*...*/ private val images: ImageLoader /*...*/): Application {
+    init {
+        // ...
+        val mainContainer = container {
+            // ...
+
+            dropReceiver = object: DropReceiver {
+                private  val allowedFileTypes                    = Files(ImageType("jpg"), ImageType("jpeg"), ImageType("png"))
+                override val active                              = true
+                private  fun allowed          (event: DropEvent) = allowedFileTypes in event.bundle
+                override fun dropEnter        (event: DropEvent) = allowed(event)
+                override fun dropOver         (event: DropEvent) = allowed(event)
+                override fun dropActionChanged(event: DropEvent) = allowed(event)
+                override fun drop             (event: DropEvent) = event.bundle[allowedFileTypes]?.let { files ->
+                    val photos = files.map { GlobalScope.async { images.load(it)?.let { FixedAspectPhoto(it) } } }
+
+                    GlobalScope.launch {
+                        photos.mapNotNull { it.await() }.forEach { photo ->
+                            import(photo, event.location)
+                        }
+                    }
+                    true
+                } ?: false
+            }
+        }
+    }
+
+    // ...
+}
+```
+
+Our `DropReceiver` specifies the supported file-types (jpg, jpeg, and png). It then checks that any drop event contains valid files before accepting it. The
+`drop(event: DropEvent)` method is called when the user attempts the final drop. Here, the receiver fetches all the allowed files in the bundle,
+and tries to load and import each one. Notice that the receiver converts raw Image returned by `ImageLoader` into a `FixedAspectPhoto`.
+
+## Importing An Image
+
+We import images using a local `import` function inside the `mainContainer` creation block. This simplifies access to local state. The `import`
+function takes a photo, which is a `View`, and a location to place it.
+
+```kotlin
+val import = { photo: View, location: Point ->
+
+}
+```
+
+Import resizes and centers the photo at the given point. It is center-rotates it between -15° and 15°. Finally, a listener is added to the `pressed`
+pointer event. This moves the photo to the foreground and updates the panel.
+
+```kotlin
+photo.width           = 400.0
+photo.position        = location - Point(photo.width / 2, photo.height / 2)
+photo.transform       = Identity.rotate(location, (Random.nextFloat() * 30 - 15) * degrees)
+photo.pointerChanged += pressed {
+    children.move(photo, to = children.size - 1)
+    panel.setPhoto(photo)
+}
+```
+
+## Using Gestures
+
+Import also registers a custom gesture listener to support multi-touch scaling and rotations.
+
+```kotlin
+GestureRecognizer(photo).changed += object: GestureListener<GestureEvent> {
+    // ...
+
+    override fun started(event: GestureEvent) {
+        // capture initial state
+        event.consume()
+    }
+
+    override fun changed(event: GestureEvent) {
+        // 1) calculate rotation angle
+        // 2) update photo transform to include rotation
+        // 3) update photo bounds based on scaling
+        event.consume()
+    }
+
+    override fun ended(event: GestureEvent) {
+        // simply consume event
+        event.consume()
+    }
+}
+```
+
+`GestureRecognizer` takes a `View` and emits events whenever it detects motion from 2 or more pointers in that `View`. It also calculates
+a scale value by comparing the distance between the selected pointers over time.
+
+We register a listener that uses the events to update the photo's `transform` and `bounds`. The listener also consumes events to avoid
+them making it to subsequent pointer listeners (the `Resizer` used for single pointer manipulation in this case).
+
+### Capturing Initial Gesture State
+
+We record the state of our photo, and the pointers provided by the `GestureRecognizer` on the `started` event. Notice that `GestureRecognizer`
+provides locations in the photo's local coordinate. This makes sense for a general-purpose utility and matches the way Doodle reports
+pointer events. We use these values to modify the photo's bounds though, which is defined in its parent's coordinates. So we map the points
+into the parent before our calculations.
+
+```kotlin
+override fun started(event: GestureEvent) {
+    // Capture initial state to apply deltas with in `changed`
+    originalSize     = photo.size
+    originalCenter   = this@container.toLocal(event.center, photo)
+    originalVector   = event.initial[1].inParent(photo) - event.initial[0].inParent(photo)
+    originalPosition = photo.position
+    initialTransform = photo.transform
+
+    event.consume() // ensure event is consumed from Resizer
+}
+```
+
+### Handling Gesture Updates
+
+The values recorded in `started` are used--along with the new state--in the `changed` event to update the selected photo.
+
+```kotlin
+override fun changed(event: GestureEvent) {
+    val currentVector = event.current[1].inParent(photo) - event.current[0].inParent(photo)
+
+    // Angle between initial set of points and their current locations
+    val transformAngle = atan2(
+        originalVector.x * currentVector.y - originalVector.y * currentVector.x,
+        originalVector.x * currentVector.x + originalVector.y * currentVector.y
+    )
+
+    // Use transform for rotation
+    photo.transform = initialTransform.rotate(around = originalCenter, by = transformAngle)
+
+    // Update bounds instead of scale transformation
+    photo.bounds = Rectangle(
+            originalPosition - ((originalPosition - originalCenter) * (1 - event.scale)),
+            originalSize * event.scale)
+
+    event.consume() // ensure event is consumed from Resizer
+}
+```
