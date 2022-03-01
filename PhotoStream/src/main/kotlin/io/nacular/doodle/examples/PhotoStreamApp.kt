@@ -25,7 +25,7 @@ import io.nacular.doodle.layout.fill
 import io.nacular.doodle.layout.min
 import io.nacular.doodle.theme.ThemeManager
 import io.nacular.doodle.theme.adhoc.DynamicTheme
-import io.nacular.doodle.theme.basic.list.BasicListBehavior
+import io.nacular.doodle.theme.basic.list.basicVerticalListBehavior
 import io.nacular.doodle.utils.ObservableList
 import io.nacular.doodle.utils.SetPool
 import io.nacular.doodle.utils.observable
@@ -110,12 +110,14 @@ class UnSplashDataModel(
         currentPage = 0
     }
 
-    override fun get(index: Int): Image? = loadedImages.getOrNull(index).also {
-        // Load the next page if the last image is fetched from the model
-        if (index == size - 1) {
-            when {
-                fetchActive -> nextPageNeeded  = true
-                else        -> currentPage    += 1
+    override fun get(index: Int): Result<Image> = Result.runCatching {
+        loadedImages[index].also {
+            // Load the next page if the last image is fetched from the model
+            if (index == size - 1) {
+                when {
+                    fetchActive -> nextPageNeeded = true
+                    else        -> currentPage += 1
+                }
             }
         }
     }
@@ -172,7 +174,7 @@ class PhotoStreamApp(display    : Display,
                 else                  -> CenterCroppedPhoto(image)
             } }
         ).apply {
-            behavior      = BasicListBehavior(rowHeight = imageHeight)
+            behavior      = basicVerticalListBehavior(itemHeight = imageHeight)
             cellAlignment = fill
         }
 

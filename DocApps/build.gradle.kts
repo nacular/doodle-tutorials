@@ -19,10 +19,13 @@ kotlin {
         }
     }
 
+    val doodleVersion: String by project
+
     dependencies {
         implementation(project(":Calculator"))
         implementation(project(":Todo"      ))
         implementation(project(":Photos"    ))
+        implementation("io.nacular.doodle:browser:$doodleVersion")
     }
 }
 

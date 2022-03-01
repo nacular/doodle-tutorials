@@ -332,8 +332,8 @@ class Calculator(
                 add(`1`,   3, 0); add(`2`,    3, 1); add(`3`,           3, 2); add(plusButton,   3, 3)
                 add(`0`,   4, 0,  columnSpan = 2  ); add(decimal,       4, 2); add(equalButton,  4, 3)
 
-                verticalSpacing   = { buttonSpacing }
-                horizontalSpacing = { buttonSpacing }
+                rowSpacing    = { buttonSpacing }
+                columnSpacing = { buttonSpacing }
             }
 
             children += listOf(output, gridPanel)

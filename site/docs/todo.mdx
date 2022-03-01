@@ -2,6 +2,9 @@
 title: Todo
 hide_title: true
 ---
+import Tabs    from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
 import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
 
 # [Todo](https://github.com/nacular/doodle-tutorials/tree/master/Todo) Tutorial
@@ -26,9 +29,22 @@ You can also see the full-screen app [here](https://nacular.github.io/doodle-tut
 
 ## Project Setup
 
-We will use a multi-platform setup for this app. This is not necessary to use Doodle, but it lets us implement our code almost
-entirely in `commonMain` and our tests in `commonTest`. We will then be able to run these tests on the JVM target, which will
-make their execution really fast and completely decoupled from the JS environment.
+We will use a multi-platform library setup for this app, with a multiplatform launcher that depends on it.
+This is not necessary to use Doodle. You could create a single multiplatform build with the common parts of your app
+in `commonMain` etc.. This setup is used here because these apps are also launched by an app within `DocApps` when embedding them
+like below. Therefore, we need a pure library for each app. This is why there is an app and a runner.
+
+```mermaid
+ classDiagram
+      Todo      <|-- TodoRunner
+      Todo      <|-- DocApps
+      TodoRunner: jvsMain.main
+      TodoRunner: jvmMain.main
+      DocApps   : main
+```
+
+<Tabs>
+<TabItem value="app" label="Todo">
 
 [**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/Todo/build.gradle.kts)
 
@@ -57,7 +73,6 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion" ) // task persistence
 
                 api ("io.nacular.doodle:core:$doodleVersion"    ) // required for Doodle
-                api ("io.nacular.doodle:browser:$doodleVersion" ) // required for Doodle in the browser
                 api ("io.nacular.doodle:controls:$doodleVersion") // provides things like buttons and panels
             }
         }
@@ -66,6 +81,77 @@ kotlin {
     }
 }
 ```
+
+</TabItem>
+<TabItem value="runner" label="TodoRunner">
+
+[**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/TodoRunner/build.gradle.kts)
+
+```kotlin title="build.gradle.kts"
+plugins {
+    kotlin("multiplatform")
+    application
+}
+
+kotlin {
+    js().browser()
+
+    jvm {
+        withJava()
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = "11"
+            }
+        }
+    }
+
+    val doodleVersion: String by project
+
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                implementation(project(":Todo")) // app library
+            }
+        }
+
+        val jsMain by getting {
+            dependencies {
+                implementation ("io.nacular.doodle:browser:$doodleVersion") // required for Web app
+            }
+        }
+
+        val jvmMain by getting {
+            dependencies {
+                val osName = System.getProperty("os.name")
+                val targetOs = when {
+                    osName == "Mac OS X"       -> "macos"
+                    osName.startsWith("Win"  ) -> "windows"
+                    osName.startsWith("Linux") -> "linux"
+                    else                       -> error("Unsupported OS: $osName")
+                }
+
+                val osArch = System.getProperty("os.arch")
+                val targetArch = when (osArch) {
+                    "x86_64", "amd64" -> "x64"
+                    "aarch64"         -> "arm64"
+                    else              -> error("Unsupported arch: $osArch")
+                }
+
+                val target = "${targetOs}-${targetArch}"
+
+                implementation ("io.nacular.doodle:desktop-jvm-$target:$doodleVersion") // required for Desktop app
+            }
+        }
+    }
+}
+
+application {
+    mainClass.set("io.nacular.doodle.examples.MainKt")
+}
+```
+
+</TabItem>
+</Tabs>
 
 ---
 

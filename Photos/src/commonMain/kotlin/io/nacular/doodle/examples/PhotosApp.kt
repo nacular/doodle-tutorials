@@ -6,13 +6,12 @@ import io.nacular.doodle.application.Application
 import io.nacular.doodle.controls.buttons.PushButton
 import io.nacular.doodle.controls.itemVisualizer
 import io.nacular.doodle.controls.range.CircularSlider
-import io.nacular.doodle.controls.spinner.Model
-import io.nacular.doodle.controls.spinner.MutableIntModel
+import io.nacular.doodle.controls.spinner.MutableIntSpinnerModel
 import io.nacular.doodle.controls.spinner.MutableSpinner
 import io.nacular.doodle.controls.spinner.Spinner
+import io.nacular.doodle.controls.spinner.SpinnerModel
 import io.nacular.doodle.controls.spinner.spinnerEditor
 import io.nacular.doodle.controls.text.Label
-import io.nacular.doodle.controls.text.TextFit.Width
 import io.nacular.doodle.controls.theme.simpleButtonRenderer
 import io.nacular.doodle.core.Container
 import io.nacular.doodle.core.Display
@@ -57,8 +56,9 @@ import io.nacular.doodle.layout.fill
 import io.nacular.doodle.system.Cursor.Companion.Text
 import io.nacular.doodle.theme.ThemeManager
 import io.nacular.doodle.theme.adhoc.DynamicTheme
-import io.nacular.doodle.theme.basic.BasicCircularSliderBehavior
+import io.nacular.doodle.theme.basic.range.BasicCircularSliderBehavior
 import io.nacular.doodle.theme.basic.spinner.SpinnerTextEditOperation
+import io.nacular.doodle.utils.Dimension.Width
 import io.nacular.doodle.utils.PropertyObservers
 import io.nacular.doodle.utils.Resizer
 import io.nacular.doodle.utils.SetPool
@@ -92,7 +92,7 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
                     updateWhen: PropertyObservers<Any, Any>,
                     suffix    : String = ""
     ): View() {
-        private fun <T, M: Model<T>> spinnerVisualizer(suffix: String = "") = itemVisualizer { item: Int, previous: View?, context: Spinner<T, M> ->
+        private fun <T, M: SpinnerModel<T>> spinnerVisualizer(suffix: String = "") = itemVisualizer { item: Int, previous: View?, context: Spinner<T, M> ->
             when (previous) {
                 is Label -> previous.also { it.text = "$item$suffix" }
                 else     -> Label("$item$suffix").apply {
@@ -112,7 +112,7 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
         }
 
         private val spinner = MutableSpinner(
-                MutableIntModel(Int.MIN_VALUE..Int.MAX_VALUE, property.get().toInt()),
+                MutableIntSpinnerModel(Int.MIN_VALUE..Int.MAX_VALUE, property.get().toInt()),
                 spinnerVisualizer(suffix)
         ).apply {
             // Make the spinner editable
@@ -125,14 +125,16 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
             }
 
             changed += {
-                if (property.get().toInt() != it.value) {
-                    property.set(it.value.toDouble())
+                it.value.onSuccess {
+                    if (property.get().toInt() != it) {
+                        property.set(it.toDouble())
+                    }
                 }
             }
         }
 
         init {
-            updateWhen += { _,_,_ -> spinner.value = property.get().toInt() }
+            updateWhen += { _,_,_ -> spinner.set(property.get().toInt()) }
 
             children += listOf(spinner, Label(property.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }))
 

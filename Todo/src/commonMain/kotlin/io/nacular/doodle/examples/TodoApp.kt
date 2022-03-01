@@ -15,7 +15,6 @@ import io.nacular.doodle.drawing.Color.Companion.Black
 import io.nacular.doodle.drawing.Color.Companion.Transparent
 import io.nacular.doodle.drawing.Color.Companion.White
 import io.nacular.doodle.drawing.Font.Style.Italic
-import io.nacular.doodle.event.*
 import io.nacular.doodle.event.PointerListener.Companion.released
 import io.nacular.doodle.examples.DataStore.DataStoreListModel
 import io.nacular.doodle.examples.DataStore.Filter
@@ -24,14 +23,14 @@ import io.nacular.doodle.focus.FocusManager
 import io.nacular.doodle.geometry.*
 import io.nacular.doodle.image.*
 import io.nacular.doodle.layout.*
-import io.nacular.doodle.text.TextDecoration.Line.*
 import io.nacular.doodle.theme.ThemeManager
 import io.nacular.doodle.theme.adhoc.DynamicTheme
 import io.nacular.doodle.theme.basic.list.*
 import io.nacular.doodle.theme.native.NativeHyperLinkStyler
+import io.nacular.doodle.utils.Dimension.Height
 import io.nacular.doodle.utils.Encoder
-import io.nacular.doodle.utils.HorizontalAlignment.*
 import kotlinx.coroutines.*
+import kotlin.Result.Companion.success
 import kotlin.math.max
 import kotlin.math.min
 
@@ -50,7 +49,7 @@ interface FilterButtonProvider {
  * Default implementation intended for use when app is top-level. It handles routing and provides
  * hyperlinks for the filter buttons.
  */
-internal class LinkFilterButtonProvider(private val dataStore: DataStore, router: Router, private val linkStyler: NativeHyperLinkStyler): FilterButtonProvider {
+public class LinkFilterButtonProvider(private val dataStore: DataStore, router: Router, private val linkStyler: NativeHyperLinkStyler): FilterButtonProvider {
     init {
         router["/"         ] = { dataStore.filter = null      }
         router["/active"   ] = { dataStore.filter = Active    }
@@ -105,8 +104,8 @@ data class TodoConfig(
  */
 private class TaskEditOperation(focusManager: FocusManager?, list: MutableList<Task, *>, task: Task, current: View): TextEditOperation<Task>(focusManager, TaskEncoder(task.completed), list, task, current) {
     private class TaskEncoder(private val completed: Boolean = false): Encoder<Task, String> {
-        override fun decode(b: String) = Task(b, completed)
-        override fun encode(a: Task  ) = a.text
+        override fun decode(b: String) = success(Task(b, completed))
+        override fun encode(a: Task  ) = success(a.text)
     }
 
     init {
@@ -158,7 +157,7 @@ private class TodoView(private val config              : TodoConfig,
                 }
 
                 // List containing Tasks. It is mutable since items can be edited
-                val list = MutableList(DataStoreListModel(dataStore), itemVisualizer = visualizer).apply {
+                val list = MutableList(DataStoreListModel(dataStore), itemVisualizer = visualizer, fitContent = setOf(Height)).apply {
                     val rowHeight = 58.0
                     font          = config.listFont
                     cellAlignment = fill
@@ -170,8 +169,11 @@ private class TodoView(private val config              : TodoConfig,
                                 if (event.clickCount >= 2) { this@apply.startEditing(index).also { event.consume() } }
                             }
                         },
-                        PatternPaint(Size(10.0, rowHeight)) { line(Point(y = 1), Point(10, 1), Stroke(config.lineColor)) },
-                        rowHeight
+                        BasicVerticalListPositioner(rowHeight),
+                        PatternPaint(Size(10.0, rowHeight)) {
+                            rect(Rectangle(size = this.size), color = White)
+                            line(Point(y = 1), Point(10, 1), Stroke(config.lineColor))
+                        },
                     )
 
                     itemsChanged += { _, removed, added, moved ->

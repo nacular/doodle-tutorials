@@ -17,7 +17,6 @@ kotlin {
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
 
                 api("io.nacular.doodle:core:$doodleVersion"    )
-                api("io.nacular.doodle:browser:$doodleVersion" )
                 api("io.nacular.doodle:controls:$doodleVersion")
             }
         }

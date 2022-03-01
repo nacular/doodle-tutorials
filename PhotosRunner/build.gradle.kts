@@ -32,9 +32,6 @@ kotlin {
 
         val jvmMain by getting {
             dependencies {
-                implementation ("io.nacular.doodle:desktop:$doodleVersion")
-
-                // Work-around for https://github.com/nacular/doodle/issues/28
                 val osName = System.getProperty("os.name")
                 val targetOs = when {
                     osName == "Mac OS X"       -> "macos"
@@ -52,7 +49,7 @@ kotlin {
 
                 val target = "${targetOs}-${targetArch}"
 
-                implementation("org.jetbrains.skiko:skiko-jvm-runtime-$target:0.4.16")
+                implementation ("io.nacular.doodle:desktop-jvm-$target:$doodleVersion")
             }
         }
     }

@@ -20,7 +20,7 @@ kotlin {
                 api("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
 
                 api("io.nacular.doodle:core:$doodleVersion"    )
-                api("io.nacular.doodle:browser:$doodleVersion" )
+                api("io.nacular.doodle:themes:$doodleVersion"  )
                 api("io.nacular.doodle:controls:$doodleVersion")
             }
         }

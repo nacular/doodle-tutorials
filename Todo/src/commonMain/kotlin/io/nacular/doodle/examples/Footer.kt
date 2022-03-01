@@ -3,7 +3,6 @@ package io.nacular.doodle.examples
 import io.nacular.doodle.controls.buttons.Button
 import io.nacular.doodle.controls.buttons.HyperLink
 import io.nacular.doodle.controls.text.Label
-import io.nacular.doodle.controls.text.TextFit
 import io.nacular.doodle.controls.theme.CommonLabelBehavior
 import io.nacular.doodle.controls.theme.CommonTextButtonBehavior
 import io.nacular.doodle.core.Behavior
@@ -21,6 +20,7 @@ import io.nacular.doodle.layout.WidthSource.Parent
 import io.nacular.doodle.text.TextDecoration.Companion.UnderLine
 import io.nacular.doodle.text.invoke
 import io.nacular.doodle.theme.native.NativeHyperLinkStyler
+import io.nacular.doodle.utils.Dimension.Height
 import io.nacular.doodle.utils.HorizontalAlignment.Center
 import io.nacular.doodle.utils.VerticalAlignment.Bottom
 
@@ -33,7 +33,7 @@ class Footer(private val textMetrics: TextMetrics, private val linkStyler: Nativ
     // Plain text
     private fun footerLabel(text: String) = Label(text).apply {
         font            = config.footerFont
-        fitText         = setOf(TextFit.Height)
+        fitText         = setOf(Height)
         acceptsThemes   = false
         foregroundColor = config.footerForeground
         behavior        = object: CommonLabelBehavior(textMetrics) {
