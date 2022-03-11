@@ -18,7 +18,6 @@ plugins {
 allprojects {
     repositories {
         maven       { url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev") }
-        mavenLocal  ()
         mavenCentral()
     }
 }
