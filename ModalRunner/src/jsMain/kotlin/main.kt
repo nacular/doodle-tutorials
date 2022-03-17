@@ -11,8 +11,8 @@ import io.nacular.doodle.examples.ModalApp
 import io.nacular.doodle.examples.ModalFactory
 import io.nacular.doodle.examples.ModalFactoryImpl
 import io.nacular.doodle.examples.PhoneBookApp
-import io.nacular.doodle.image.Image
-import io.nacular.doodle.theme.basic.BasicTheme
+import io.nacular.doodle.geometry.PathMetrics
+import io.nacular.doodle.geometry.impl.PathMetricsImpl
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicButtonBehavior
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicLabelBehavior
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicTableBehavior
@@ -56,6 +56,7 @@ fun main() {
         nativeScrollPanelBehavior(),
         Module(name = "AppModule") {
             bindSingleton<Animator>     { AnimatorImpl    (instance(), instance()) }
+            bindSingleton<PathMetrics>  { PathMetricsImpl (instance()            ) }
             bindSingleton<ModalFactory> { ModalFactoryImpl(instance(), instance()) }
         }
     )) {
@@ -69,6 +70,7 @@ fun main() {
             theme        = instance(),
             Modal        = instance(),
             uiDispatcher = Dispatchers.UI,
+            pathMetrics  = instance(),
             textMetrics  = instance()
         )
     }

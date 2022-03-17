@@ -8,9 +8,8 @@ import io.nacular.doodle.application.Modules.Companion.KeyboardModule
 import io.nacular.doodle.application.Modules.Companion.PointerModule
 import io.nacular.doodle.application.application
 import io.nacular.doodle.coroutines.Dispatchers
-import io.nacular.doodle.examples.ModalApp
-import io.nacular.doodle.examples.ModalFactory
-import io.nacular.doodle.examples.ModalFactoryImpl
+import io.nacular.doodle.geometry.PathMetrics
+import io.nacular.doodle.geometry.impl.PathMetricsImpl
 import io.nacular.doodle.theme.basic.BasicTheme
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicButtonBehavior
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicLabelBehavior
@@ -55,6 +54,7 @@ fun main() {
         NativeTheme.nativeScrollPanelBehavior(),
         Module(name = "AppModule") {
             bindSingleton<Animator>     { AnimatorImpl    (instance(), instance()) }
+            bindSingleton<PathMetrics>  { PathMetricsImpl (instance()            ) }
             bindSingleton<ModalFactory> { ModalFactoryImpl(instance(), instance()) }
         }
     )) {
@@ -68,7 +68,8 @@ fun main() {
             theme        = instance(),
             Modal        = instance(),
             uiDispatcher = Dispatchers.UI,
-            textMetrics  = instance()
+            pathMetrics  = instance(),
+            textMetrics  = instance(),
         )
     }
 }
