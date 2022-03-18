@@ -10,5 +10,6 @@ include(
 "TodoRunner",
 "PhotoStream",
 "Modal",
-"ModalRunner",
+"Contacts",
+"ContactsRunner",
 )
