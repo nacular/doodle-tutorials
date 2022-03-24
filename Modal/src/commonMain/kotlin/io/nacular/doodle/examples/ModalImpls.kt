@@ -77,12 +77,14 @@ private class Dialog(contents: View, insets: Insets = Insets(20.0)): View() {
  * @param display where the modal will be shown
  * @param animate used to animate the modal
  */
-abstract class AbstractModal(private val display: Display, private val animate: Animator): View() {
+abstract class AbstractModal(display: Display, private val animate: Animator): View() {
     private var showing      = false
     private var showProgress = 0f
     private var animation: Animation? by observable(null) { old,_ ->
         old?.cancel()
     }
+
+    private val display_ = display
 
     private val sizeChanged: (Display, Size, Size) -> Unit = { _,_,_ ->
         size = display.size
@@ -108,10 +110,10 @@ abstract class AbstractModal(private val display: Display, private val animate: 
 
         if (!showing) {
             showing = true
-            size    = display.size
+            size    = display_.size
 
-            display += this
-            display.sizeChanged += sizeChanged
+            display_ += this
+            display_.sizeChanged += sizeChanged
 
             animation = (animate(0f to 1f) using speedUpSlowDown(250 * Time.milliseconds)) {
                 showProgress = it
@@ -125,8 +127,8 @@ abstract class AbstractModal(private val display: Display, private val animate: 
         animation?.cancel()
 
         children.clear()
-        display -= this
-        display.sizeChanged -= sizeChanged
+        display_ -= this
+        display_.sizeChanged -= sizeChanged
 
         showing  = false
     }

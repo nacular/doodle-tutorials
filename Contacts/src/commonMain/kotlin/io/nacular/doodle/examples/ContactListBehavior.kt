@@ -25,8 +25,18 @@ import io.nacular.doodle.layout.constrain
 import io.nacular.doodle.theme.basic.VerticalListPositioner
 import io.nacular.doodle.utils.SetObserver
 
-class PhoneNumberTableBehavior: TableBehavior<Contact>() {
-    private inner class ContactRow<T>(private val column: Column<T>, table: Table<Contact, *>, cell: T, row: Int, private val itemVisualizer: ItemVisualizer<T, IndexedItem>) : View() {
+class ContactListBehavior(private val navigator: Navigator): TableBehavior<Contact>() {
+    /**
+     * Renders each cell within the Table. It contains the View returned by the Table's
+     * visualizer for [column]. And aligns it based on the column's `cellAlignment`.
+     */
+    private inner class ContactCell<T>(
+                    table         : Table<Contact, *>,
+        private val column        : Column<T>,
+                    cell          : T,
+                    row           : Int,
+        private val itemVisualizer: ItemVisualizer<T, IndexedItem>): View() {
+
         private var index = row
 
         init {
@@ -35,7 +45,7 @@ class PhoneNumberTableBehavior: TableBehavior<Contact>() {
             focusable       = false
             styleChanged   += { rerender() }
             pointerChanged += object: PointerListener {
-                private var pressed = false
+                private var pressed     = false
                 private var pointerOver = false
 
                 override fun entered(event: PointerEvent) {
@@ -58,7 +68,9 @@ class PhoneNumberTableBehavior: TableBehavior<Contact>() {
 
                 override fun released(event: PointerEvent) {
                     if (pointerOver && pressed) {
-
+                        table[index].onSuccess {
+                            navigator.showContact(it)
+                        }
                     }
                     pressed = false
                 }
@@ -67,24 +79,22 @@ class PhoneNumberTableBehavior: TableBehavior<Contact>() {
             update(table, cell, row)
         }
 
+        // Called whenever the cell needs to be updated with new data
         fun update(table: Table<Contact, *>, cell: T, row: Int) {
             index       = row
             children[0] = itemVisualizer(cell, children.firstOrNull(), SimpleIndexedItem(row, table.selected(index)))
+            idealSize   = children[0].idealSize
 
-            idealSize = children[0].idealSize
             column.cellAlignment?.let { alignment ->
                 layout = constrain(children[0]) {
                     alignment(it)
                 }
             }
         }
-
-        override fun render(canvas: Canvas) {
-            backgroundColor?.let { canvas.rect(bounds.atOrigin, it.paint) }
-        }
     }
 
     private val selectionChanged: SetObserver<Table<Contact, *>, Int> = { table,_,_ ->
+        // Repaint the Table to show selected rows
         table.bodyDirty()
     }
 
@@ -96,6 +106,9 @@ class PhoneNumberTableBehavior: TableBehavior<Contact>() {
         view.selectionChanged -= selectionChanged
     }
 
+    /**
+     * Simple container that holds the column's header in a container with a bottom border.
+     */
     override val headerCellGenerator = object: AbstractTableBehavior.HeaderCellGenerator<Table<Contact, *>> {
         override fun <A> invoke(table: Table<Contact, *>, column: Column<A>) = container {
             column.header?.let { header ->
@@ -109,7 +122,7 @@ class PhoneNumberTableBehavior: TableBehavior<Contact>() {
 
             val thickness = 1.0
             render = {
-                line(Point(0.0, height - thickness), Point(width, height - thickness), stroke = Stroke(thickness = thickness, fill = Color(229u, 231u, 235u).paint))
+                line(Point(y = height - thickness), Point(width, height - thickness), stroke = Stroke(thickness = thickness, fill = OUTLINE_COLOR.paint))
             }
         }
     }
@@ -118,13 +131,13 @@ class PhoneNumberTableBehavior: TableBehavior<Contact>() {
         override fun invoke(table: Table<Contact, *>) = HeaderGeometry(0.0, TABLE_HEADER_HEIGHT)
     }
 
-    override val overflowColumnConfig = null
+    override val overflowColumnConfig: Nothing? = null
 
-    // TODO: Replace with generator that provides hover, edit, delete
+    @Suppress("UNCHECKED_CAST")
     override val cellGenerator: CellGenerator<Contact> = object: CellGenerator<Contact> {
         override fun <A> invoke(table: Table<Contact, *>, column: Column<A>, cell: A, row: Int, itemGenerator: ItemVisualizer<A, IndexedItem>, current: View?): View = when (current) {
-            is ContactRow<*> -> (current as ContactRow<A>).apply { update(table, cell, row) }
-            else             -> ContactRow(column, table, cell, row, itemGenerator)
+            is ContactCell<*> -> (current as ContactCell<A>).apply { update(table, cell, row) }
+            else              -> ContactCell(table, column, cell, row, itemGenerator)
         }
     }
 
@@ -132,8 +145,8 @@ class PhoneNumberTableBehavior: TableBehavior<Contact>() {
         private val delegate = VerticalListPositioner(ROW_HEIGHT)
 
         override fun rowBounds  (of: Table<Contact, *>, row: Contact, index: Int) = delegate.itemBounds (of.size,     of.insets, index)
-        override fun row        (of: Table<Contact, *>, at: Point) = delegate.itemFor    (of.size,     of.insets,  at  )
-        override fun minimumSize(of: Table<Contact, *>) = delegate.minimumSize(of.numItems, of.insets       )
+        override fun row        (of: Table<Contact, *>, at: Point               ) = delegate.itemFor    (of.size,     of.insets,  at  )
+        override fun minimumSize(of: Table<Contact, *>                          ) = delegate.minimumSize(of.numItems, of.insets       )
     }
 
     override fun renderBody(table: Table<Contact, *>, canvas: Canvas) {

@@ -3,17 +3,22 @@ package io.nacular.doodle.examples
 import io.nacular.doodle.controls.Photo
 import io.nacular.doodle.controls.text.Label
 import io.nacular.doodle.controls.text.TextField
+import io.nacular.doodle.controls.theme.CommonLabelBehavior
 import io.nacular.doodle.core.Layout
 import io.nacular.doodle.core.View
 import io.nacular.doodle.drawing.AffineTransform
 import io.nacular.doodle.drawing.Canvas
 import io.nacular.doodle.drawing.Color
 import io.nacular.doodle.drawing.Color.Companion.Black
+import io.nacular.doodle.drawing.Color.Companion.Transparent
 import io.nacular.doodle.drawing.Color.Companion.White
-import io.nacular.doodle.drawing.Font
+import io.nacular.doodle.drawing.TextMetrics
 import io.nacular.doodle.drawing.opacity
 import io.nacular.doodle.drawing.paint
 import io.nacular.doodle.drawing.rect
+import io.nacular.doodle.event.PointerEvent
+import io.nacular.doodle.event.PointerListener.Companion.clicked
+import io.nacular.doodle.event.PointerMotionListener.Companion.moved
 import io.nacular.doodle.geometry.PathMetrics
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Rectangle
@@ -21,17 +26,17 @@ import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.geometry.path
 import io.nacular.doodle.image.Image
 import io.nacular.doodle.layout.constrain
+import io.nacular.doodle.system.Cursor.Companion.Pointer
 import kotlin.math.max
 
-private const val SEARCH_ICON_PATH = "M12.5 11H11.71L11.43 10.73A6.471 6.471 0 0013 6.5 6.5 6.5 0 106.5 13C8.11 13 9.59 12.41 10.73 11.43L11 11.71V12.5L16 17.49 17.49 16 12.5 11ZM6.5 11C4.01 11 2 8.99 2 6.5S4.01 2 6.5 2 11 4.01 11 6.5 8.99 11 6.5 11Z"
-private const val DELETE_ICON_PATH = "M14 1.41 12.59 0 7 5.59 1.41 0 0 1.41 5.59 7 0 12.59 1.41 14 7 8.41 12.59 14 14 12.59 8.41 7Z"
 /**
  * Renders the header portion of the main page
  */
 class Header(
+    private val fonts                 : AppFonts,
+    private val navigator            : Navigator,
+    private val textMetrics           : TextMetrics,
     private val pathMetrics           : PathMetrics,
-    private val largeFont             : Font,
-    private val mediumFont            : Font,
     private val contactsModel         : ContactsModel,
                 logoImage             : Image,
                 filterCenterAboveWidth: Double,
@@ -49,11 +54,11 @@ class Header(
         val searchIconSize = pathMetrics.size(searchIconPath)
 
         private val textField = TextField().apply {
-            font             = mediumFont
+            font             = fonts.medium
             placeHolder      = "Search"
             borderVisible    = false
-            backgroundColor  = Color.Transparent
-            placeHolderColor = Color(156u, 153u, 155u)
+            backgroundColor  = Transparent
+            placeHolderColor = PLACE_HOLDER_COLOR
             focusChanged    += { _,_,_ ->
                 this@FilterBox.rerender()
             }
@@ -65,7 +70,7 @@ class Header(
             val clearButton = PathIconButton(pathData = DELETE_ICON_PATH, pathMetrics = pathMetrics).apply {
                 size            = Size(22, 44)
                 visible         = textField.text.isNotBlank()
-                foregroundColor = Color(0x5f6368u)
+                foregroundColor = SEARCH_ICON_COLOR
                 fired += {
                     textField.text = ""
                 }
@@ -102,15 +107,20 @@ class Header(
             }
 
             canvas.transform(AffineTransform.Identity.translate(20.0, (height - searchIconSize.height) / 2)) {
-                canvas.path(searchIconPath, fill = Color(0x5f6368u).paint)
+                canvas.path(searchIconPath, fill = SEARCH_ICON_COLOR.paint)
             }
         }
     }
 
     init {
-        children += Photo    (logoImage  ).apply { size = Size(40)      }
-        children += Label    ("Phonebook").apply { font = largeFont     }
-        children += FilterBox(           ).apply { size = Size(300, 45) }
+        children += Photo(logoImage  ).apply { size = Size(40) }
+        children += Label("Phonebook").apply {
+            font = fonts.large
+            foregroundColor = Color(95u, 99u, 104u)
+            acceptsThemes = false
+            behavior = CommonLabelBehavior(textMetrics)
+        }
+        children += FilterBox().apply { size = Size(300, 45) }
 
         val filterNaturalWidth = 300.0
 
@@ -119,14 +129,33 @@ class Header(
             val label  = container.children[1]
             val filter = container.children[2]
 
-            logo.position  = Point(INSET, (naturalHeight - logo.height) / 2)
+            logo.position  = Point(2 * INSET, (naturalHeight - logo.height) / 2)
             label.position = Point(logo.bounds.right + 10, logo.bounds.center.y - label.height / 2)
 
             filter.bounds = when {
                 container.width > filterCenterAboveWidth -> Rectangle((container.width - filterNaturalWidth) / 2,    logo.bounds.center.y - filter.height / 2, filterNaturalWidth, filter.height)
                 container.width > filterRightAboveWidth  -> Rectangle( container.width - filterNaturalWidth - INSET, logo.bounds.center.y - filter.height / 2, filterNaturalWidth, filter.height)
-                else                                     -> Rectangle(logo.x, container.height - filter.height, max(0.0, container.width - 2 * INSET), filter.height)
+                else                                     -> Rectangle(logo.x, container.height - filter.height - 8, max(0.0, container.width - 2 * INSET), filter.height)
+            }
+        }
+
+        pointerMotionChanged += moved {
+            cursor = when {
+                it.inHotspot -> Pointer
+                else         -> null
+            }
+        }
+
+        pointerChanged += clicked {
+            if (it.inHotspot) {
+                navigator.showContactList()
             }
         }
     }
+
+    private val PointerEvent.inHotspot get() = this@Header.toLocal(location, target).x < 220
 }
+
+private       val SEARCH_ICON_COLOR = Color(0x5f6368u)
+private /*const*/ val SEARCH_ICON_PATH  = if (DESKTOP_WORK_AROUND) "M14 1.41 12.59 0 7 5.59 1.41 0 0 1.41 5.59 7 0 12.59 1.41 14 7 8.41 12.59 14 14 12.59 8.41 7Z" else "M12.5 11H11.71L11.43 10.73A6.471 6.471 0 0013 6.5 6.5 6.5 0 106.5 13C8.11 13 9.59 12.41 10.73 11.43L11 11.71V12.5L16 17.49 17.49 16 12.5 11ZM6.5 11C4.01 11 2 8.99 2 6.5S4.01 2 6.5 2 11 4.01 11 6.5 8.99 11 6.5 11Z"
+private const val DELETE_ICON_PATH  = "M14 1.41 12.59 0 7 5.59 1.41 0 0 1.41 5.59 7 0 12.59 1.41 14 7 8.41 12.59 14 14 12.59 8.41 7Z"

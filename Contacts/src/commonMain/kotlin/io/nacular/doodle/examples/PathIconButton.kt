@@ -6,11 +6,11 @@ import io.nacular.doodle.controls.theme.simpleButtonRenderer
 import io.nacular.doodle.geometry.PathMetrics
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.path
-import io.nacular.doodle.utils.Anchor
+import io.nacular.doodle.utils.Anchor.Leading
 
 class PathIconButton(pathMetrics: PathMetrics, pathData: String): PushButton(icon = PathIcon(path(pathData), pathMetrics = pathMetrics)) {
     init {
-        iconAnchor    = Anchor.Leading
+        iconAnchor    = Leading
         acceptsThemes = false
         behavior      = simpleButtonRenderer { button, canvas ->
             button.icon?.apply {

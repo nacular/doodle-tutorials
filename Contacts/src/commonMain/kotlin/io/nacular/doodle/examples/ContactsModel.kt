@@ -21,6 +21,9 @@ interface ContactsModel {
 
     operator fun plusAssign (contact: Contact)
     operator fun minusAssign(contact: Contact)
+
+    fun id(of: Contact): Int?
+    fun find(id: Int): Contact?
 }
 
 /**
@@ -35,6 +38,10 @@ class SimpleContactsModel(
         filteredList.filter = new
     }
 
-    override fun plusAssign (contact: Contact) = super.add   (contact)
+    override fun plusAssign (contact: Contact) = if (size > 0) super.add(0, contact) else super.add(contact)
     override fun minusAssign(contact: Contact) = super.remove(contact)
+
+    override fun id(of: Contact): Int? = indexOf(of).takeIf { it >= 0 }
+
+    override fun find(id: Int): Contact? = this[id].getOrNull()
 }
