@@ -19,6 +19,7 @@ import io.nacular.doodle.drawing.rect
 import io.nacular.doodle.event.PointerEvent
 import io.nacular.doodle.event.PointerListener.Companion.clicked
 import io.nacular.doodle.event.PointerMotionListener.Companion.moved
+import io.nacular.doodle.focus.FocusManager
 import io.nacular.doodle.geometry.PathMetrics
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Rectangle
@@ -27,6 +28,7 @@ import io.nacular.doodle.geometry.path
 import io.nacular.doodle.image.Image
 import io.nacular.doodle.layout.constrain
 import io.nacular.doodle.system.Cursor.Companion.Pointer
+import io.nacular.doodle.system.Cursor.Companion.Text
 import kotlin.math.max
 
 /**
@@ -34,9 +36,10 @@ import kotlin.math.max
  */
 class Header(
     private val fonts                 : AppFonts,
-    private val navigator            : Navigator,
+    private val navigator             : Navigator,
     private val textMetrics           : TextMetrics,
     private val pathMetrics           : PathMetrics,
+    private val focusManager          : FocusManager,
     private val contactsModel         : ContactsModel,
                 logoImage             : Image,
                 filterCenterAboveWidth: Double,
@@ -65,6 +68,7 @@ class Header(
         }
 
         init {
+            cursor             = Text
             clipCanvasToBounds = false
 
             val clearButton = PathIconButton(pathData = DELETE_ICON_PATH, pathMetrics = pathMetrics).apply {
@@ -95,6 +99,10 @@ class Header(
                 textField.centerY = parent.centerY
                 clear.right       = parent.right - 20
                 clear.centerY     = parent.centerY
+            }
+
+            pointerChanged += clicked {
+                focusManager.requestFocus(textField)
             }
         }
 
@@ -134,8 +142,8 @@ class Header(
 
             filter.bounds = when {
                 container.width > filterCenterAboveWidth -> Rectangle((container.width - filterNaturalWidth) / 2,    logo.bounds.center.y - filter.height / 2, filterNaturalWidth, filter.height)
-                container.width > filterRightAboveWidth  -> Rectangle( container.width - filterNaturalWidth - INSET, logo.bounds.center.y - filter.height / 2, filterNaturalWidth, filter.height)
-                else                                     -> Rectangle(logo.x, container.height - filter.height - 8, max(0.0, container.width - 2 * INSET), filter.height)
+                container.width > filterRightAboveWidth  -> Rectangle( container.width - filterNaturalWidth - 2 * INSET, logo.bounds.center.y - filter.height / 2, filterNaturalWidth, filter.height)
+                else                                     -> Rectangle(logo.x, container.height - filter.height - 8, max(0.0, container.width - 4 * INSET), filter.height)
             }
         }
 

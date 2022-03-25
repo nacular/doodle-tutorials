@@ -29,7 +29,6 @@ import io.nacular.doodle.layout.constrain
 import io.nacular.doodle.layout.fill
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlin.math.max
 import kotlin.math.min
 
 
@@ -172,29 +171,23 @@ class ContactList(
         }
     }
 
-    column(Label("Name"        ), { name        }, nameVisualizer   ) { width = 300.0; cellAlignment = alignment; headerAlignment = alignment }
+    column(Label("Name"        ), { name        }, nameVisualizer   ) { cellAlignment = alignment; headerAlignment = alignment                }
     column(Label("Phone Number"), { phoneNumber }, TextVisualizer() ) { cellAlignment = alignment; headerAlignment = alignment                }
-    column(null,                                   toolsVisualizer  ) { cellAlignment = fill(Insets(top = 20.0, bottom = 20.0, right = 20.0)); width = 100.0; maxWidth = 100.0 }
+    column(null,                                   toolsVisualizer  ) { cellAlignment = fill(Insets(top = 20.0, bottom = 20.0, right = 20.0)) }
 
 }) {
     init {
-        if (true) {
-            // FIXME: There is a bug in Doodle where this triggers a layout before the behavior is installed, leading to an index out of bounds
-            // This will be fixed in 0.7.2
+        columnSizePolicy = object: ColumnSizePolicy {
+            override fun layout(width: Double, columns: List<ColumnSizePolicy.Column>, startIndex: Int): Double {
+                columns[2].width = if (width > 672.0 - 2 * INSET) 100.0 else 0.0 //width - columns[0].width - columns[1].width
+                columns[0].width = width / 2
+                columns[1].width = width - columns[0].width - columns[2].width
 
-            // "un-comment" to get policy where each column is equally sized
-            columnSizePolicy = object: ColumnSizePolicy {
-                override fun layout(width: Double, columns: List<ColumnSizePolicy.Column>, startIndex: Int): Double {
-                    columns[0].width = width / 2
-                    columns[1].width = max(300.0, width / 2 - 100)
-                    columns[2].width = width - columns[0].width - columns[1].width
+                return width
+            }
 
-                    return width
-                }
-
-                override fun widthChanged(width: Double, columns: List<ColumnSizePolicy.Column>, index: Int, to: Double) {
-                    // no-op
-                }
+            override fun widthChanged(width: Double, columns: List<ColumnSizePolicy.Column>, index: Int, to: Double) {
+                // no-op
             }
         }
 
@@ -203,5 +196,5 @@ class ContactList(
     }
 }
 
-private /*const*/ val EDIT_ICON_PATH   = if (DESKTOP_WORK_AROUND) "M1 16c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V4H1v12zM14 1h-3.5l-1-1h-5l-1 1H0v2h14V1z" else "M0 18h3.75L14.81 6.94l-3.75-3.75L0 14.25V18zm2-2.92 9.06-9.06.92.92L2.92 16H2v-.92zM15.37.29a.996.996 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83a.996.996 0 000-1.41l-2.34-2.34z"
+private /*const*/ val EDIT_ICON_PATH get() = if (DESKTOP_WORK_AROUND) "M1 16c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V4H1v12zM14 1h-3.5l-1-1h-5l-1 1H0v2h14V1z" else "M0 18h3.75L14.81 6.94l-3.75-3.75L0 14.25V18zm2-2.92 9.06-9.06.92.92L2.92 16H2v-.92zM15.37.29a.996.996 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83a.996.996 0 000-1.41l-2.34-2.34z"
 private const val DELETE_ICON_PATH = "M1 16c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V4H1v12zM14 1h-3.5l-1-1h-5l-1 1H0v2h14V1z"

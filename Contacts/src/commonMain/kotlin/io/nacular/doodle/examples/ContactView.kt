@@ -6,23 +6,15 @@ import io.nacular.doodle.controls.icons.PathIcon
 import io.nacular.doodle.controls.text.Label
 import io.nacular.doodle.controls.theme.CommonTextButtonBehavior
 import io.nacular.doodle.core.Behavior
-import io.nacular.doodle.core.Layout
-import io.nacular.doodle.core.View
+import io.nacular.doodle.core.Layout.Companion.simpleLayout
 import io.nacular.doodle.core.container
 import io.nacular.doodle.core.plusAssign
-import io.nacular.doodle.core.view
 import io.nacular.doodle.drawing.Canvas
 import io.nacular.doodle.drawing.Color
 import io.nacular.doodle.drawing.Color.Companion.Black
-import io.nacular.doodle.drawing.Color.Companion.blackOrWhiteContrast
 import io.nacular.doodle.drawing.Stroke
 import io.nacular.doodle.drawing.TextMetrics
-import io.nacular.doodle.drawing.paint
-import io.nacular.doodle.drawing.text
-import io.nacular.doodle.geometry.Circle
 import io.nacular.doodle.geometry.PathMetrics
-import io.nacular.doodle.geometry.Point
-import io.nacular.doodle.geometry.Rectangle
 import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.geometry.path
 import io.nacular.doodle.layout.constrain
@@ -30,67 +22,19 @@ import io.nacular.doodle.text.invoke
 import io.nacular.doodle.theme.native.NativeHyperLinkStyler
 import io.nacular.doodle.utils.Dimension.Width
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import kotlin.math.max
-import kotlin.math.min
 
 class ContactView(
-    private val textMetrics: TextMetrics,
-    linkStyler          : NativeHyperLinkStyler,
+    textMetrics: TextMetrics,
+    linkStyler : NativeHyperLinkStyler,
     navigator  : Navigator,
     appScope   : CoroutineScope,
     pathMetrics: PathMetrics,
     contact    : Contact,
     fonts      : AppFonts,
     buttons    : ButtonFactory,
-    modals     : Modals
-): View() {
-    private inner class Avatar(private val name: String): View() {
-        override fun render(canvas: Canvas) {
-            val circleColor  = name.toColor()
-            val firstInitial = "${name.first()}"
-            val textSize     = textMetrics.size(firstInitial, font)
-
-            canvas.circle(Circle(radius = min(width, height) / 2, center = Point(width / 2, height / 2)), fill = name.toColor().paint)
-            canvas.scale(around = Point(width / 2, height / 2), 4.0, 4.0) {
-                text(
-                    firstInitial,
-                    at    = Point((width - textSize.width) / 2, (height - textSize.height) / 2),
-                    color = blackOrWhiteContrast(circleColor),
-                    font  = font
-                )
-            }
-        }
-    }
-
+    modals     : Modals): ContactCommon(textMetrics, navigator, appScope, contact, fonts, buttons, modals) {
     init {
-        val back   = buttons.back()
-        val name   = Label (contact.name).apply { font = fonts.xLarge }
-        val avatar = Avatar(contact.name).apply { size = Size(176); font = fonts.medium }
-        val edit   = buttons.edit  ().apply {
-            font = fonts.small
-            fired += {
-                navigator.showContactEdit(contact)
-            }
-        }
-        val delete = buttons.delete().apply {
-            font = fonts.small
-            fired += {
-                appScope.launch {
-                    if (modals.delete(contact, fonts).show()) {
-                        navigator.contactDeleted(contact)
-                    }
-                }
-            }
-        }
-
-        val spacer = view {
-            height = 64.0
-            render = {
-                line(Point(0.0, height / 2), Point(width, height / 2), stroke = Stroke(OUTLINE_COLOR))
-            }
-        }
-
         val details = container {
             this += Label("Contact Details").apply {
                 font = fonts.small
@@ -134,30 +78,10 @@ class ContactView(
             }
         }
 
-        children += listOf(back, avatar, name, spacer, edit, delete, details)
+        setDetail(details)
 
-        layout = Layout.simpleLayout {
-            // TODO: Handle smaller width
-
-            back.position   = Point(INSET, 2 * INSET)
-            avatar.position = Point(back.bounds.right + 2 * INSET, back.y)
-            name.position   = Point(avatar.bounds.right + 2 * INSET, avatar.bounds.center.y - name.height / 2)
-
-            val idealDeleteX = it.width - INSET - delete.width
-            val idealEditX   = idealDeleteX - (edit.width + INSET)
-
-            if (idealEditX < name.bounds.right + INSET) {
-                delete.position = Point(it.width / 2 + INSET / 2, avatar.bounds.bottom + INSET / 2)
-                edit.position   = Point(delete.x - (edit.width + INSET), delete.y)
-            } else {
-                delete.position = Point(idealDeleteX, avatar.bounds.bottom - delete.height)
-                edit.position   = Point(idealEditX,   delete.y                            )
-            }
-
-            spacer.bounds  = Rectangle(back.x,   delete.bounds.bottom, max(0.0,   it.width - 2 * INSET), spacer.height)
-            details.bounds = Rectangle(spacer.x, spacer.bounds.bottom, min(520.0, spacer.width        ), 98.0         )
+        layout = simpleLayout {
+            layoutCommonItems()
         }
     }
-
-    private operator fun <T> List<T>.component6() = this[5]
 }

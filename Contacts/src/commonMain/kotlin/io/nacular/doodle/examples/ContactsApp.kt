@@ -20,6 +20,7 @@ import io.nacular.doodle.drawing.opacity
 import io.nacular.doodle.drawing.paint
 import io.nacular.doodle.drawing.rect
 import io.nacular.doodle.drawing.text
+import io.nacular.doodle.focus.FocusManager
 import io.nacular.doodle.geometry.PathMetrics
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Rectangle
@@ -83,6 +84,7 @@ private class CreateContactButton(router: Router, textMetrics: TextMetrics, addI
 
 class ContactsApp<M>(
     private val display        : Display,
+                focusManager   : FocusManager,
                 uiDispatcher   : CoroutineDispatcher,
                 navigator      : Navigator,
                 fonts          : FontLoader,
@@ -106,7 +108,7 @@ class ContactsApp<M>(
 
             themeManager.selected = theme
 
-            val largeFont = fonts("dmsans.woff2") {
+            val largeFont = fonts("dmsans.ttf") {
                 size     = 20
                 weight   = 100
                 families = listOf("DM Sans")
@@ -130,9 +132,10 @@ class ContactsApp<M>(
                 textMetrics            = textMetrics,
                 pathMetrics            = pathMetrics,
                 contactsModel          = model,
+                focusManager           = focusManager,
                 naturalHeight          = PAGE_HEADER_HEIGHT,
-                filterCenterAboveWidth = MEDIUM_WIDTH - 2 * INSET,
-                filterRightAboveWidth  = SMALL_WIDTH  - 2 * INSET,
+                filterCenterAboveWidth = MEDIUM_WIDTH,
+                filterRightAboveWidth  = SMALL_WIDTH,
             ).apply { font = largeFont }
 
             val contactList = ContactList(
@@ -192,15 +195,15 @@ class ContactsApp<M>(
 
             router.fireAction()
 
-            display += CreateContactButton(router, textMetrics, images.load("add.png")!!).apply { font = boldSmallFont }
+            display += CreateContactButton(router, textMetrics, images.load("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAkCAYAAADhAJiYAAAAAXNSR0IArs4c6QAAAL5JREFUWEdj/P///3+GQQQYRx1EIDZGQ4hQch1+IfTaxQzF06J7ThEKBLzyFIfQqIMIhf9oCI2GEKV12WgaGjRp6M9eNkJuAcu/bzeAq/trwM8QLbSBKH17q7ixqsNZUpPqIFIcA3IJTR30WpORIVdyH1EhA1NEMwfd2mBIsmPICiFivWu6MgRF6enwNcRqJS0NEWvqqIMIhdRoCI2GEKW1/WgaGnJpiJCDSZWnuF9GqoWE1I86aDSECIUAIXkAXtfmleN2uj8AAAAASUVORK5CYII=")!!).apply { font = boldSmallFont }
 
             display.layout = simpleLayout { container ->
                 val header   = container.children[0]
                 val mainView = container.children[1]
                 val button   = container.children[2]
 
-                header.size     = Size(container.width - 2 * INSET, if (container.width > SMALL_WIDTH) PAGE_HEADER_HEIGHT else PAGE_HEADER_HEIGHT_COMPACT)
-                mainView.bounds = Rectangle(INSET, header.height, header.width, container.height - header.height)
+                header.size     = Size(container.width, if (container.width > SMALL_WIDTH) PAGE_HEADER_HEIGHT else PAGE_HEADER_HEIGHT_COMPACT)
+                mainView.bounds = Rectangle(INSET, header.height, header.width - 2 * INSET, container.height - header.height)
 
                 button.bounds = when {
                     container.width > MEDIUM_WIDTH -> {
@@ -228,7 +231,7 @@ class ContactsApp<M>(
     override fun shutdown() { /* no-op */ }
 }
 
-private const val MEDIUM_WIDTH               = 768.0 // Moves create button down below this width
-private const val SMALL_WIDTH                = 640.0 // Moves filter down below this width
+private const val MEDIUM_WIDTH               = 800.0 // Moves create button down below this width
+private const val SMALL_WIDTH                = 672.0 // Moves filter down below this width
 private const val PAGE_HEADER_HEIGHT         =  64.0
 private const val PAGE_HEADER_HEIGHT_COMPACT = 116.0 // Height of header for small viewport

@@ -68,6 +68,7 @@ fun main() {
             pathMetrics     = instance(),
             textMetrics     = instance(),
             linkStyler      = instance(),
+            focusManager    = instance(),
             uiDispatcher    = Dispatchers.UI,
             themeManager    = instance(),
             buttonFactory   = instance(),

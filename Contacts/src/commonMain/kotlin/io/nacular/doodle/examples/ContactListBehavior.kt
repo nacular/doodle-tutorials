@@ -13,6 +13,7 @@ import io.nacular.doodle.core.container
 import io.nacular.doodle.core.plusAssign
 import io.nacular.doodle.drawing.Canvas
 import io.nacular.doodle.drawing.Color
+import io.nacular.doodle.drawing.Color.Companion.White
 import io.nacular.doodle.drawing.Stroke
 import io.nacular.doodle.drawing.height
 import io.nacular.doodle.drawing.paint
@@ -150,6 +151,8 @@ class ContactListBehavior(private val navigator: Navigator): TableBehavior<Conta
     }
 
     override fun renderBody(table: Table<Contact, *>, canvas: Canvas) {
+        canvas.rect(table.bounds.atOrigin, color = White)
+
         table.selection.map { it to table[it] }.forEach { (index, row) ->
             row.onSuccess {
                 canvas.rect(rowPositioner.rowBounds(table, it, index).inset(Insets(top = 1.0)), Color(0xf5f5f5u))
