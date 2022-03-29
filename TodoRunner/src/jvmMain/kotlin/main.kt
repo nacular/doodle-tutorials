@@ -1,5 +1,3 @@
-package io.nacular.doodle.examples
-
 import io.nacular.doodle.application.Modules.Companion.FontModule
 import io.nacular.doodle.application.Modules.Companion.ImageModule
 import io.nacular.doodle.application.Modules.Companion.KeyboardModule
@@ -9,6 +7,13 @@ import io.nacular.doodle.controls.buttons.Button
 import io.nacular.doodle.controls.buttons.PushButton
 import io.nacular.doodle.core.Behavior
 import io.nacular.doodle.coroutines.Dispatchers
+import io.nacular.doodle.examples.DataStore
+import io.nacular.doodle.examples.FilePersistence
+import io.nacular.doodle.examples.FilterButtonProvider
+import io.nacular.doodle.examples.PersistentStore
+import io.nacular.doodle.examples.Router
+import io.nacular.doodle.examples.TodoApp
+import io.nacular.doodle.examples.TrivialRouter
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicLabelBehavior
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeHyperLinkBehavior
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeScrollPanelBehavior

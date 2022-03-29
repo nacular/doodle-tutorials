@@ -56,7 +56,7 @@ kotlin {
 }
 
 application {
-    mainClass.set("io.nacular.doodle.examples.MainKt")
+    mainClass.set("MainKt")
 }
 
 installFullScreenDemo("Development")
