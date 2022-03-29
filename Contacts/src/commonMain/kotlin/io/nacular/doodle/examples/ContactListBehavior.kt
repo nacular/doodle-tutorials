@@ -12,8 +12,6 @@ import io.nacular.doodle.core.View
 import io.nacular.doodle.core.container
 import io.nacular.doodle.core.plusAssign
 import io.nacular.doodle.drawing.Canvas
-import io.nacular.doodle.drawing.Color
-import io.nacular.doodle.drawing.Color.Companion.White
 import io.nacular.doodle.drawing.Stroke
 import io.nacular.doodle.drawing.height
 import io.nacular.doodle.drawing.paint
@@ -23,13 +21,23 @@ import io.nacular.doodle.event.PointerListener
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.layout.Insets
 import io.nacular.doodle.layout.constrain
+import io.nacular.doodle.system.Cursor.Companion.Pointer
 import io.nacular.doodle.theme.basic.VerticalListPositioner
 import io.nacular.doodle.utils.SetObserver
 
-class ContactListBehavior(private val navigator: Navigator): TableBehavior<Contact>() {
+/**
+ * Defines the behavior of [ContactList].
+ */
+class ContactListBehavior(private val assets: AppAssets, private val navigator: Navigator): TableBehavior<Contact>() {
     /**
      * Renders each cell within the Table. It contains the View returned by the Table's
      * visualizer for [column]. And aligns it based on the column's `cellAlignment`.
+     *
+     * @param table the cell is within
+     * @param column the cell belongs to
+     * @param cell data to render
+     * @param row index of the cell
+     * @param itemVisualizer this cell will wrap (and align)
      */
     private inner class ContactCell<T>(
                     table         : Table<Contact, *>,
@@ -43,6 +51,7 @@ class ContactListBehavior(private val navigator: Navigator): TableBehavior<Conta
         init {
             children += itemVisualizer(cell, context = SimpleIndexedItem(row, false))
 
+            cursor          = Pointer
             focusable       = false
             styleChanged   += { rerender() }
             pointerChanged += object: PointerListener {
@@ -56,6 +65,8 @@ class ContactListBehavior(private val navigator: Navigator): TableBehavior<Conta
 
                 override fun exited(event: PointerEvent) {
                     parent?.toLocal(event.location, from = event.target)?.let { point ->
+                        // Exit events are triggered for children as well, so need to check
+                        // that the pointer has actually left the cell.
                         if (!contains(point)) {
                             pointerOver = false
                             table.removeSelection(setOf(index))
@@ -121,9 +132,10 @@ class ContactListBehavior(private val navigator: Navigator): TableBehavior<Conta
                 }
             }
 
-            val thickness = 1.0
             render = {
-                line(Point(y = height - thickness), Point(width, height - thickness), stroke = Stroke(thickness = thickness, fill = OUTLINE_COLOR.paint))
+                val thickness = 1.0
+
+                line(Point(y = height - thickness), Point(width, height - thickness), stroke = Stroke(thickness = thickness, fill = assets.outline.paint))
             }
         }
     }
@@ -151,11 +163,11 @@ class ContactListBehavior(private val navigator: Navigator): TableBehavior<Conta
     }
 
     override fun renderBody(table: Table<Contact, *>, canvas: Canvas) {
-        canvas.rect(table.bounds.atOrigin, color = White)
+        canvas.rect(table.bounds.atOrigin, color = assets.background)
 
         table.selection.map { it to table[it] }.forEach { (index, row) ->
             row.onSuccess {
-                canvas.rect(rowPositioner.rowBounds(table, it, index).inset(Insets(top = 1.0)), Color(0xf5f5f5u))
+                canvas.rect(rowPositioner.rowBounds(table, it, index).inset(Insets(top = 1.0)), assets.listHighlight)
             }
         }
     }

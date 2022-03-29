@@ -1,6 +1,7 @@
 package io.nacular.doodle.examples
 
 import io.nacular.doodle.core.View
+import io.nacular.doodle.layout.Insets
 
 /**
  * Simple interface representing a modal view
@@ -38,14 +39,16 @@ interface ModalFactory {
      * Creates a regular modal by specifying the contents it should display.
      * This allows the modal to be fully customizable.
      *
+     * @param insets applied to [contents]
      * @param contents to display within the modal
      */
-    operator fun invoke(contents: (Modal) -> View): Modal
+    operator fun invoke(insets: Insets = Insets(20.0), contents: (Modal) -> View): Modal
 
     /**
      * Creates a modal that blocks until it has input.
      *
+     * @param insets applied to [contents]
      * @param contents to display within the modal, and a way to indicate when a result is ready
      */
-    operator fun <T> invoke(contents: (completed: (T) -> Unit) -> View): SuspendingModal<T>
+    operator fun <T> invoke(insets: Insets = Insets(20.0), contents: (completed: (T) -> Unit) -> View): SuspendingModal<T>
 }

@@ -4,14 +4,10 @@ import io.nacular.doodle.controls.form.Form
 import io.nacular.doodle.controls.form.verticalLayout
 import io.nacular.doodle.controls.text.Label
 import io.nacular.doodle.core.View
-import io.nacular.doodle.core.renderProperty
 import io.nacular.doodle.core.view
 import io.nacular.doodle.drawing.Canvas
-import io.nacular.doodle.drawing.Color.Companion.blackOrWhiteContrast
 import io.nacular.doodle.drawing.Stroke
 import io.nacular.doodle.drawing.TextMetrics
-import io.nacular.doodle.drawing.paint
-import io.nacular.doodle.drawing.text
 import io.nacular.doodle.geometry.Circle
 import io.nacular.doodle.geometry.PathMetrics
 import io.nacular.doodle.geometry.Point
@@ -25,105 +21,89 @@ import io.nacular.doodle.utils.Dimension.Width
 import kotlin.math.min
 
 class CreateContactView(
-    private val textFieldStyler: NativeTextFieldStyler,
-    private val pathMetrics: PathMetrics,
-    private val textMetrics: TextMetrics,
-    actions: Navigator,
-    fonts: AppFonts,
-    buttons: ButtonFactory,
-    image: Image
+                assets         : AppAssets,
+                buttons        : AppButtons,
+                navigator      : Navigator,
+    private val pathMetrics    : PathMetrics,
+    private val textMetrics    : TextMetrics,
+    private val textFieldStyler: NativeTextFieldStyler
 ): View() {
-    private inner class Avatar(private val image: Image): View() {
-        var name by renderProperty("")
-
+    private inner class ChangeableAvatar(private val image: Image): Avatar(textMetrics, "") {
         override fun render(canvas: Canvas) {
             when {
                 name.isBlank() -> canvas.clip(Circle(radius = min(width, height) / 2, center = Point(width / 2, height / 2))) {
                     canvas.image(image, destination = bounds.atOrigin)
                 }
-                else -> {
-                    val circleColor  = name.toColor()
-                    val firstInitial = "${name.first()}"
-                    val textSize     = textMetrics.size(firstInitial, font)
-
-                    canvas.circle(Circle(radius = min(width, height) / 2, center = Point(width / 2, height / 2)), fill = name.toColor().paint)
-                    canvas.scale(around = Point(width / 2, height / 2), 4.0, 4.0) {
-                        text(
-                            firstInitial,
-                            at    = Point((width - textSize.width) / 2, (height - textSize.height) / 2),
-                            color = blackOrWhiteContrast(circleColor),
-                            font  = font
-                        )
-                    }
-                }
+                else -> super.render(canvas)
             }
         }
     }
 
     init {
-        lateinit var name       : String
+        lateinit var name: String
         lateinit var phoneNumber: String
 
         val label = Label("Create Contact").apply {
-            font = fonts.medium
-            height = 28.0
+            font    = assets.medium
+            height  = 28.0
             fitText = setOf(Width)
         }
 
-        val back   = buttons.back()
-        val avatar = Avatar(image).apply { size = Size(176); font = fonts.medium }
-        val button = buttons.create().apply {
-            font    = fonts.small
+        val back   = buttons.back(assets.backIcon)
+        val avatar = ChangeableAvatar(assets.blankAvatar).apply { size = Size(176); font = assets.medium }
+        val button = buttons.create(assets.buttonBackground, assets.buttonForeground).apply {
+            font = assets.small
             enabled = false
 
             fired += {
-                actions.createContact(name, phoneNumber)
+                navigator.createContact(name, phoneNumber)
             }
         }
 
-        val form = Form { this(
-                + customTextField(textFieldStyler, pathMetrics, "Name",         NAME_ICON_PATH,  Regex(".+"        )) { textChanged += { _,_,new -> avatar.name = new } },
-                + customTextField(textFieldStyler, pathMetrics, "Phone Number", PHONE_ICON_PATH, Regex("[\\s,0-9]+")),
+        val form = Form {
+            this(
+                +formTextField(assets, textFieldStyler, pathMetrics, "Name",         assets.nameIcon,  Regex(".+")) { textChanged += { _, _, new -> avatar.name = new } },
+                +formTextField(assets, textFieldStyler, pathMetrics, "Phone Number", assets.phoneIcon, Regex("[\\s,0-9]+")),
                 onInvalid = { button.enabled = false }
             ) { name_, phone_ ->
-                name        = name_
+                name = name_
                 phoneNumber = phone_
                 button.enabled = true
             }
         }.apply {
-            font   = fonts.small
+            font   = assets.small
             layout = verticalLayout(this, spacing = 32.0, itemHeight = 33.0)
         }
 
         val spacer = view {
             height = 64.0
             render = {
-                line(Point(0.0, height / 2), Point(width, height / 2), stroke = Stroke(OUTLINE_COLOR))
+                line(Point(0.0, height / 2), Point(width, height / 2), stroke = Stroke(assets.outline))
             }
         }
 
         children += listOf(label, back, avatar, spacer, form, button)
 
         layout = constrain(label, back, avatar, spacer, form, button) { (label, back, avatar, spacer, form, button) ->
-            label.top    = parent.top  + 2 * INSET
-            label.left   = parent.left + INSET
+            label.top = parent.top + 2 * INSET
+            label.left = parent.left + INSET
 
-            back.top     = label.bottom + 2 * INSET
-            back.left    = label.left
+            back.top = label.bottom + 2 * INSET
+            back.left = label.left
 
-            avatar.top   = label.bottom + 3.0/2 * INSET
-            avatar.left  = back.right   + 2 * INSET
+            avatar.top = label.bottom + 3.0 / 2 * INSET
+            avatar.left = back.right + 2 * INSET
 
-            spacer.top   = avatar.bottom
-            spacer.left  = back.left
+            spacer.top = avatar.bottom
+            spacer.left = back.left
             spacer.right = parent.right
 
-            form.top     = spacer.bottom
-            form.left    = back.left
-            form.width   = min(parent.width - INSET, constant(520.0))
+            form.top = spacer.bottom
+            form.left = back.left
+            form.width = min(parent.width - INSET, constant(520.0))
 
-            button.top   = form.bottom + 2 * INSET
-            button.left  = back.left
+            button.top = form.bottom + 2 * INSET
+            button.left = back.left
         }
     }
 

@@ -1,19 +1,19 @@
 package io.nacular.doodle.examples
 
+import io.nacular.doodle.animation.Animation
+import io.nacular.doodle.animation.Animator
 import io.nacular.doodle.controls.Photo
 import io.nacular.doodle.controls.text.Label
 import io.nacular.doodle.controls.text.TextField
 import io.nacular.doodle.controls.theme.CommonLabelBehavior
 import io.nacular.doodle.core.Layout
 import io.nacular.doodle.core.View
+import io.nacular.doodle.core.renderProperty
 import io.nacular.doodle.drawing.AffineTransform
 import io.nacular.doodle.drawing.Canvas
-import io.nacular.doodle.drawing.Color
-import io.nacular.doodle.drawing.Color.Companion.Black
 import io.nacular.doodle.drawing.Color.Companion.Transparent
-import io.nacular.doodle.drawing.Color.Companion.White
 import io.nacular.doodle.drawing.TextMetrics
-import io.nacular.doodle.drawing.opacity
+import io.nacular.doodle.drawing.interpolate
 import io.nacular.doodle.drawing.paint
 import io.nacular.doodle.drawing.rect
 import io.nacular.doodle.event.PointerEvent
@@ -25,43 +25,48 @@ import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Rectangle
 import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.geometry.path
-import io.nacular.doodle.image.Image
 import io.nacular.doodle.layout.constrain
 import io.nacular.doodle.system.Cursor.Companion.Pointer
 import io.nacular.doodle.system.Cursor.Companion.Text
+import io.nacular.doodle.utils.observable
 import kotlin.math.max
 
 /**
  * Renders the header portion of the main page
  */
 class Header(
-    private val fonts                 : AppFonts,
-    private val navigator             : Navigator,
-    private val textMetrics           : TextMetrics,
-    private val pathMetrics           : PathMetrics,
-    private val focusManager          : FocusManager,
-    private val contactsModel         : ContactsModel,
-                logoImage             : Image,
-                filterCenterAboveWidth: Double,
-                filterRightAboveWidth : Double,
-                naturalHeight         : Double
+    private val assets      : AppAssets,
+    private val animate     : Animator,
+    private val contacts    : ContactsModel,
+    private val navigator   : Navigator,
+    private val textMetrics : TextMetrics,
+    private val pathMetrics : PathMetrics,
+    private val focusManager: FocusManager,
 ): View() {
 
-    // FIXME: Factor out hard coded colors
+    val narrowHeight           = 116.0
+    val naturalHeight          = 64.0
+    val filterRightAboveWidth  = 672.0
+    val filterCenterAboveWidth = 800.0
 
     /**
      * Search box that filters which contacts are shown
      */
     private inner class FilterBox: View() {
-        val searchIconPath = path(SEARCH_ICON_PATH)
-        val searchIconSize = pathMetrics.size(searchIconPath)
+
+        private var progress              by renderProperty(0f  )
+        private var animation: Animation? by observable    (null) { old,_ ->
+            old?.cancel()
+        }
+
+        private val searchIconPath = path(assets.searchIcon)
+        private val searchIconSize = pathMetrics.size(searchIconPath)
 
         private val textField = TextField().apply {
-            font             = fonts.medium
             placeHolder      = "Search"
             borderVisible    = false
             backgroundColor  = Transparent
-            placeHolderColor = PLACE_HOLDER_COLOR
+            placeHolderColor = assets.placeHolder
             focusChanged    += { _,_,_ ->
                 this@FilterBox.rerender()
             }
@@ -71,10 +76,11 @@ class Header(
             cursor             = Text
             clipCanvasToBounds = false
 
-            val clearButton = PathIconButton(pathData = DELETE_ICON_PATH, pathMetrics = pathMetrics).apply {
+            val clearButton = PathIconButton(pathData = assets.deleteIcon, pathMetrics = pathMetrics).apply {
                 size            = Size(22, 44)
+                cursor          = Pointer
                 visible         = textField.text.isNotBlank()
-                foregroundColor = SEARCH_ICON_COLOR
+                foregroundColor = assets.search
                 fired += {
                     textField.text = ""
                 }
@@ -82,8 +88,8 @@ class Header(
 
             textField.textChanged += { _,_,new ->
                 when {
-                    new.isBlank() -> contactsModel.filter = null
-                    else          -> contactsModel.filter = { it.name.contains(new, ignoreCase = true) }
+                    new.isBlank() -> contacts.filter = null
+                    else          -> contacts.filter = { it.name.contains(new, ignoreCase = true) }
                 }
 
                 clearButton.visible = new.isNotBlank()
@@ -104,31 +110,42 @@ class Header(
             pointerChanged += clicked {
                 focusManager.requestFocus(textField)
             }
+
+            textField.focusChanged += { _,_,hasFocus ->
+                val range = when {
+                    hasFocus -> progress to 1f
+                    else     -> progress to 0f
+                }
+
+                animation = (animate (range) using assets.slowTransition) {
+                    progress = it
+                }
+            }
         }
 
         override fun render(canvas: Canvas) {
             when {
-                textField.hasFocus -> canvas.outerShadow(horizontal = 0.0, vertical = 0.0, color = Black.opacity(0.1f), blurRadius = 3.0) {
-                    canvas.rect(bounds.atOrigin, radius = 8.0, color = White)
+                progress > 0f -> canvas.outerShadow(horizontal = 0.0, vertical = 4.0 * progress, color = assets.shadow, blurRadius = 3.0 * progress) {
+                    canvas.rect(bounds.atOrigin, radius = 8.0, color = interpolate(assets.searchSelected, assets.background, progress))
                 }
-                else               -> canvas.rect(bounds.atOrigin, radius = 8.0, color = Color(241u, 243u, 244u))
+                else          -> canvas.rect(bounds.atOrigin, radius = 8.0, color = assets.searchSelected)
             }
 
             canvas.transform(AffineTransform.Identity.translate(20.0, (height - searchIconSize.height) / 2)) {
-                canvas.path(searchIconPath, fill = SEARCH_ICON_COLOR.paint)
+                canvas.path(searchIconPath, fill = assets.search.paint)
             }
         }
     }
 
     init {
-        children += Photo(logoImage  ).apply { size = Size(40) }
+        children += Photo(assets.logo).apply { size = Size(40) }
         children += Label("Phonebook").apply {
-            font = fonts.large
-            foregroundColor = Color(95u, 99u, 104u)
-            acceptsThemes = false
-            behavior = CommonLabelBehavior(textMetrics)
+            font            = assets.large
+            behavior        = CommonLabelBehavior(textMetrics)
+            acceptsThemes   = false
+            foregroundColor = assets.header
         }
-        children += FilterBox().apply { size = Size(300, 45) }
+        children += FilterBox().apply { size = Size(300, 45); font = assets.medium }
 
         val filterNaturalWidth = 300.0
 
@@ -163,7 +180,3 @@ class Header(
 
     private val PointerEvent.inHotspot get() = this@Header.toLocal(location, target).x < 220
 }
-
-private       val SEARCH_ICON_COLOR = Color(0x5f6368u)
-private /*const*/ val SEARCH_ICON_PATH  = if (DESKTOP_WORK_AROUND) "M14 1.41 12.59 0 7 5.59 1.41 0 0 1.41 5.59 7 0 12.59 1.41 14 7 8.41 12.59 14 14 12.59 8.41 7Z" else "M12.5 11H11.71L11.43 10.73A6.471 6.471 0 0013 6.5 6.5 6.5 0 106.5 13C8.11 13 9.59 12.41 10.73 11.43L11 11.71V12.5L16 17.49 17.49 16 12.5 11ZM6.5 11C4.01 11 2 8.99 2 6.5S4.01 2 6.5 2 11 4.01 11 6.5 8.99 11 6.5 11Z"
-private const val DELETE_ICON_PATH  = "M14 1.41 12.59 0 7 5.59 1.41 0 0 1.41 5.59 7 0 12.59 1.41 14 7 8.41 12.59 14 14 12.59 8.41 7Z"

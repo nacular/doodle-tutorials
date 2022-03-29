@@ -3,62 +3,45 @@ package io.nacular.doodle.examples
 import io.nacular.doodle.controls.text.Label
 import io.nacular.doodle.core.View
 import io.nacular.doodle.core.view
-import io.nacular.doodle.drawing.Canvas
-import io.nacular.doodle.drawing.Color.Companion.blackOrWhiteContrast
 import io.nacular.doodle.drawing.Stroke
 import io.nacular.doodle.drawing.TextMetrics
-import io.nacular.doodle.drawing.paint
-import io.nacular.doodle.drawing.text
-import io.nacular.doodle.geometry.Circle
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Rectangle
 import io.nacular.doodle.geometry.Size
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.max
 import kotlin.math.min
 
+/**
+ * Base class for Contact views that handles common setup and rendering.
+ */
 abstract class ContactCommon(
-    private val textMetrics: TextMetrics,
-    navigator  : Navigator,
-    appScope   : CoroutineScope,
-    contact    : Contact,
-    fonts      : AppFonts,
-    buttons    : ButtonFactory,
-    modals     : Modals,
+    modals      : Modals,
+    assets      : AppAssets,
+    buttons     : AppButtons,
+    contact     : Contact,
+    appScope    : CoroutineScope,
+    navigator   : Navigator,
+    textMetrics : TextMetrics,
+    uiDispatcher: CoroutineDispatcher,
 ): View() {
-    protected inner class Avatar(private val name: String): View() {
-        override fun render(canvas: Canvas) {
-            val circleColor  = name.toColor()
-            val firstInitial = "${name.first()}"
-            val textSize     = textMetrics.size(firstInitial, font)
-
-            canvas.circle(Circle(radius = min(width, height) / 2, center = Point(width / 2, height / 2)), fill = name.toColor().paint)
-            canvas.scale(around = Point(width / 2, height / 2), 4.0, 4.0) {
-                text(
-                    firstInitial,
-                    at    = Point((width - textSize.width) / 2, (height - textSize.height) / 2),
-                    color = blackOrWhiteContrast(circleColor),
-                    font  = font
-                )
-            }
-        }
-    }
-
-    protected val back   = buttons.back()
-    protected val name   = Label (contact.name).apply { font = fonts.xLarge }
-    protected val avatar = Avatar(contact.name).apply { size = Size(176); font = fonts.medium }
-    protected val edit   = buttons.edit  ().apply {
-        font = fonts.small
+    protected val back   = buttons.back(assets.backIcon)
+    protected val name   = Label (contact.name).apply { font = assets.xLarge }
+    protected val avatar = Avatar(textMetrics, contact.name).apply { size = Size(176); font = assets.medium }
+    protected val edit   = buttons.edit(assets.buttonBackground, assets.buttonForeground).apply {
+        font = assets.small
         fired += {
             navigator.showContactEdit(contact)
         }
     }
-    protected val delete = buttons.delete().apply {
-        font = fonts.small
+
+    protected val delete = buttons.delete(assets.deleteBackground, assets.buttonForeground).apply {
+        font = assets.small
         fired += {
-            appScope.launch {
-                if (modals.delete(contact, fonts).show()) {
+            appScope.launch(uiDispatcher) {
+                if (modals.delete(assets, contact).show()) {
                     navigator.contactDeleted(contact)
                 }
             }
@@ -68,7 +51,7 @@ abstract class ContactCommon(
     protected val spacer = view {
         height = 64.0
         render = {
-            line(Point(0.0, height / 2), Point(width, height / 2), stroke = Stroke(OUTLINE_COLOR))
+            line(Point(0.0, height / 2), Point(width, height / 2), stroke = Stroke(assets.outline))
         }
     }
 

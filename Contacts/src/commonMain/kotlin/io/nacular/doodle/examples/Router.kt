@@ -10,10 +10,16 @@ interface Router {
     /** Adds a route */
     operator fun set(route: String, action: RouteHandler?)
 
+    /**
+     * Navigates to the given route
+     */
     fun goTo(route: String)
 
     /** Notifies handlers of the current route, as though it was changed */
     fun fireAction()
 
+    /**
+     * Goes to the previous route
+     */
     fun goBack()
 }

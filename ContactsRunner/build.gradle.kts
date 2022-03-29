@@ -16,17 +16,20 @@ kotlin {
     }
 
     val doodleVersion: String by project
+    val kodeinVersion: String by project
+
 
     sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation(project(":Contacts"))
+                implementation("org.kodein.di:kodein-di:$kodeinVersion")
             }
         }
 
         val jsMain by getting {
             dependencies {
-                implementation ("io.nacular.doodle:browser:$doodleVersion")
+                implementation("io.nacular.doodle:browser:$doodleVersion")
             }
         }
 
@@ -49,14 +52,14 @@ kotlin {
 
                 val target = "${targetOs}-${targetArch}"
 
-                implementation ("io.nacular.doodle:desktop-jvm-$target:$doodleVersion")
+                implementation("io.nacular.doodle:desktop-jvm-$target:$doodleVersion")
             }
         }
     }
 }
 
 application {
-    mainClass.set("io.nacular.doodle.examples.MainKt")
+    mainClass.set("MainKt")
 }
 
 installFullScreenDemo("Development")

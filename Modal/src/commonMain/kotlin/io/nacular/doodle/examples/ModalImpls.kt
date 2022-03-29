@@ -15,8 +15,10 @@ import io.nacular.doodle.drawing.Color.Companion.Black
 import io.nacular.doodle.drawing.Color.Companion.White
 import io.nacular.doodle.drawing.opacity
 import io.nacular.doodle.drawing.rect
+import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Rectangle
 import io.nacular.doodle.geometry.Size
+import io.nacular.doodle.geometry.toPath
 import io.nacular.doodle.layout.Insets
 import io.nacular.doodle.utils.observable
 import io.nacular.measured.units.Time
@@ -30,8 +32,8 @@ import kotlin.coroutines.suspendCoroutine
  * Simple factory to create modals.
  */
 class ModalFactoryImpl(private val display: Display, private val animate: Animator): ModalFactory {
-    override fun     invoke(contents: (Modal      ) -> View) = ModalImpl          (display, animate, contents)
-    override fun <T> invoke(contents: ((T) -> Unit) -> View) = SuspendingModalImpl(display, animate, contents)
+    override fun     invoke(insets: Insets, contents: (Modal      ) -> View) = ModalImpl          (display, animate, insets, contents)
+    override fun <T> invoke(insets: Insets, contents: ((T) -> Unit) -> View) = SuspendingModalImpl(display, animate, insets, contents)
 }
 
 /**
@@ -42,11 +44,21 @@ class ModalFactoryImpl(private val display: Display, private val animate: Animat
  * @param contents to display in the dialog
  * @param insets applied to contents
  */
-private class Dialog(contents: View, insets: Insets = Insets(20.0)): View() {
+private class Dialog(contents: View, insets: Insets): View() {
+    private val clipPath get() = object: ClipPath(bounds.atOrigin.toPath(10.0)) {
+        override fun contains(point: Point) = point in bounds.atOrigin
+    }
+
     init {
         clipCanvasToBounds = false
 
         children += contents
+
+        childrenClipPath = clipPath
+
+        boundsChanged += { _,_,_ ->
+            childrenClipPath = clipPath
+        }
 
         layout = object: Layout {
             override fun requiresLayout(child: Positionable, of: PositionableContainer, old: SizePreferences, new: SizePreferences): Boolean {
@@ -90,9 +102,9 @@ abstract class AbstractModal(display: Display, private val animate: Animator): V
         size = display.size
     }
 
-    fun show(contents: View) {
+    fun show(contents: View, insets: Insets) {
         if (children.isEmpty()) {
-            children += Dialog(contents).apply { opacity = 0f }
+            children += Dialog(contents, insets).apply { opacity = 0f }
             layout = object: Layout {
                 override fun requiresLayout(child: Positionable, of: PositionableContainer, old: SizePreferences, new: SizePreferences): Boolean {
                     return old.idealSize != new.idealSize
@@ -144,9 +156,9 @@ abstract class AbstractModal(display: Display, private val animate: Animator): V
  * @param display where the modal will be shown.
  * @param contents to show within the modal.
  */
-class ModalImpl(display: Display, animate: Animator, private val contents: (Modal) -> View): AbstractModal(display, animate), Modal {
+class ModalImpl(display: Display, animate: Animator, private val modalInsets: Insets, private val contents: (Modal) -> View): AbstractModal(display, animate), Modal {
     override fun show() {
-        super.show(contents(this))
+        super.show(contents(this), modalInsets)
     }
 }
 
@@ -156,13 +168,13 @@ class ModalImpl(display: Display, animate: Animator, private val contents: (Moda
  * @param display where the modal will be shown.
  * @param config defining what the modal shows and when it is complete.
  */
-class SuspendingModalImpl<T>(display: Display, animate: Animator, private val config: (completed: (T) -> Unit) -> View): AbstractModal(display, animate), SuspendingModal<T> {
+class SuspendingModalImpl<T>(display: Display, animate: Animator, private val modalInsets: Insets, private val config: (completed: (T) -> Unit) -> View): AbstractModal(display, animate), SuspendingModal<T> {
     override suspend fun show(): T = suspendCoroutine { coroutine ->
         try {
             super.show(config {
                 super.hide()
                 coroutine.resume(it)
-            })
+            }, modalInsets)
         } catch (e: CancellationException) {
             coroutine.resumeWithException(e)
         }

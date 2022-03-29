@@ -1,5 +1,5 @@
-import io.nacular.doodle.examples.RouteHandler
-import io.nacular.doodle.examples.Router
+package io.nacular.doodle.examples
+
 import org.w3c.dom.Window
 
 /**
