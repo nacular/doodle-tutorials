@@ -1,6 +1,7 @@
 package io.nacular.doodle.examples
 
 import io.nacular.doodle.controls.SimpleMutableListModel
+import io.nacular.doodle.examples.ContactsModel.EditContext
 import io.nacular.doodle.utils.FilteredList
 import io.nacular.doodle.utils.ObservableList
 import io.nacular.doodle.utils.observable
@@ -16,16 +17,31 @@ data class Contact(val name: String, val phoneNumber: String)
  * Collection of contacts
  */
 interface ContactsModel {
+    class EditContext {
+        var name       : String? = null
+        var phoneNumber: String? = null
+    }
+
     /**
      * Changes which contacts are shown
      */
     var filter: ((Contact) -> Boolean)?
 
-    operator fun plusAssign (contact: Contact)
+    // Adds a Contact
+    operator fun plusAssign(contact: Contact)
+
+    // Removes a Contact
     operator fun minusAssign(contact: Contact)
 
-    fun id(of: Contact): Int?
-    fun find(id: Int): Contact?
+    /**
+     * Edits the given Contact in place within the model.
+     *
+     * @param existing contact to edit (must be present in the model)
+     */
+    fun edit(existing: Contact, block: EditContext.() -> Unit): Result<Contact>
+
+    fun id  (of: Contact): Int?
+    fun find(id: Int    ): Contact?
 }
 
 interface PersistentStore<T> {
@@ -36,16 +52,28 @@ interface PersistentStore<T> {
 /**
  * Model based on [FilteredList]
  */
-class SimpleContactsModel private constructor(
-    private val contacts    : ObservableList<Contact> = ObservableList(),
-    private val filteredList: FilteredList<Contact> = FilteredList(contacts)
-): SimpleMutableListModel<Contact>(filteredList), ContactsModel {
+class SimpleContactsModel private constructor(private val filteredList: FilteredList<Contact>): SimpleMutableListModel<Contact>(filteredList), ContactsModel {
     override var filter: ((Contact) -> Boolean)? by observable(null) { _,new ->
         filteredList.filter = new
     }
 
+    // Contacts are inserted at the front
     override fun plusAssign (contact: Contact) = if (size > 0) super.add(0, contact) else super.add(contact)
     override fun minusAssign(contact: Contact) = super.remove(contact)
+
+    override fun edit(existing: Contact, block: EditContext.() -> Unit): Result<Contact> {
+        val index = indexOf(existing)
+
+        // Only edit if the Contact really exists
+        if (index >= 0) {
+            EditContext().apply(block).also {
+                // Apply the properties that have been set
+                this[index] = Contact(it.name ?: existing.name, it.phoneNumber ?: existing.phoneNumber)
+            }
+        }
+
+        return this[index]
+    }
 
     override fun id(of: Contact): Int? = indexOf(of).takeIf { it >= 0 }
 
@@ -53,13 +81,13 @@ class SimpleContactsModel private constructor(
 
     companion object {
         operator fun invoke(persistentStore: PersistentStore<Contact>): SimpleContactsModel {
-            val tasks = ObservableList(persistentStore.load()).apply {
+            val contacts = ObservableList(persistentStore.load()).apply {
                 changed += { _,_,_,_ ->
                     persistentStore.save(this)
                 }
             }
 
-            return SimpleContactsModel(tasks, FilteredList(tasks)).apply {
+            return SimpleContactsModel(FilteredList(contacts)).apply {
                 // Add dummy data if empty
                 if (isEmpty) {
                     this += Contact("Joe",             "1234567")

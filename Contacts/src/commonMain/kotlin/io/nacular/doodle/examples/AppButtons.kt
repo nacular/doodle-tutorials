@@ -42,10 +42,10 @@ class AppButtonsImpl(
     override fun delete(background: Color, foreground: Color) = simpleButton("Delete", background, text = foreground)
 
     private fun simpleButton(name: String, background: Color, text: Color) = PushButton(name).apply {
-        size   = Size(113, 40)
-        cursor = Pointer
-
-        behavior = simpleTextButtonRenderer(textMetrics) { button, canvas ->
+        size          = Size(113, 40)
+        cursor        = Pointer
+        acceptsThemes = false
+        behavior      = simpleTextButtonRenderer(textMetrics) { button, canvas ->
             val color = background.let { if (enabled) it else it.grayScale() }
 
             canvas.rect(bounds.atOrigin, radius = 4.0, fill = color.paint)

@@ -8,6 +8,7 @@ import io.nacular.doodle.drawing.TextMetrics
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Rectangle
 import io.nacular.doodle.geometry.Size
+import io.nacular.doodle.utils.observable
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -19,30 +20,32 @@ import kotlin.math.min
  */
 abstract class ContactCommon(
     modals      : Modals,
-    assets      : AppAssets,
+    assets      : AppConfig,
     buttons     : AppButtons,
     contact     : Contact,
+    contacts    : ContactsModel,
     appScope    : CoroutineScope,
     navigator   : Navigator,
     textMetrics : TextMetrics,
     uiDispatcher: CoroutineDispatcher,
 ): View() {
+    protected var contact: Contact by observable(contact) { _,new ->
+        name.text   = new.name
+        avatar.name = new.name
+    }
+
     protected val back   = buttons.back(assets.backIcon)
     protected val name   = Label (contact.name).apply { font = assets.xLarge }
     protected val avatar = Avatar(textMetrics, contact.name).apply { size = Size(176); font = assets.medium }
-    protected val edit   = buttons.edit(assets.buttonBackground, assets.buttonForeground).apply {
-        font = assets.small
-        fired += {
-            navigator.showContactEdit(contact)
-        }
-    }
+    protected val edit   = buttons.edit(assets.buttonBackground, assets.buttonForeground).apply { font = assets.small }
 
     protected val delete = buttons.delete(assets.deleteBackground, assets.buttonForeground).apply {
         font = assets.small
         fired += {
             appScope.launch(uiDispatcher) {
-                if (modals.delete(assets, contact).show()) {
-                    navigator.contactDeleted(contact)
+                if (modals.confirmDelete(assets, this@ContactCommon.contact).show()) {
+                    contacts -= this@ContactCommon.contact
+                    navigator.showContactList()
                 }
             }
         }
@@ -69,8 +72,6 @@ abstract class ContactCommon(
     }
 
     protected fun layoutCommonItems() {
-        // TODO: Handle smaller width
-
         back.position   = Point(INSET, 2 * INSET)
         avatar.position = Point(back.bounds.right + 2 * INSET, back.y)
         name.position   = Point(avatar.bounds.right + 2 * INSET, avatar.bounds.center.y - name.height / 2)
@@ -78,12 +79,17 @@ abstract class ContactCommon(
         val idealDeleteX = width - INSET - delete.width
         val idealEditX   = idealDeleteX - (edit.width + INSET)
 
-        if (idealEditX < name.bounds.right + INSET) {
-            delete.position = Point(width / 2 + INSET / 2, avatar.bounds.bottom + INSET / 2)
-            edit.position   = Point(delete.x - (edit.width + INSET), delete.y)
-        } else {
-            delete.position = Point(idealDeleteX, avatar.bounds.bottom - delete.height)
-            edit.position   = Point(idealEditX,   delete.y                            )
+        when {
+            idealEditX < name.bounds.right + INSET -> {
+                avatar.position = Point((width - avatar.width) / 2, back.y)
+                name.position   = Point(avatar.bounds.center.x - name.width / 2, avatar.bounds.bottom + INSET)
+                delete.position = Point(width / 2 + INSET / 2, name.bounds.bottom + INSET)
+                edit.position   = Point(delete.x - (edit.width + INSET), delete.y)
+            }
+            else                                   -> {
+                delete.position = Point(idealDeleteX, avatar.bounds.bottom - delete.height)
+                edit.position   = Point(idealEditX,   delete.y                            )
+            }
         }
 
         spacer.bounds  = Rectangle(back.x, delete.bounds.bottom, max(0.0, width - 2 * INSET), spacer.height)

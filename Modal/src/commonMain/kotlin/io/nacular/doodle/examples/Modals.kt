@@ -18,6 +18,12 @@ interface Modal {
     fun hide()
 }
 
+interface Modeless {
+    fun show()
+
+    fun hide()
+}
+
 /**
  * A modal that blocks when shown until a result is produced. This approach
  * is useful when user input is mandatory and the modal cannot be dismissed
@@ -43,6 +49,8 @@ interface ModalFactory {
      * @param contents to display within the modal
      */
     operator fun invoke(insets: Insets = Insets(20.0), contents: (Modal) -> View): Modal
+
+    operator fun invoke(insets: Insets = Insets(20.0), contents: (Modeless) -> View): Modeless
 
     /**
      * Creates a modal that blocks until it has input.

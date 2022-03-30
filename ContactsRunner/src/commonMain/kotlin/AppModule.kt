@@ -1,12 +1,11 @@
 import io.nacular.doodle.animation.Animator
 import io.nacular.doodle.animation.impl.AnimatorImpl
-import io.nacular.doodle.examples.AppAssets
 import io.nacular.doodle.examples.AppButtons
 import io.nacular.doodle.examples.AppButtonsImpl
+import io.nacular.doodle.examples.AppConfig
 import io.nacular.doodle.examples.Contact
 import io.nacular.doodle.examples.ContactList
 import io.nacular.doodle.examples.ContactView
-import io.nacular.doodle.examples.ContactsModel
 import io.nacular.doodle.examples.CreateContactButton
 import io.nacular.doodle.examples.CreateContactView
 import io.nacular.doodle.examples.EditContactView
@@ -22,19 +21,26 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import org.kodein.di.DI.Module
 import org.kodein.di.bindFactory
-import org.kodein.di.bindInstance
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 
+/**
+ * Creates a Module with common bindings.
+ *
+ * @param appScope used by various dependencies for launching coroutines
+ * @param uiDispatcher used to ensure coroutines run on the UI thread
+ * @param contacts model used by various dependencies
+ *
+ * @return module with common bindings.
+ */
 fun appModule(appScope: CoroutineScope, uiDispatcher: CoroutineDispatcher, contacts: SimpleContactsModel) = Module(name = "AppModule") {
-    bindInstance<ContactsModel>  { contacts }
-    bindSingleton<Animator>      { AnimatorImpl     (instance(), instance())             }
-    bindSingleton<ModalFactory>  { ModalFactoryImpl (instance(), instance())             }
-    bindSingleton<Navigator>     { NavigatorImpl    (instance(), contacts)               }
-    bindSingleton<AppButtons>    { AppButtonsImpl   (instance(), instance(), instance()) }
-    bindSingleton<Modals>        { ModalsImpl       (instance(), instance())             }
+    bindSingleton<Animator>     { AnimatorImpl     (instance(), instance())             }
+    bindSingleton<ModalFactory> { ModalFactoryImpl (instance(), instance())             }
+    bindSingleton<Navigator>    { NavigatorImpl    (instance(), contacts)               }
+    bindSingleton<AppButtons>   { AppButtonsImpl   (instance(), instance(), instance()) }
+    bindSingleton<Modals>       { ModalsImpl       (instance(), instance())             }
 
-    bindFactory<AppAssets, ContactList> {
+    bindFactory<AppConfig, ContactList> {
         ContactList(
             assets       = it,
             modals       = instance(),
@@ -47,23 +53,25 @@ fun appModule(appScope: CoroutineScope, uiDispatcher: CoroutineDispatcher, conta
         )
     }
 
-    bindFactory<AppAssets, CreateContactView> {
+    bindFactory<AppConfig, CreateContactView> {
         CreateContactView(
             assets          = it,
-            navigator       = instance(),
             buttons         = instance(),
+            contacts        = contacts,
+            navigator       = instance(),
             pathMetrics     = instance(),
             textMetrics     = instance(),
             textFieldStyler = instance(),
         )
     }
 
-    bindFactory<Pair<AppAssets, Contact>, ContactView> { (assets, contact) ->
+    bindFactory<Pair<AppConfig, Contact>, ContactView> { (assets, contact) ->
         ContactView(
             assets       = assets,
             modals       = instance(),
             buttons      = instance(),
             contact      = contact,
+            contacts     = contacts,
             appScope     = appScope,
             navigator    = instance(),
             linkStyler   = instance(),
@@ -73,11 +81,12 @@ fun appModule(appScope: CoroutineScope, uiDispatcher: CoroutineDispatcher, conta
         )
     }
 
-    bindFactory<Pair<AppAssets, Contact>, EditContactView> { (assets, contact) ->
+    bindFactory<Pair<AppConfig, Contact>, EditContactView> { (assets, contact) ->
         EditContactView(
             assets          = assets,
             modals          = instance(),
             contact         = contact,
+            contacts        = contacts,
             buttons         = instance(),
             appScope        = appScope,
             navigator       = instance(),
@@ -88,7 +97,7 @@ fun appModule(appScope: CoroutineScope, uiDispatcher: CoroutineDispatcher, conta
         )
     }
 
-    bindFactory<AppAssets, Header> {
+    bindFactory<AppConfig, Header> {
         Header(
             assets       = it,
             animate      = instance(),
@@ -100,7 +109,7 @@ fun appModule(appScope: CoroutineScope, uiDispatcher: CoroutineDispatcher, conta
         )
     }
 
-    bindFactory<AppAssets, CreateContactButton> {
-        CreateContactButton(assets = it, router = instance(), textMetrics = instance(), animate = instance())
+    bindFactory<AppConfig, CreateContactButton> {
+        CreateContactButton(assets = it, navigator = instance(), textMetrics = instance(), animate = instance())
     }
 }

@@ -9,6 +9,7 @@ import io.nacular.doodle.drawing.Color.Companion.White
 import io.nacular.doodle.drawing.Font
 import io.nacular.doodle.drawing.FontLoader
 import io.nacular.doodle.drawing.opacity
+import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.image.Image
 import io.nacular.doodle.image.ImageLoader
 import io.nacular.measured.units.Time.Companion.milliseconds
@@ -17,7 +18,7 @@ import io.nacular.measured.units.times
 /**
  * Created by Nicholas Eddy on 3/22/22.
  */
-interface AppAssets {
+interface AppConfig {
     val logo       : Image
     val create     : Image
     val blankAvatar: Image
@@ -55,20 +56,24 @@ interface AppAssets {
 
     val slowTransition  : (Float, Float) -> Transition<NoneUnit> get() = speedUpSlowDown(250 * milliseconds)
     val fastTransition  : (Float, Float) -> Transition<NoneUnit> get() = speedUpSlowDown(100 * milliseconds)
+
+    val createButtonLargeSize: Size get() = Size(186, 45)
+    val createButtonSmallSize: Size get() = Size(68)
 }
 
-class AppAssetsImpl(
-    override val small    : Font,
-    override val medium   : Font,
-    override val large    : Font,
-    override val xLarge   : Font,
-    override val smallBold: Font,
-    override val create   : Image,
-    override val blankAvatar    : Image,
-    override val logo     : Image): AppAssets {
+class AppConfigImpl private constructor(
+    override val small      : Font,
+    override val medium     : Font,
+    override val large      : Font,
+    override val xLarge     : Font,
+    override val smallBold  : Font,
+    override val logo       : Image,
+    override val create     : Image,
+    override val blankAvatar: Image,
+): AppConfig {
 
     companion object {
-        suspend operator fun invoke(fonts: FontLoader, images: ImageLoader): AppAssets {
+        suspend operator fun invoke(fonts: FontLoader, images: ImageLoader): AppConfig {
             val large = fonts("dmsans.ttf") {
                 size     = 20
                 weight   = 100
@@ -77,7 +82,7 @@ class AppAssetsImpl(
 
             val small = fonts(large) { size = 16 }!!
 
-            return AppAssetsImpl(
+            return AppConfigImpl(
                 logo        = images.load("logo.png"  )!!,
                 create      = images.load("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAkCAYAAADhAJiYAAAAAXNSR0IArs4c6QAAAL5JREFUWEdj/P///3+GQQQYRx1EIDZGQ4hQch1+IfTaxQzF06J7ThEKBLzyFIfQqIMIhf9oCI2GEKV12WgaGjRp6M9eNkJuAcu/bzeAq/trwM8QLbSBKH17q7ixqsNZUpPqIFIcA3IJTR30WpORIVdyH1EhA1NEMwfd2mBIsmPICiFivWu6MgRF6enwNcRqJS0NEWvqqIMIhdRoCI2GEKW1/WgaGnJpiJCDSZWnuF9GqoWE1I86aDSECIUAIXkAXtfmleN2uj8AAAAASUVORK5CYII=")!!,
                 blankAvatar = images.load("create.png")!!,
@@ -85,7 +90,11 @@ class AppAssetsImpl(
                 large       = large,
                 medium      = fonts(large) { size = 18 }!!,
                 xLarge      = fonts(large) { size = 30 }!!,
-                smallBold   = fonts(small) { weight = 500 }!!,
+                smallBold   = fonts("dmsans-500.ttf") {
+                    size     = small.size
+                    families = listOf(small.family)
+                    weight   = 500
+                }!!,
             )
         }
     }

@@ -18,11 +18,21 @@ import io.nacular.doodle.layout.Insets
 import io.nacular.doodle.layout.constrain
 import io.nacular.doodle.system.Cursor.Companion.Pointer
 
+/**
+ * Provides a way to show common app modals.
+ */
 interface Modals {
-    fun delete(assets: AppAssets, contact: Contact): SuspendingModal<Boolean>
+    /**
+     * Shows the Delete Contact confirmation modal.
+     *
+     * @param assets containing fonts, colors, etc.
+     * @param contact being deleted
+     */
+    fun confirmDelete(assets: AppConfig, contact: Contact): SuspendingModal<Boolean>
 }
 
 class ModalsImpl(private val textMetrics: TextMetrics, private val modals: ModalFactory): Modals {
+
     private fun button(text: String, foreground: Color) = PushButton(text).apply {
         size          = Size(113, 40)
         cursor        = Pointer
@@ -37,7 +47,7 @@ class ModalsImpl(private val textMetrics: TextMetrics, private val modals: Modal
         }
     }
 
-    override fun delete(assets: AppAssets, contact: Contact): SuspendingModal<Boolean> = modals<Boolean>(insets = Insets(top = 20.0)) { completed ->
+    override fun confirmDelete(assets: AppConfig, contact: Contact): SuspendingModal<Boolean> = modals<Boolean>(insets = Insets(top = 20.0)) { completed ->
         container {
             font = assets.small
 

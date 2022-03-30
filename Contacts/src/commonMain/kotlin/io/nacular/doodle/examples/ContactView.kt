@@ -9,6 +9,7 @@ import io.nacular.doodle.core.Behavior
 import io.nacular.doodle.core.Layout.Companion.simpleLayout
 import io.nacular.doodle.core.container
 import io.nacular.doodle.core.plusAssign
+import io.nacular.doodle.core.then
 import io.nacular.doodle.drawing.Canvas
 import io.nacular.doodle.drawing.Stroke
 import io.nacular.doodle.drawing.TextMetrics
@@ -23,10 +24,14 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlin.math.max
 
+/**
+ * Displays a Contact
+ */
 class ContactView(
     modals      : Modals,
-    assets      : AppAssets,
+    assets      : AppConfig,
     contact     : Contact,
+    contacts    : ContactsModel,
     buttons     : AppButtons,
     appScope    : CoroutineScope,
     navigator   : Navigator,
@@ -39,37 +44,48 @@ class ContactView(
     modals       = modals,
     contact      = contact,
     buttons      = buttons,
+    contacts     = contacts,
     appScope     = appScope,
     navigator    = navigator,
     textMetrics  = textMetrics,
     uiDispatcher = uiDispatcher
 ) {
     init {
+        edit.apply {
+            fired += {
+                // Show Contact edit when pressed
+                navigator.showContactEdit(super.contact)
+            }
+        }
+
         val details = container {
-            this@container += Label("Contact Details").apply {
+            this += Label("Contact Details").apply {
                 font    = assets.small
                 height  = 24.0
                 fitText = setOf(Width)
             }
-            this@container += HyperLink(
-                url = "tel:${contact.phoneNumber}",
+            this += HyperLink(
+                url  = "tel:${contact.phoneNumber}",
                 text = contact.phoneNumber,
                 icon = PathIcon(path = path(assets.phoneIcon), pathMetrics = pathMetrics, fill = assets.phoneNumber),
             ).apply {
-                font = assets.small
-                acceptsThemes = false
-                iconTextSpacing = 16.0
-                behavior = linkStyler(this, object : CommonTextButtonBehavior<HyperLink>(textMetrics) {
+                font            = assets.small
+                acceptsThemes   = false
+                iconTextSpacing = INSET
+                behavior        = linkStyler(this, object: CommonTextButtonBehavior<HyperLink>(textMetrics) {
                     override fun install(view: HyperLink) {
                         super.install(view)
                         val textSize = textMetrics.size(text, font)
                         val iconSize = icon!!.size(view)
 
+                        // Ensure link's size includes icon and text
                         size = Size(textPosition(view).x + textSize.width, max(iconSize.height, textSize.height))
                     }
 
                     override fun render(view: HyperLink, canvas: Canvas) {
                         icon!!.render(view, canvas, at = iconPosition(view, icon = icon!!))
+
+                        // Styled text with phoneNumberLink color and link's font
                         canvas.text(assets.phoneNumberLink.invoke { view.font(view.text) }, at = textPosition(view))
                     }
                 }) as Behavior<Button>
@@ -80,18 +96,17 @@ class ContactView(
             }
 
             layout = constrain(children[0], children[1]) { label, link ->
-                label.top = parent.top + INSET
-                label.left = parent.left + INSET
-
-                link.top = label.bottom + INSET
-                link.left = label.left
+                label.top  = parent.top   + INSET
+                label.left = parent.left  + INSET
+                link.top   = label.bottom + INSET
+                link.left  = label.left
             }
         }
 
         setDetail(details)
 
-        layout = simpleLayout {
-            layoutCommonItems()
+        layout = simpleLayout { layoutCommonItems() }.then {
+            idealSize = Size(spacer.width + 2 * INSET, details.bounds.bottom + INSET)
         }
     }
 }

@@ -1,6 +1,7 @@
 package io.nacular.doodle.examples
 
 import io.nacular.doodle.application.Application
+import io.nacular.doodle.controls.panels.ScrollPanel
 import io.nacular.doodle.core.Display
 import io.nacular.doodle.core.Layout.Companion.simpleLayout
 import io.nacular.doodle.core.View
@@ -19,47 +20,64 @@ import kotlinx.coroutines.launch
  *
  * @param theme for the app
  * @param Header factory for creating the [Header] view
- * @param router for
+ * @param router for managing app routes
+ * @param assets creation for the app
+ * @param display where all content for the app is shown
+ * @param contacts data model
+ * @param appScope for launching coroutines
+ * @param navigator to show different views within the app
+ * @param ContactView factory
+ * @param ContactList factory
+ * @param uiDispatcher allows dispatching to the UI thread
+ * @param themeManager for setting the app's theme
+ * @param CreateButton factory to obtain the app's create button
+ * @param EditContactView factory to create the Contact edit view
+ * @param CreateContactView factory to create the Contact creation view
  */
 class ContactsApp(
     theme            : DynamicTheme,
-    Header           : (AppAssets) -> Header,
+    Header           : (AppConfig) -> Header,
     router           : Router,
-    assets           : suspend () -> AppAssets,
+    assets           : suspend () -> AppConfig,
     display          : Display,
     contacts         : ContactsModel,
     appScope         : CoroutineScope,
     navigator        : Navigator,
-    ContactView      : (AppAssets, Contact) -> ContactView,
-    ContactList      : (AppAssets         ) -> ContactList,
+    ContactView      : (AppConfig, Contact) -> ContactView,
+    ContactList      : (AppConfig         ) -> ContactList,
     uiDispatcher     : CoroutineDispatcher,
     themeManager     : ThemeManager,
-    CreateButton     : (AppAssets         ) -> CreateContactButton,
-    EditContactView  : (AppAssets, Contact) -> EditContactView,
-    CreateContactView: (AppAssets         ) -> CreateContactView,
+    CreateButton     : (AppConfig         ) -> CreateContactButton,
+    EditContactView  : (AppConfig, Contact) -> EditContactView,
+    CreateContactView: (AppConfig         ) -> CreateContactView,
 ): Application {
 
+    private lateinit var header     : Header
+    private lateinit var contactList: View
+
     init {
+        // Coroutine used to load assets
         appScope.launch(uiDispatcher) {
             val appAssets = assets()
 
-            themeManager.selected = theme
+            themeManager.selected = theme // Install theme
 
-            val header      = Header     (appAssets)
-            val contactList = ContactList(appAssets)
+            header      = Header     (appAssets)
+            contactList = ContactList(appAssets)
 
-            router[""                 ] = { _,_        -> setMainView(display, contactList                 ) }
-            router["/add"             ] = { _,_        -> setMainView(display, CreateContactView(appAssets)) }
+            // Register handlers for different routes
+            router[""                 ] = { _,_        -> setMainView(display, contactList                              ) }
+            router["/add"             ] = { _,_        -> setMainView(display, scrollPanel(CreateContactView(appAssets))) }
             router["/contact/([0-9]+)"] = { _, matches ->
                 when (val contact = matches.firstOrNull()?.toInt()?.let { contacts.find(it) }) {
                     null -> navigator.showContactList()
-                    else -> setMainView(display, ContactView(appAssets, contact))
+                    else -> setMainView(display, scrollPanel(ContactView(appAssets, contact)))
                 }
             }
             router["/contact/([0-9]+)/edit"] = { _, matches ->
                 when (val contact = matches.firstOrNull()?.toInt()?.let { contacts.find(it) }) {
                     null -> navigator.showContactList()
-                    else -> setMainView(display, EditContactView(appAssets, contact))
+                    else -> setMainView(display, scrollPanel(EditContactView(appAssets, contact)))
                 }
             }
 
@@ -70,6 +88,7 @@ class ContactsApp(
 
             display += CreateButton(appAssets)
 
+            // Setup layout that manages how Header, CreateButton, and current View are positioned
             display.layout = simpleLayout { container ->
                 val mainView = container.children[1]
                 val button   = container.children[2]
@@ -78,14 +97,8 @@ class ContactsApp(
                 mainView.bounds = Rectangle(INSET, header.height, header.width - 2 * INSET, container.height - header.height)
 
                 button.bounds = when {
-                    container.width > header.filterCenterAboveWidth -> {
-                        val size = Size(186, 45)
-                        Rectangle(container.width - size.width - 20, (header.naturalHeight - size.height) / 2, size.width, size.height)
-                    }
-                    else           -> {
-                        val size = Size(68, 68)
-                        Rectangle(container.width - size.width - 20, container.height - size.height - 40, size.width, size.height)
-                    }
+                    container.width > header.filterCenterAboveWidth -> Rectangle(container.width - appAssets.createButtonLargeSize.width - 20, (header.naturalHeight - appAssets.createButtonLargeSize.height) / 2, appAssets.createButtonLargeSize.width, appAssets.createButtonLargeSize.height)
+                    else                                            -> Rectangle(container.width - appAssets.createButtonSmallSize.width - 20, container.height - appAssets.createButtonSmallSize.height - 40,      appAssets.createButtonSmallSize.width, appAssets.createButtonSmallSize.height)
                 }
             }
 
@@ -93,11 +106,17 @@ class ContactsApp(
         }
     }
 
+    private fun scrollPanel(content: View) = ScrollPanel(content).apply {
+        contentWidthConstraints = { parent.width }
+    }
+
     private fun setMainView(display: Display, view: View) {
         when {
             display.children.size < 3 -> display             += view
             else                      -> display.children[1]  = view
         }
+
+        header.searchEnabled = view == contactList
     }
 
     override fun shutdown() { /* no-op */ }

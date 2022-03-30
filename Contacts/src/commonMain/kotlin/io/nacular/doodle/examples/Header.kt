@@ -32,22 +32,36 @@ import io.nacular.doodle.utils.observable
 import kotlin.math.max
 
 /**
- * Renders the header portion of the main page
+ * Renders the header portion of the main view.
+ *
+ * @param assets containing fonts, colors, etc.
+ * @param animate the filter box
+ * @param contacts model
+ * @param navigator for going to contact list view
+ * @param pathMetrics for measuring Paths
+ * @param textMetrics for measuring text
+ * @param focusManager to request focus
  */
 class Header(
-    private val assets      : AppAssets,
+    private val assets      : AppConfig,
     private val animate     : Animator,
     private val contacts    : ContactsModel,
     private val navigator   : Navigator,
-    private val textMetrics : TextMetrics,
     private val pathMetrics : PathMetrics,
+    private val textMetrics : TextMetrics,
     private val focusManager: FocusManager,
 ): View() {
 
     val narrowHeight           = 116.0
-    val naturalHeight          = 64.0
+    val naturalHeight          =  64.0
     val filterRightAboveWidth  = 672.0
     val filterCenterAboveWidth = 800.0
+
+    private val filterBox: FilterBox
+
+    var searchEnabled by observable(true) { _,new ->
+        filterBox.enabled = new
+    }
 
     /**
      * Search box that filters which contacts are shown
@@ -62,13 +76,20 @@ class Header(
         private val searchIconPath = path(assets.searchIcon)
         private val searchIconSize = pathMetrics.size(searchIconPath)
 
-        private val textField = TextField().apply {
+        val textField = TextField().apply {
             placeHolder      = "Search"
             borderVisible    = false
             backgroundColor  = Transparent
             placeHolderColor = assets.placeHolder
-            focusChanged    += { _,_,_ ->
-                this@FilterBox.rerender()
+            focusChanged    += { _,_,hasFocus ->
+                val range = when {
+                    hasFocus -> progress to 1f
+                    else     -> progress to 0f
+                }
+
+                animation = (animate (range) using assets.slowTransition) {
+                    progress = it
+                }
             }
         }
 
@@ -110,17 +131,6 @@ class Header(
             pointerChanged += clicked {
                 focusManager.requestFocus(textField)
             }
-
-            textField.focusChanged += { _,_,hasFocus ->
-                val range = when {
-                    hasFocus -> progress to 1f
-                    else     -> progress to 0f
-                }
-
-                animation = (animate (range) using assets.slowTransition) {
-                    progress = it
-                }
-            }
         }
 
         override fun render(canvas: Canvas) {
@@ -145,7 +155,7 @@ class Header(
             acceptsThemes   = false
             foregroundColor = assets.header
         }
-        children += FilterBox().apply { size = Size(300, 45); font = assets.medium }
+        children += FilterBox().apply { size = Size(300, 45); font = assets.medium }.also { filterBox = it }
 
         val filterNaturalWidth = 300.0
 
@@ -164,6 +174,7 @@ class Header(
             }
         }
 
+        // Custom cursor when pointer in the "clickable" region
         pointerMotionChanged += moved {
             cursor = when {
                 it.inHotspot -> Pointer
@@ -171,6 +182,7 @@ class Header(
             }
         }
 
+        // Show Contact list when "clickable" region clicked
         pointerChanged += clicked {
             if (it.inHotspot) {
                 navigator.showContactList()

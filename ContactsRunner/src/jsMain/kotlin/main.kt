@@ -5,14 +5,13 @@ import io.nacular.doodle.application.Modules.Companion.KeyboardModule
 import io.nacular.doodle.application.Modules.Companion.PointerModule
 import io.nacular.doodle.application.application
 import io.nacular.doodle.coroutines.Dispatchers
-import io.nacular.doodle.examples.AppAssets
-import io.nacular.doodle.examples.AppAssetsImpl
+import io.nacular.doodle.examples.AppConfig
+import io.nacular.doodle.examples.AppConfigImpl
 import io.nacular.doodle.examples.Contact
 import io.nacular.doodle.examples.ContactView
 import io.nacular.doodle.examples.ContactsApp
 import io.nacular.doodle.examples.EditContactView
 import io.nacular.doodle.examples.LocalStorePersistence
-import io.nacular.doodle.examples.PersistentStore
 import io.nacular.doodle.examples.Router
 import io.nacular.doodle.examples.SimpleContactsModel
 import io.nacular.doodle.examples.TrivialRouter
@@ -47,15 +46,15 @@ suspend fun main() {
         nativeScrollPanelBehavior(),
         appModule(appScope = appScope, contacts = contacts, uiDispatcher = Dispatchers.UI),
         Module   (name = "PlatformModule") {
-            bindInstance<Router>                   { TrivialRouter        (window    ) }
-            bindSingleton<PathMetrics>             { PathMetricsImpl      (instance()) }
-            bindSingleton<PersistentStore<Contact>>{ LocalStorePersistence(          ) }
+            // Platform-specific bindings
+            bindInstance<Router>       { TrivialRouter  (window    ) }
+            bindSingleton<PathMetrics> { PathMetricsImpl(instance()) }
         }
     )) {
         // load app
         ContactsApp(
             theme             = instance(),
-            assets            = { AppAssetsImpl(instance(), instance()) },
+            assets            = { AppConfigImpl(instance(), instance()) },
             router            = instance(),
             Header            = factory(),
             display           = instance(),
@@ -64,10 +63,10 @@ suspend fun main() {
             navigator         = instance(),
             ContactList       = factory(),
             uiDispatcher      = Dispatchers.UI,
-            ContactView       = { assets, contact -> factory<Pair<AppAssets, Contact>, ContactView>()(assets to contact) },
+            ContactView       = { assets, contact -> factory<Pair<AppConfig, Contact>, ContactView>()(assets to contact) },
             CreateButton      = factory(),
             themeManager      = instance(),
-            EditContactView   = { assets, contact -> factory<Pair<AppAssets, Contact>, EditContactView>()(assets to contact) },
+            EditContactView   = { assets, contact -> factory<Pair<AppConfig, Contact>, EditContactView>()(assets to contact) },
             CreateContactView = factory(),
         )
     }

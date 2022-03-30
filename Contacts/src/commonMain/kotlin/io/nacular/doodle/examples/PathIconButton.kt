@@ -6,11 +6,15 @@ import io.nacular.doodle.controls.theme.simpleButtonRenderer
 import io.nacular.doodle.geometry.PathMetrics
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.path
-import io.nacular.doodle.utils.Anchor.Leading
 
+/**
+ * Button with a centered [PathIcon].
+ *
+ * @param pathMetrics for measuring Path
+ * @param pathData to create Path
+ */
 class PathIconButton(pathMetrics: PathMetrics, pathData: String): PushButton(icon = PathIcon(path(pathData), pathMetrics = pathMetrics)) {
     init {
-        iconAnchor    = Leading
         acceptsThemes = false
         behavior      = simpleButtonRenderer { button, canvas ->
             button.icon?.apply {

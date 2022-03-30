@@ -43,7 +43,7 @@ import kotlin.math.min
  * @param pathMetrics for measuring paths
  */
 class ContactList(
-    assets      : AppAssets,
+    assets      : AppConfig,
     modals      : Modals,
     appScope    : CoroutineScope,
     contacts    : MutableListModel<Contact>,
@@ -73,8 +73,9 @@ class ContactList(
             else        -> ToolCell(assets, pathMetrics, context.selected).apply {
                 onDelete = {
                     appScope.launch(uiDispatcher) {
-                        if (modals.delete(assets, context.item).show()) {
-                            navigator.contactDeleted(context.item)
+                        if (modals.confirmDelete(assets, context.item).show()) {
+                            contacts.remove(context.item)
+                            // show toast
                         }
                     }
                 }
@@ -107,7 +108,8 @@ class ContactList(
             }
         }
 
-        behavior = ContactListBehavior(assets, navigator)
+        behavior      = ContactListBehavior(assets, navigator)
+        acceptsThemes = false
     }
 }
 
@@ -153,16 +155,12 @@ private class NameCell(private val textMetrics: TextMetrics, value: String): Vie
 /**
  * Renders edit/delete buttons within a row when it is selected
  */
-private class ToolCell(private val assets: AppAssets, private val pathMetrics: PathMetrics, private var selected: Boolean): View() {
-
+private class ToolCell(private val assets: AppConfig, private val pathMetrics: PathMetrics, private var selected: Boolean): View() {
     init {
         update(selected)
     }
 
-    private fun createButton(path: String) = PathIconButton(
-        pathData    = path,
-        pathMetrics = pathMetrics
-    ).apply {
+    private fun createButton(path: String) = PathIconButton(pathData = path, pathMetrics = pathMetrics).apply {
         size            = Size(24)
         foregroundColor = assets.tool
         pointerChanged  += object: PointerListener {
@@ -174,6 +172,7 @@ private class ToolCell(private val assets: AppAssets, private val pathMetrics: P
     var onEdit  : (() -> Unit)? = null
     var onDelete: (() -> Unit)? = null
 
+    // Called whenever the cell needs to be updated
     fun update(selected: Boolean) {
         if (selected == this.selected) return
 

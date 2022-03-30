@@ -28,7 +28,7 @@ import io.nacular.doodle.utils.SetObserver
 /**
  * Defines the behavior of [ContactList].
  */
-class ContactListBehavior(private val assets: AppAssets, private val navigator: Navigator): TableBehavior<Contact>() {
+class ContactListBehavior(private val assets: AppConfig, private val navigator: Navigator): TableBehavior<Contact>() {
     /**
      * Renders each cell within the Table. It contains the View returned by the Table's
      * visualizer for [column]. And aligns it based on the column's `cellAlignment`.
@@ -53,8 +53,11 @@ class ContactListBehavior(private val assets: AppAssets, private val navigator: 
 
             cursor          = Pointer
             focusable       = false
-            styleChanged   += { rerender() }
             pointerChanged += object: PointerListener {
+                // There is a clicked event, but it will trigger only when the pointer is pressed/released within
+                // a single View. That means it won't fire if a child (say the row's avatar) is pressed and the
+                // pointer is moved to another part of the row and released. So we track click at the row level
+                // this way.
                 private var pressed     = false
                 private var pointerOver = false
 
@@ -155,6 +158,7 @@ class ContactListBehavior(private val assets: AppAssets, private val navigator: 
     }
 
     override val rowPositioner: RowPositioner<Contact> = object: RowPositioner<Contact> {
+        // Position rows like a vertical list
         private val delegate = VerticalListPositioner(ROW_HEIGHT)
 
         override fun rowBounds  (of: Table<Contact, *>, row: Contact, index: Int) = delegate.itemBounds (of.size,     of.insets, index)

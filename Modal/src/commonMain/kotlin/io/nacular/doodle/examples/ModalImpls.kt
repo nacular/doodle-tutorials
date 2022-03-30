@@ -8,8 +8,10 @@ import io.nacular.doodle.core.Layout
 import io.nacular.doodle.core.Positionable
 import io.nacular.doodle.core.PositionableContainer
 import io.nacular.doodle.core.View
+import io.nacular.doodle.core.height
 import io.nacular.doodle.core.minusAssign
 import io.nacular.doodle.core.plusAssign
+import io.nacular.doodle.core.width
 import io.nacular.doodle.drawing.Canvas
 import io.nacular.doodle.drawing.Color.Companion.Black
 import io.nacular.doodle.drawing.Color.Companion.White
@@ -33,6 +35,7 @@ import kotlin.coroutines.suspendCoroutine
  */
 class ModalFactoryImpl(private val display: Display, private val animate: Animator): ModalFactory {
     override fun     invoke(insets: Insets, contents: (Modal      ) -> View) = ModalImpl          (display, animate, insets, contents)
+    override fun     invoke(insets: Insets, contents: (Modeless   ) -> View) = ModelessImpl       (display, animate, insets, contents)
     override fun <T> invoke(insets: Insets, contents: ((T) -> Unit) -> View) = SuspendingModalImpl(display, animate, insets, contents)
 }
 
@@ -178,5 +181,51 @@ class SuspendingModalImpl<T>(display: Display, animate: Animator, private val mo
         } catch (e: CancellationException) {
             coroutine.resumeWithException(e)
         }
+    }
+}
+
+class ModelessImpl(display: Display, private val animate: Animator, modalInsets: Insets, contents: (Modeless) -> View): Modeless {
+    private var showing      = false
+    private var showProgress = 0f
+    private var animation: Animation? by observable(null) { old,_ ->
+        old?.cancel()
+    }
+
+    private val dialog = Dialog(contents(this), modalInsets).apply {
+        boundsChanged += { _,_,_ ->
+            position = Point((display.width - width) / 2, (display.height - height) / 2)
+        }
+
+        sizePreferencesChanged += { _,_,_ ->
+            size = idealSize ?: size
+        }
+    }
+    private val display_ = display
+
+    private val sizeChanged: (Display, Size, Size) -> Unit = { _,_,_ ->
+        dialog.position = Point((display.width - dialog.width) / 2, (display.height - dialog.height) / 2)
+    }
+
+    override fun show() {
+        if (!showing) {
+            showing = true
+            display_ += dialog
+
+            display_.sizeChanged += sizeChanged
+
+            animation = (animate(0f to 1f) using speedUpSlowDown(250 * Time.milliseconds)) {
+                showProgress = it
+                dialog.opacity = it
+            }
+        }
+    }
+
+    override fun hide() {
+        animation?.cancel()
+
+        display_ -= dialog
+        display_.sizeChanged -= sizeChanged
+
+        showing  = false
     }
 }

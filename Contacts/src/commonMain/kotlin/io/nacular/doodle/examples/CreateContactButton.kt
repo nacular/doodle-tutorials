@@ -20,13 +20,17 @@ import io.nacular.doodle.utils.observable
 
 /**
  * Button use to create a new Contact
+ *
+ * @param assets containing fonts etc.
+ * @param animate for shadow animation
+ * @param navigator to show Contact creation view
+ * @param textMetrics to measure button's text
  */
 class CreateContactButton(
-    assets     : AppAssets,
-    router     : Router,
+                assets     : AppConfig,
     private val animate    : Animator,
-    textMetrics: TextMetrics,
-): PushButton("Create Contact") {
+                navigator  : Navigator,
+                textMetrics: TextMetrics): PushButton("Create Contact") {
 
     private var progress              by renderProperty(0f  )
     private var animation: Animation? by observable    (null) { old,_ ->
@@ -37,33 +41,33 @@ class CreateContactButton(
         font   = assets.smallBold
         icon   = ImageIcon(assets.create)
         cursor = Pointer
-        fired += {
-            router.goTo("/add")
-        }
+        fired += { navigator.showCreateContact() }
 
-        val iconSize = icon!!.size(this@CreateContactButton)
+        val iconSize    = icon!!.size(this@CreateContactButton)
         acceptsThemes   = false
         iconTextSpacing = 10.0
         behavior        = object: CommonTextButtonBehavior<Button>(textMetrics) {
             override fun clipCanvasToBounds(view: Button) = false
 
             override fun render(view: Button, canvas: Canvas) {
-                val draw     = { canvas.rect(bounds.atOrigin, radius = view.height / 2, color = assets.background) }
-                val showText = view.width > view.height
+                val drawButton = { canvas.rect(bounds.atOrigin, radius = view.height / 2, color = assets.background) }
+                val showText   = view.width > view.height
 
                 val shadow = when {
                     showText -> OuterShadow(horizontal = 0.0, vertical = 0.0, color = assets.shadow, blurRadius = 3.0)
                     else     -> OuterShadow(horizontal = 0.0, vertical = 7.0, color = assets.shadow, blurRadius = 5.0)
                 }
 
+                // Button always has at least this outer shadow
                 canvas.shadow(shadow) {
                     val offset = 3.0 * progress
 
                     when {
+                        // Draw hover shadow
                         view.model.pointerOver && !view.model.pressed || animation != null -> canvas.outerShadow(horizontal = 0.0, vertical = offset, color = assets.shadow, blurRadius = offset) {
-                            draw()
+                            drawButton()
                         }
-                        else -> draw()
+                        else -> drawButton()
                     }
                 }
 
@@ -80,23 +84,21 @@ class CreateContactButton(
         pointerChanged += object: PointerListener {
             override fun entered(event: PointerEvent) {
                 super.entered(event)
+
                 animation = (animate (0f to 1f) using assets.fastTransition) {
                     progress = it
                 }.apply {
-                    completed += {
-                        animation = null
-                    }
+                    completed += { animation = null }
                 }
             }
 
             override fun exited(event: PointerEvent) {
                 super.exited(event)
+
                 animation = (animate (1f to 0f) using assets.fastTransition) {
                     progress = it
                 }.apply {
-                    completed += {
-                        animation = null
-                    }
+                    completed += { animation = null }
                 }
             }
         }

@@ -48,7 +48,7 @@ fun String.toColor(): Color {
  * Field used in Contact create/edit forms.
  */
 fun formTextField(
-    assets          : AppAssets,
+    assets          : AppConfig,
     textFieldStyler : NativeTextFieldStyler,
     pathMetrics     : PathMetrics,
     placeHolder     : String,
@@ -60,6 +60,7 @@ fun formTextField(
     textField(regex) {
         textField.placeHolder      = placeHolder
         textField.placeHolderColor = assets.placeHolder
+        textField.acceptsThemes    = false
         textField.behavior         = textFieldStyler(textField, object: NativeTextFieldBehaviorModifier {
             init {
                 textField.acceptsThemes   = false
