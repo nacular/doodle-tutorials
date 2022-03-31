@@ -21,7 +21,16 @@ import io.nacular.doodle.examples.PersistentStore
 import io.nacular.doodle.examples.PhotosApp
 import io.nacular.doodle.examples.Router
 import io.nacular.doodle.examples.TodoApp
-import io.nacular.doodle.examples.TrivialRouter
+import io.nacular.doodle.examples.contacts.AppConfig
+import io.nacular.doodle.examples.contacts.AppConfigImpl
+import io.nacular.doodle.examples.contacts.Contact
+import io.nacular.doodle.examples.contacts.ContactView
+import io.nacular.doodle.examples.contacts.ContactsApp
+import io.nacular.doodle.examples.contacts.EditContactView
+import io.nacular.doodle.examples.contacts.SimpleContactsModel
+import io.nacular.doodle.examples.contacts.appModule
+import io.nacular.doodle.geometry.PathMetrics
+import io.nacular.doodle.geometry.impl.PathMetricsImpl
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicCircularProgressIndicatorBehavior
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicLabelBehavior
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicMutableSpinnerBehavior
@@ -29,8 +38,12 @@ import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeHyperLinkBehav
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeScrollPanelBehavior
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeTextFieldBehavior
 import kotlinx.browser.window
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import org.kodein.di.DI.Module
+import org.kodein.di.bindInstance
 import org.kodein.di.bindSingleton
+import org.kodein.di.factory
 import org.kodein.di.instance
 
 @JsName("calculator")
@@ -56,10 +69,10 @@ fun todo(element: HTMLElement) {
     application(root = element, modules = listOf(FontModule, ImageModule, PointerModule, KeyboardModule, basicLabelBehavior(),
             nativeTextFieldBehavior(), nativeHyperLinkBehavior(), nativeScrollPanelBehavior(smoothScrolling = true),
             Module(name = "AppModule") {
-                bindSingleton<PersistentStore>      { LocalStorePersistence       (                      ) }
-                bindSingleton                       { DataStore                   (instance()            ) }
-                bindSingleton<Router>               { TrivialRouter               (window                ) }
-                bindSingleton<FilterButtonProvider> { EmbeddedFilterButtonProvider(instance()            ) }
+                bindSingleton<PersistentStore>      { LocalStorePersistence                   (          ) }
+                bindSingleton                       { DataStore                               (instance()) }
+                bindSingleton<Router>               { io.nacular.doodle.examples.TrivialRouter(window    ) }
+                bindSingleton<FilterButtonProvider> { EmbeddedFilterButtonProvider            (instance()) }
 
             }
     )) {
@@ -85,5 +98,48 @@ fun photos(element: HTMLElement) {
     )) {
         // load app
         PhotosApp(instance(), instance(), instance(), instance(), instance(), instance())
+    }
+}
+
+@JsName("contacts")
+fun contacts(element: HTMLElement) {
+    val contacts = SimpleContactsModel(io.nacular.doodle.examples.contacts.LocalStorePersistence())
+    val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
+
+    application (root = element, modules = listOf(
+        FontModule,
+        ImageModule,
+        FocusModule,
+        PointerModule,
+        KeyboardModule,
+        basicLabelBehavior       (),
+        nativeTextFieldBehavior  (spellCheck = false),
+        nativeHyperLinkBehavior  (),
+        nativeScrollPanelBehavior(),
+        appModule(appScope = appScope, contacts = contacts, uiDispatcher = Dispatchers.UI),
+        Module   (name = "PlatformModule") {
+            // Platform-specific bindings
+            bindSingleton<PathMetrics>                               { PathMetricsImpl(instance()) }
+            bindInstance<io.nacular.doodle.examples.contacts.Router> { EmbeddedRouter (          ) }
+        }
+    )) {
+        // load app
+        ContactsApp(
+            theme             = instance(),
+            assets            = { AppConfigImpl(instance(), instance()) },
+            router            = instance(),
+            Header            = factory(),
+            display           = instance(),
+            contacts          = contacts,
+            appScope          = appScope,
+            navigator         = instance(),
+            ContactList       = factory(),
+            uiDispatcher      = Dispatchers.UI,
+            ContactView       = { assets, contact -> factory<Pair<AppConfig, Contact>, ContactView>()(assets to contact) },
+            CreateButton      = factory(),
+            themeManager      = instance(),
+            EditContactView   = { assets, contact -> factory<Pair<AppConfig, Contact>, EditContactView>()(assets to contact) },
+            CreateContactView = factory(),
+        )
     }
 }

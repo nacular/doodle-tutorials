@@ -4,6 +4,7 @@
 const sidebars = {
   tutorialSidebar: [
     'introduction',
+    'contacts',
     'calculator',
     'todo',
     'photos',

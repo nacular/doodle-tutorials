@@ -5,16 +5,17 @@ import io.nacular.doodle.application.Modules.Companion.KeyboardModule
 import io.nacular.doodle.application.Modules.Companion.PointerModule
 import io.nacular.doodle.application.application
 import io.nacular.doodle.coroutines.Dispatchers
-import io.nacular.doodle.examples.AppConfig
-import io.nacular.doodle.examples.AppConfigImpl
-import io.nacular.doodle.examples.Contact
-import io.nacular.doodle.examples.ContactView
-import io.nacular.doodle.examples.ContactsApp
-import io.nacular.doodle.examples.EditContactView
-import io.nacular.doodle.examples.LocalStorePersistence
-import io.nacular.doodle.examples.Router
-import io.nacular.doodle.examples.SimpleContactsModel
-import io.nacular.doodle.examples.TrivialRouter
+import io.nacular.doodle.examples.contacts.EditContactView
+import io.nacular.doodle.examples.contacts.LocalStorePersistence
+import io.nacular.doodle.examples.contacts.Router
+import io.nacular.doodle.examples.contacts.SimpleContactsModel
+import io.nacular.doodle.examples.contacts.TrivialRouter
+import io.nacular.doodle.examples.contacts.appModule
+import io.nacular.doodle.examples.contacts.AppConfig
+import io.nacular.doodle.examples.contacts.AppConfigImpl
+import io.nacular.doodle.examples.contacts.Contact
+import io.nacular.doodle.examples.contacts.ContactView
+import io.nacular.doodle.examples.contacts.ContactsApp
 import io.nacular.doodle.geometry.PathMetrics
 import io.nacular.doodle.geometry.impl.PathMetricsImpl
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicLabelBehavior
@@ -30,7 +31,7 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.factory
 import org.kodein.di.instance
 
-suspend fun main() {
+fun main() {
     val contacts = SimpleContactsModel(LocalStorePersistence())
     val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
 

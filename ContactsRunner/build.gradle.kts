@@ -16,14 +16,11 @@ kotlin {
     }
 
     val doodleVersion: String by project
-    val kodeinVersion: String by project
-
 
     sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation(project(":Contacts"))
-                implementation("org.kodein.di:kodein-di:$kodeinVersion")
             }
         }
 

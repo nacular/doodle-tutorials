@@ -15,6 +15,7 @@ kotlin {
                 keep("doodle-tutorials-DocApps.calculator")
                 keep("doodle-tutorials-DocApps.todo"      )
                 keep("doodle-tutorials-DocApps.photos"    )
+                keep("doodle-tutorials-DocApps.contacts"  )
             }
         }
     }
@@ -25,6 +26,7 @@ kotlin {
         implementation(project(":Calculator"))
         implementation(project(":Todo"      ))
         implementation(project(":Photos"    ))
+        implementation(project(":Contacts"  ))
         implementation("io.nacular.doodle:browser:$doodleVersion")
     }
 }

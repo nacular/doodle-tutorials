@@ -7,6 +7,7 @@ kotlin {
     jsTargets ()
     jvmTargets()
 
+    val kodeinVersion       : String by project
     val doodleVersion       : String by project
     val coroutinesVersion   : String by project
     val serializationVersion: String by project
@@ -17,6 +18,7 @@ kotlin {
                 implementation(kotlin("stdlib-common"))
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
                 api("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
+                api("org.kodein.di:kodein-di:$kodeinVersion")
 
                 api("io.nacular.doodle:core:$doodleVersion"    )
                 api("io.nacular.doodle:controls:$doodleVersion")
