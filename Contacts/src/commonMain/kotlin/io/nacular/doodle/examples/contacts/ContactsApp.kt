@@ -3,7 +3,9 @@ package io.nacular.doodle.examples.contacts
 import io.nacular.doodle.application.Application
 import io.nacular.doodle.controls.panels.ScrollPanel
 import io.nacular.doodle.core.Display
-import io.nacular.doodle.core.Layout.Companion.simpleLayout
+import io.nacular.doodle.core.Layout
+import io.nacular.doodle.core.Positionable
+import io.nacular.doodle.core.PositionableContainer
 import io.nacular.doodle.core.View
 import io.nacular.doodle.core.plusAssign
 import io.nacular.doodle.drawing.paint
@@ -14,6 +16,7 @@ import io.nacular.doodle.theme.adhoc.DynamicTheme
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlin.math.max
 
 /**
  * Simple contacts app based on https://phonebook-pi.vercel.app/
@@ -89,16 +92,26 @@ class ContactsApp(
             display += CreateButton(appAssets)
 
             // Setup layout that manages how Header, CreateButton, and current View are positioned
-            display.layout = simpleLayout { container ->
-                val mainView = container.children[1]
-                val button   = container.children[2]
+            display.layout = object: Layout {
+                // Header needs to be sized based on its minimumSize, so this layout should respond to any changes to it.
+                override fun requiresLayout(
+                    child: Positionable,
+                    of   : PositionableContainer,
+                    old  : View.SizePreferences,
+                    new  : View.SizePreferences
+                ) = new.minimumSize != old.minimumSize
 
-                header.size     = Size(container.width, if (container.width > header.filterRightAboveWidth) header.naturalHeight else header.narrowHeight)
-                mainView.bounds = Rectangle(INSET, header.height, header.width - 2 * INSET, container.height - header.height)
+                override fun layout(container: PositionableContainer) {
+                    val mainView = container.children[1]
+                    val button   = container.children[2]
 
-                button.bounds = when {
-                    container.width > header.filterCenterAboveWidth -> Rectangle(container.width - appAssets.createButtonLargeSize.width - 20, (header.naturalHeight - appAssets.createButtonLargeSize.height) / 2, appAssets.createButtonLargeSize.width, appAssets.createButtonLargeSize.height)
-                    else                                            -> Rectangle(container.width - appAssets.createButtonSmallSize.width - 20, container.height - appAssets.createButtonSmallSize.height - 40,      appAssets.createButtonSmallSize.width, appAssets.createButtonSmallSize.height)
+                    header.size     = Size(container.width, header.minimumSize.height)
+                    mainView.bounds = Rectangle(INSET, header.height, max(0.0, header.width - 2 * INSET), max(0.0, container.height - header.height))
+
+                    button.bounds = when {
+                        header.filterCentered -> Rectangle(container.width - appAssets.createButtonLargeSize.width - 20, (header.naturalHeight - appAssets.createButtonLargeSize.height) / 2, appAssets.createButtonLargeSize.width, appAssets.createButtonLargeSize.height)
+                        else                  -> Rectangle(container.width - appAssets.createButtonSmallSize.width - 20, container.height - appAssets.createButtonSmallSize.height - 40,      appAssets.createButtonSmallSize.width, appAssets.createButtonSmallSize.height)
+                    }
                 }
             }
 

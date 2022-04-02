@@ -3,18 +3,18 @@ package io.nacular.doodle.examples.contacts
 import io.nacular.doodle.animation.Animation
 import io.nacular.doodle.animation.Animator
 import io.nacular.doodle.controls.Photo
+import io.nacular.doodle.controls.icons.PathIcon
 import io.nacular.doodle.controls.text.Label
 import io.nacular.doodle.controls.text.TextField
 import io.nacular.doodle.controls.theme.CommonLabelBehavior
 import io.nacular.doodle.core.Layout
 import io.nacular.doodle.core.View
 import io.nacular.doodle.core.renderProperty
-import io.nacular.doodle.drawing.AffineTransform
+import io.nacular.doodle.core.then
 import io.nacular.doodle.drawing.Canvas
 import io.nacular.doodle.drawing.Color.Companion.Transparent
 import io.nacular.doodle.drawing.TextMetrics
 import io.nacular.doodle.drawing.interpolate
-import io.nacular.doodle.drawing.paint
 import io.nacular.doodle.drawing.rect
 import io.nacular.doodle.event.PointerEvent
 import io.nacular.doodle.event.PointerListener.Companion.clicked
@@ -52,17 +52,6 @@ class Header(
     private val focusManager: FocusManager,
 ): View() {
 
-    val narrowHeight           = 116.0
-    val naturalHeight          =  64.0
-    val filterRightAboveWidth  = 672.0
-    val filterCenterAboveWidth = 800.0
-
-    private val filterBox: FilterBox
-
-    var searchEnabled by observable(true) { _,new ->
-        filterBox.enabled = new
-    }
-
     /**
      * Search box that filters which contacts are shown
      */
@@ -73,8 +62,8 @@ class Header(
             old?.cancel()
         }
 
-        private val searchIconPath = path(assets.searchIcon)
-        private val searchIconSize = pathMetrics.size(searchIconPath)
+        private val searchIcon     = PathIcon<View>(path(assets.searchIcon), fill = assets.search, pathMetrics = pathMetrics)
+        private val searchIconSize = searchIcon.size(this)
 
         val textField = TextField().apply {
             placeHolder      = "Search"
@@ -82,12 +71,7 @@ class Header(
             backgroundColor  = Transparent
             placeHolderColor = assets.placeHolder
             focusChanged    += { _,_,hasFocus ->
-                val range = when {
-                    hasFocus -> progress to 1f
-                    else     -> progress to 0f
-                }
-
-                animation = (animate (range) using assets.slowTransition) {
+                animation = (animate (progress to if (hasFocus) 1f else 0f) using assets.slowTransition) {
                     progress = it
                 }
             }
@@ -136,15 +120,25 @@ class Header(
         override fun render(canvas: Canvas) {
             when {
                 progress > 0f -> canvas.outerShadow(horizontal = 0.0, vertical = 4.0 * progress, color = assets.shadow, blurRadius = 3.0 * progress) {
+                    // interpolate color during animation
                     canvas.rect(bounds.atOrigin, radius = 8.0, color = interpolate(assets.searchSelected, assets.background, progress))
                 }
                 else          -> canvas.rect(bounds.atOrigin, radius = 8.0, color = assets.searchSelected)
             }
 
-            canvas.transform(AffineTransform.Identity.translate(20.0, (height - searchIconSize.height) / 2)) {
-                canvas.path(searchIconPath, fill = assets.search.paint)
-            }
+            searchIcon.render(this, canvas, at = Point(20.0, (height - searchIconSize.height) / 2))
         }
+    }
+
+            val naturalHeight          =  64.0
+    private val filterRightAboveWidth  = 672.0
+    private val filterCenterAboveWidth = 800.0
+    private val filterBox: FilterBox
+
+    val filterCentered: Boolean get() = width > filterCenterAboveWidth
+
+    var searchEnabled by observable(true) { _,new ->
+        filterBox.enabled = new
     }
 
     init {
@@ -168,10 +162,13 @@ class Header(
             label.position = Point(logo.bounds.right + 10, logo.bounds.center.y - label.height / 2)
 
             filter.bounds = when {
-                container.width > filterCenterAboveWidth -> Rectangle((container.width - filterNaturalWidth) / 2,    logo.bounds.center.y - filter.height / 2, filterNaturalWidth, filter.height)
+                container.width > filterCenterAboveWidth -> Rectangle((container.width - filterNaturalWidth) / 2,        logo.bounds.center.y - filter.height / 2, filterNaturalWidth, filter.height)
                 container.width > filterRightAboveWidth  -> Rectangle( container.width - filterNaturalWidth - 2 * INSET, logo.bounds.center.y - filter.height / 2, filterNaturalWidth, filter.height)
-                else                                     -> Rectangle(logo.x, container.height - filter.height - 8, max(0.0, container.width - 4 * INSET), filter.height)
+                else                                     -> Rectangle(logo.x, logo.bounds.bottom + INSET, max(0.0, container.width - 4 * INSET), filter.height)
             }
+        }.then {
+            minimumSize = Size(width, max(0.0, filterBox.bounds.bottom + 8))
+            idealSize   = minimumSize
         }
 
         // Custom cursor when pointer in the "clickable" region

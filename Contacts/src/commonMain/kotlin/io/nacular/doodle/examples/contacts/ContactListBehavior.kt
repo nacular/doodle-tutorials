@@ -147,6 +147,7 @@ class ContactListBehavior(private val assets: AppConfig, private val navigator: 
         override fun invoke(table: Table<Contact, *>) = HeaderGeometry(0.0, TABLE_HEADER_HEIGHT)
     }
 
+    // No overflow column will be in the Table
     override val overflowColumnConfig: Nothing? = null
 
     @Suppress("UNCHECKED_CAST")
@@ -169,6 +170,8 @@ class ContactListBehavior(private val assets: AppConfig, private val navigator: 
     override fun renderBody(table: Table<Contact, *>, canvas: Canvas) {
         canvas.rect(table.bounds.atOrigin, color = assets.background)
 
+        // Highlight selected rows
+        // Selection is a set of indexes, so need to extract the row data from table
         table.selection.map { it to table[it] }.forEach { (index, row) ->
             row.onSuccess {
                 canvas.rect(rowPositioner.rowBounds(table, it, index).inset(Insets(top = 1.0)), assets.listHighlight)

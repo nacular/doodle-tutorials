@@ -14,6 +14,7 @@ import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.image.Image
 import io.nacular.doodle.layout.constant
 import io.nacular.doodle.layout.constrain
+import io.nacular.doodle.layout.max
 import io.nacular.doodle.layout.min
 import io.nacular.doodle.theme.native.NativeTextFieldStyler
 import io.nacular.doodle.utils.Dimension.Width
@@ -60,28 +61,15 @@ class CreateContactView(
             fitText = setOf(Width)
         }
 
-        val back   = buttons.back(assets.backIcon)
-        val avatar = DynamicAvatar(assets.blankAvatar).apply { size = Size(176); font = assets.medium }
+        val back   = buttons.back  (assets.backIcon)
+        val avatar = DynamicAvatar (assets.blankAvatar).apply { size = Size(176); font = assets.medium }
         val button = buttons.create(assets.buttonBackground, assets.buttonForeground).apply {
-            font = assets.small
-            enabled = false
-
-            fired += {
+            font     = assets.small
+            enabled  = false
+            fired   += {
                 contacts += Contact(name, phoneNumber)
                 navigator.showContactList()
             }
-        }
-
-        val form = editForm(
-            assets          = assets,
-            textFieldStyler = textFieldStyler,
-            pathMetrics     = pathMetrics,
-            button          = button,
-            nameChanged     = { avatar.name = it }
-        ) { name_, phone_ ->
-            name           = name_
-            phoneNumber    = phone_
-            button.enabled = true
         }
 
         val spacer = view {
@@ -89,6 +77,18 @@ class CreateContactView(
             render = {
                 line(Point(0.0, height / 2), Point(width, height / 2), stroke = Stroke(assets.outline))
             }
+        }
+
+        val form = editForm(
+            assets          = assets,
+            button          = button,
+            pathMetrics     = pathMetrics,
+            nameChanged     = { avatar.name = it },
+            textFieldStyler = textFieldStyler
+        ) { name_, phone_ ->
+            name           = name_
+            phoneNumber    = phone_
+            button.enabled = true
         }
 
         children += listOf(label, back, avatar, spacer, form, button)
@@ -109,7 +109,7 @@ class CreateContactView(
 
             form.top   = spacer.bottom
             form.left  = back.left
-            form.width = min(parent.width - 2 * INSET, constant(520.0))
+            form.width = max(constant(0.0), min(parent.width - 2 * INSET, constant(520.0)))
 
             button.top  = form.bottom + 2 * INSET
             button.left = back.left

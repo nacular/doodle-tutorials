@@ -40,8 +40,8 @@ like below. Therefore, we need a pure library for each app. This is why there is
  classDiagram
       Calculator <|-- CalculatorRunner
       Calculator <|-- DocApps
-      CalculatorRunner: jvsMain.main
       CalculatorRunner: jvmMain.main
+      CalculatorRunner: jsMain.main
       DocApps         : main
 ```
 

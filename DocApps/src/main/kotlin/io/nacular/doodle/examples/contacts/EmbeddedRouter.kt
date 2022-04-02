@@ -1,9 +1,9 @@
-import io.nacular.doodle.examples.contacts.RouteHandler
+package io.nacular.doodle.examples.contacts
 
 /**
  * Simple Router that does not modify the window hash.
  */
-class EmbeddedRouter: io.nacular.doodle.examples.contacts.Router {
+class EmbeddedRouter: Router {
     private val routes  = LinkedHashMap<Regex, RouteHandler>()
     private val history = mutableListOf<String>()
 

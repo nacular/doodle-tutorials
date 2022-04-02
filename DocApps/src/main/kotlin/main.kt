@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 import io.nacular.doodle.HTMLElement
 import io.nacular.doodle.animation.Animator
 import io.nacular.doodle.animation.impl.AnimatorImpl
@@ -24,11 +26,19 @@ import io.nacular.doodle.examples.TodoApp
 import io.nacular.doodle.examples.contacts.AppConfig
 import io.nacular.doodle.examples.contacts.AppConfigImpl
 import io.nacular.doodle.examples.contacts.Contact
+import io.nacular.doodle.examples.contacts.ContactList
 import io.nacular.doodle.examples.contacts.ContactView
 import io.nacular.doodle.examples.contacts.ContactsApp
+import io.nacular.doodle.examples.contacts.CreateContactView
 import io.nacular.doodle.examples.contacts.EditContactView
+import io.nacular.doodle.examples.contacts.EmbeddedRouter
+import io.nacular.doodle.examples.contacts.Header
+import io.nacular.doodle.examples.contacts.NoOpContacts
+import io.nacular.doodle.examples.contacts.NoOpPersistence
 import io.nacular.doodle.examples.contacts.SimpleContactsModel
 import io.nacular.doodle.examples.contacts.appModule
+import io.nacular.doodle.examples.contacts.showcase
+import io.nacular.doodle.examples.contacts.showcaseModules
 import io.nacular.doodle.geometry.PathMetrics
 import io.nacular.doodle.geometry.impl.PathMetricsImpl
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicCircularProgressIndicatorBehavior
@@ -41,6 +51,7 @@ import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import org.kodein.di.DI.Module
+import org.kodein.di.bindFactory
 import org.kodein.di.bindInstance
 import org.kodein.di.bindSingleton
 import org.kodein.di.factory
@@ -141,5 +152,160 @@ fun contacts(element: HTMLElement) {
             EditContactView   = { assets, contact -> factory<Pair<AppConfig, Contact>, EditContactView>()(assets to contact) },
             CreateContactView = factory(),
         )
+    }
+}
+
+@JsName("contactList")
+fun contactList(element: HTMLElement) {
+    val contacts = SimpleContactsModel(NoOpPersistence)
+    val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
+
+    application (root = element, modules = showcaseModules + Module(name = "PlatformModule") {
+        bindFactory<AppConfig, ContactList> {
+            ContactList(
+                assets       = it,
+                modals       = instance(),
+                appScope     = appScope,
+                contacts     = contacts,
+                navigator    = instance(),
+                textMetrics  = instance(),
+                pathMetrics  = instance(),
+                uiDispatcher = Dispatchers.UI
+            )
+        }
+    }) {
+        showcase(
+            theme        = instance(),
+            assets       = { AppConfigImpl(instance(), instance()) },
+            display      = instance(),
+            appScope     = appScope,
+            themeManager = instance()
+        ) {
+            factory<AppConfig, ContactList>()(it)
+        }
+    }
+}
+
+@JsName("contactCreation")
+fun contactCreation(element: HTMLElement) {
+    val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
+
+    application (root = element, modules = showcaseModules + Module(name = "PlatformModule") {
+        bindFactory<AppConfig, CreateContactView> {
+            CreateContactView(
+                assets          = it,
+                buttons         = instance(),
+                contacts        = NoOpContacts,
+                navigator       = instance(),
+                pathMetrics     = instance(),
+                textMetrics     = instance(),
+                textFieldStyler = instance(),
+            )
+        }
+    }) {
+        showcase(
+            theme        = instance(),
+            assets       = { AppConfigImpl(instance(), instance()) },
+            display      = instance(),
+            appScope     = appScope,
+            themeManager = instance()
+        ) {
+            factory<AppConfig, CreateContactView>()(it)
+        }
+    }
+}
+
+@JsName("contactEditing")
+fun contactEditing(element: HTMLElement) {
+    val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
+
+    application (root = element, modules = showcaseModules + Module(name = "PlatformModule") {
+        bindFactory<Pair<AppConfig, Contact>, EditContactView> { (assets, contact) ->
+            EditContactView(
+                assets          = assets,
+                modals          = instance(),
+                contact         = contact,
+                contacts        = NoOpContacts,
+                buttons         = instance(),
+                appScope        = appScope,
+                navigator       = instance(),
+                pathMetrics     = instance(),
+                textMetrics     = instance(),
+                uiDispatcher    = Dispatchers.UI,
+                textFieldStyler = instance(),
+            )
+        }
+    }) {
+        showcase(
+            theme        = instance(),
+            assets       = { AppConfigImpl(instance(), instance()) },
+            display      = instance(),
+            appScope     = appScope,
+            themeManager = instance()
+        ) {
+            factory<Pair<AppConfig, Contact>, EditContactView>()(it to Contact("Santa Clause", "123456789"))
+        }
+    }
+}
+
+@JsName("contactView")
+fun contactView(element: HTMLElement) {
+    val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
+
+    application (root = element, modules = showcaseModules + Module(name = "PlatformModule") {
+        bindFactory<Pair<AppConfig, Contact>, ContactView> { (assets, contact) ->
+            ContactView(
+                assets       = assets,
+                modals       = instance(),
+                buttons      = instance(),
+                contact      = contact,
+                contacts     = NoOpContacts,
+                appScope     = appScope,
+                navigator    = instance(),
+                linkStyler   = instance(),
+                pathMetrics  = instance(),
+                textMetrics  = instance(),
+                uiDispatcher = Dispatchers.UI
+            )
+        }
+    }) {
+        showcase(
+            theme        = instance(),
+            assets       = { AppConfigImpl(instance(), instance()) },
+            display      = instance(),
+            appScope     = appScope,
+            themeManager = instance()
+        ) {
+            factory<Pair<AppConfig, Contact>, ContactView>()(it to Contact("Jack Frost", "123456789"))
+        }
+    }
+}
+
+@JsName("contactsHeader")
+fun contactsHeader(element: HTMLElement) {
+    val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
+
+    application (root = element, modules = showcaseModules + Module(name = "PlatformModule") {
+        bindFactory<AppConfig, Header> {
+            Header(
+                assets       = it,
+                animate      = instance(),
+                contacts     = NoOpContacts,
+                navigator    = instance(),
+                textMetrics  = instance(),
+                pathMetrics  = instance(),
+                focusManager = instance(),
+            )
+        }
+    }) {
+        showcase(
+            theme        = instance(),
+            assets       = { AppConfigImpl(instance(), instance()) },
+            display      = instance(),
+            appScope     = appScope,
+            themeManager = instance()
+        ) {
+            factory<AppConfig, Header>()(it)
+        }
     }
 }

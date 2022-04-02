@@ -12,10 +12,15 @@ kotlin {
             }
 
             dceTask {
-                keep("doodle-tutorials-DocApps.calculator")
-                keep("doodle-tutorials-DocApps.todo"      )
-                keep("doodle-tutorials-DocApps.photos"    )
-                keep("doodle-tutorials-DocApps.contacts"  )
+                keep("doodle-tutorials-DocApps.calculator"     )
+                keep("doodle-tutorials-DocApps.todo"           )
+                keep("doodle-tutorials-DocApps.photos"         )
+                keep("doodle-tutorials-DocApps.contacts"       )
+                keep("doodle-tutorials-DocApps.contactList"    )
+                keep("doodle-tutorials-DocApps.contactView"    )
+                keep("doodle-tutorials-DocApps.contactEditing" )
+                keep("doodle-tutorials-DocApps.contactCreation")
+                keep("doodle-tutorials-DocApps.contactsHeader" )
             }
         }
     }
