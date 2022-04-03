@@ -26,6 +26,7 @@ import io.nacular.doodle.layout.Constraints
 import io.nacular.doodle.layout.Insets
 import io.nacular.doodle.layout.constrain
 import io.nacular.doodle.layout.fill
+import io.nacular.doodle.text.invoke
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -113,7 +114,6 @@ class ContactList(
     }
 }
 
-
 /**
  * Renders the Avatar and name for the name column
  */
@@ -123,15 +123,26 @@ private class NameCell(private val textMetrics: TextMetrics, value: String): Vie
     }
 
     fun update(value: String) {
-        layout = null
-        children.clear()
-        children += Label("${value.first()}").apply {
-            val circleColor = value.toColor()
+        if (children.isEmpty()) {
+            children += Label("${value.first()}").apply {
+                size          = Size(36)
+                fitText       = emptySet()
+                acceptsThemes = false
+            }
 
-            size            = Size(36)
-            fitText         = emptySet()
-            acceptsThemes   = false
-            foregroundColor = blackOrWhiteContrast(circleColor)
+            children += Label(value)
+
+            layout = constrain(children[0], children[1]) { icon, name ->
+                icon.centerY = parent.centerY
+                name.left    = icon.right + INSET
+                name.centerY = icon.centerY
+            }.then {
+                size = Size(children[1].bounds.right, children[0].height)
+            }
+        }
+        (children[0] as Label).apply {
+            val circleColor = value.toColor()
+            styledText      = blackOrWhiteContrast(circleColor)("${value.first()}")
             behavior        = object: CommonLabelBehavior(textMetrics) {
                 override fun render(view: Label, canvas: Canvas) {
                     canvas.circle(Circle(radius = min(width, height) / 2, center = Point(width / 2, height / 2)), fill = circleColor.paint)
@@ -140,15 +151,7 @@ private class NameCell(private val textMetrics: TextMetrics, value: String): Vie
             }
         }
 
-        children += Label(value)
-
-        layout = constrain(children[0], children[1]) { icon, name ->
-            icon.centerY = parent.centerY
-            name.left    = icon.right + INSET
-            name.centerY = icon.centerY
-        }.then {
-            size = Size(children[1].bounds.right, children[0].height)
-        }
+        (children[1] as Label).text = value
     }
 }
 
