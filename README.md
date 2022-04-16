@@ -5,7 +5,8 @@
 A collection of live apps and tutorials to help you learn [Doodle](https://nacular.github.io/doodle). Play with the apps and check out their 
 walkthroughs and source code.
 
-- [Calculator](https://nacular.github.io/doodle-tutorials/#/calculator)
-- [TodoMVC](https://nacular.github.io/doodle-tutorials/#/todo)
-- [Photos](https://nacular.github.io/doodle-tutorials/#/photos)
-- [PhotoStream](https://nacular.github.io/doodle-tutorials/#/photostream.md)
+- [Contacts](https://nacular.github.io/doodle-tutorials/docs/contacts)
+- [Calculator](https://nacular.github.io/doodle-tutorials/docs/calculator)
+- [TodoMVC](https://nacular.github.io/doodle-tutorials/docs/todo)
+- [Photos](https://nacular.github.io/doodle-tutorials/docs/photos)
+- [PhotoStream](https://nacular.github.io/doodle-tutorials/docs/photostream)
