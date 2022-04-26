@@ -258,6 +258,8 @@
 
 /*! Check if previously processed */
 
+/*! For license information please see DocApps.js.LICENSE.txt */
+
 /*! d3 */
 
 /*! dagre */
