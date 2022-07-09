@@ -26,6 +26,7 @@ import io.nacular.doodle.datatransport.dragdrop.DropEvent
 import io.nacular.doodle.datatransport.dragdrop.DropReceiver
 import io.nacular.doodle.drawing.AffineTransform
 import io.nacular.doodle.drawing.AffineTransform.Companion.Identity
+import io.nacular.doodle.drawing.AffineTransform2D
 import io.nacular.doodle.drawing.Canvas
 import io.nacular.doodle.drawing.Color.Companion.Black
 import io.nacular.doodle.drawing.Color.Companion.Darkgray
@@ -63,8 +64,10 @@ import io.nacular.doodle.utils.PropertyObservers
 import io.nacular.doodle.utils.Resizer
 import io.nacular.doodle.utils.SetPool
 import io.nacular.doodle.utils.ToStringIntEncoder
+import io.nacular.measured.units.Angle
 import io.nacular.measured.units.Angle.Companion.atan2
 import io.nacular.measured.units.Angle.Companion.degrees
+import io.nacular.measured.units.Measure
 import io.nacular.measured.units.Time.Companion.milliseconds
 import io.nacular.measured.units.normalize
 import io.nacular.measured.units.times
@@ -191,10 +194,12 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
 
         children.clear()
 
+        val computeAngle: (View) -> Measure<Angle> = { (it.transform as? AffineTransform2D)?.computeAngle() ?: (0 * degrees) }
+
         field = new?.also { photo ->
             val photoAngle = object: Any() {
-                var angle by observable(photo.transform.computeAngle() `in` degrees) { _,_,new ->
-                    if ((new * degrees).normalize() != photo.transform.computeAngle().normalize()) {
+                var angle by observable(computeAngle(photo) `in` degrees) { _,_,new ->
+                    if ((new * degrees).normalize() != computeAngle(photo).normalize()) {
                         photo.parent?.let {
                             val photoCenter = Point(photo.width/2, photo.height/2)
                             photo.position  = it.toLocal(photoCenter, photo) - photoCenter
@@ -212,7 +217,7 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
             }
 
             photo.transformChanged += { _,_,_ ->
-                photoAngle.angle     = photo.transform.computeAngle() `in` degrees
+                photoAngle.angle     = computeAngle(photo) `in` degrees
                 rotationSlider.value = photoAngle.angle
             }
 
