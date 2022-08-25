@@ -120,7 +120,7 @@ class ContactsApp(
     }
 
     private fun scrollPanel(content: View) = ScrollPanel(content).apply {
-        contentWidthConstraints = { parent.width }
+        contentWidthConstraints = { parent.width - parent.scrollBarWidth }
     }
 
     private fun setMainView(display: Display, view: View) {

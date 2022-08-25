@@ -1,6 +1,6 @@
-import io.nacular.doodle.application.Modules
 import io.nacular.doodle.application.Modules.Companion.FocusModule
 import io.nacular.doodle.application.Modules.Companion.FontModule
+import io.nacular.doodle.application.Modules.Companion.ImageModule
 import io.nacular.doodle.application.Modules.Companion.KeyboardModule
 import io.nacular.doodle.application.Modules.Companion.PointerModule
 import io.nacular.doodle.application.application
@@ -40,7 +40,7 @@ fun main() {
         FocusModule,
         PointerModule,
         KeyboardModule,
-        Modules.ImageModule,
+        ImageModule,
         basicLabelBehavior       (),
         nativeTextFieldBehavior  (spellCheck = false),
         nativeHyperLinkBehavior  (),

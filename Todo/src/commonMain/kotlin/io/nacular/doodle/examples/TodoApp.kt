@@ -192,7 +192,7 @@ private class TodoView(private val config              : TodoConfig,
 
                 children += listOf(
                     TaskCreationBox(focusManager, textMetrics, config, dataStore),
-                    ScrollPanel    (list).apply { contentWidthConstraints = { parent.width } },
+                    ScrollPanel    (list).apply { contentWidthConstraints = { parent.width - parent.scrollBarWidth } },
                     FilterBox      (config, dataStore, textMetrics, filterButtonProvider)
                 )
 

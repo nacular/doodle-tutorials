@@ -180,7 +180,7 @@ class PhotoStreamApp(display    : Display,
 
         display += ScrollPanel(list).apply {
             // Ensure list's width is equal to scroll-panel's
-            contentWidthConstraints = { parent.width }
+            contentWidthConstraints = { parent.width - parent.scrollBarWidth }
         }
 
         display.layout = constrain(display.children[0]) {
