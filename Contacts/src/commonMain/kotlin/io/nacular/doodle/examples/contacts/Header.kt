@@ -25,7 +25,7 @@ import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Rectangle
 import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.geometry.path
-import io.nacular.doodle.layout.constrain
+import io.nacular.doodle.layout.cassowary.constrain
 import io.nacular.doodle.system.Cursor.Companion.Pointer
 import io.nacular.doodle.system.Cursor.Companion.Text
 import io.nacular.doodle.utils.observable
@@ -82,7 +82,7 @@ class Header(
             clipCanvasToBounds = false
 
             val clearButton = PathIconButton(pathData = assets.deleteIcon, pathMetrics = pathMetrics).apply {
-                size            = Size(22, 44)
+                height          = 44.0
                 cursor          = Pointer
                 visible         = textField.text.isNotBlank()
                 foregroundColor = assets.search
@@ -104,12 +104,13 @@ class Header(
             children += clearButton
 
             layout = constrain(children[0], children[1]) { textField, clear ->
-                textField.left    = parent.left + searchIconSize.width + 2 * 20
-                textField.height  = parent.height
-                textField.right   = clear.left
-                textField.centerY = parent.centerY
-                clear.right       = parent.right - 20
-                clear.centerY     = parent.centerY
+                textField.left    eq searchIconSize.width + 2 * 20
+                textField.right   eq clear.left
+                textField.height  eq parent.height
+                textField.centerY eq parent.centerY
+                clear.width       eq 22
+                clear.right       eq parent.right - 20
+                clear.centerY     eq parent.centerY
             }
 
             pointerChanged += clicked {

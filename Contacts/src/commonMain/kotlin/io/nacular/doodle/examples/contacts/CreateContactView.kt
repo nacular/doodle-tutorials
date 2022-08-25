@@ -12,10 +12,7 @@ import io.nacular.doodle.geometry.PathMetrics
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.image.Image
-import io.nacular.doodle.layout.constant
-import io.nacular.doodle.layout.constrain
-import io.nacular.doodle.layout.max
-import io.nacular.doodle.layout.min
+import io.nacular.doodle.layout.cassowary.constrain
 import io.nacular.doodle.theme.native.NativeTextFieldStyler
 import io.nacular.doodle.utils.Dimension.Width
 import kotlin.math.min
@@ -94,25 +91,25 @@ class CreateContactView(
         children += listOf(label, back, avatar, spacer, form, button)
 
         layout = constrain(label, back, avatar, spacer, form, button) { (label, back, avatar, spacer, form, button) ->
-            label.top  = parent.top + 2 * INSET
-            label.left = parent.left + INSET
+            label.top  eq 2 * INSET
+            label.left eq     INSET
 
-            back.top  = label.bottom + 2 * INSET
-            back.left = label.left
+            back.top  eq label.bottom + 2 * INSET
+            back.left eq label.left
 
-            avatar.top = label.bottom + 3.0 / 2 * INSET
-            avatar.left = back.right + 2 * INSET
+            avatar.top  eq label.bottom + 3.0 / 2 * INSET
+            avatar.left eq back.right + 2 * INSET
 
-            spacer.top   = avatar.bottom
-            spacer.left  = back.left
-            spacer.right = parent.right - INSET
+            spacer.top   eq avatar.bottom
+            spacer.left  eq back.left
+            spacer.right eq parent.right - INSET
 
-            form.top   = spacer.bottom
-            form.left  = back.left
-            form.width = max(constant(0.0), min(parent.width - 2 * INSET, constant(520.0)))
+            form.top   eq spacer.bottom
+            form.left  eq back.left
+            form.width eq max(0.0, min(parent.width - 2 * INSET, 520.0))
 
-            button.top  = form.bottom + 2 * INSET
-            button.left = back.left
+            button.top  eq form.bottom + 2 * INSET
+            button.left eq back.left
         }.then {
             idealSize = Size(spacer.width + 2 * INSET, button.bounds.bottom + INSET)
         }

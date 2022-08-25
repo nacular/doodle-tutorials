@@ -24,7 +24,7 @@ import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.layout.Constraints
 import io.nacular.doodle.layout.Insets
-import io.nacular.doodle.layout.constrain
+import io.nacular.doodle.layout.cassowary.constrain
 import io.nacular.doodle.layout.fill
 import io.nacular.doodle.text.invoke
 import kotlinx.coroutines.CoroutineDispatcher
@@ -133,9 +133,9 @@ private class NameCell(private val textMetrics: TextMetrics, value: String): Vie
             children += Label(value)
 
             layout = constrain(children[0], children[1]) { icon, name ->
-                icon.centerY = parent.centerY
-                name.left    = icon.right + INSET
-                name.centerY = icon.centerY
+                icon.centerY eq parent.centerY
+                name.left    eq icon.right + INSET
+                name.centerY eq icon.centerY
             }.then {
                 size = Size(children[1].bounds.right, children[0].height)
             }
@@ -187,10 +187,10 @@ private class ToolCell(private val assets: AppConfig, private val pathMetrics: P
                 children += createButton(assets.trashIcon).apply { fired += { onDelete?.invoke() } }
 
                 layout = constrain(children[0], children[1]) { edit, delete ->
-                    delete.centerY = parent.centerY
-                    delete.right   = parent.right
-                    edit.centerY   = delete.centerY
-                    edit.right     = delete.left - 4
+                    delete.centerY eq parent.centerY
+                    delete.right   eq parent.right
+                    edit.centerY   eq delete.centerY
+                    edit.right     eq delete.left - 4
                 }
             }
             else     -> {

@@ -49,7 +49,7 @@ interface FilterButtonProvider {
  * Default implementation intended for use when app is top-level. It handles routing and provides
  * hyperlinks for the filter buttons.
  */
-public class LinkFilterButtonProvider(private val dataStore: DataStore, router: Router, private val linkStyler: NativeHyperLinkStyler): FilterButtonProvider {
+class LinkFilterButtonProvider(private val dataStore: DataStore, router: Router, private val linkStyler: NativeHyperLinkStyler): FilterButtonProvider {
     init {
         router["/"         ] = { dataStore.filter = null      }
         router["/active"   ] = { dataStore.filter = Active    }

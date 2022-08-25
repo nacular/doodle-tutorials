@@ -23,8 +23,7 @@ import io.nacular.doodle.geometry.PathMetrics
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.path
 import io.nacular.doodle.layout.Insets
-import io.nacular.doodle.layout.constrain
-import io.nacular.doodle.layout.fill
+import io.nacular.doodle.layout.cassowary.constrain
 import io.nacular.doodle.theme.native.NativeTextFieldBehaviorModifier
 import io.nacular.doodle.theme.native.NativeTextFieldStyler
 import kotlin.math.floor
@@ -125,7 +124,8 @@ private fun <T> iconField(pathMetrics: PathMetrics, path: String, visualizer: ()
         }
 
         layout = constrain(children[0]) {
-            fill(Insets(left = iconSize.width + 24))(it)
+            it.edges eq parent.edges + Insets(left = iconSize.width + 24)
+//            fill(Insets(left = iconSize.width + 24))(it)
         }
     }
 }
