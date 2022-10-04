@@ -9,14 +9,13 @@ import io.nacular.doodle.core.PositionableContainer
 import io.nacular.doodle.core.View
 import io.nacular.doodle.core.plusAssign
 import io.nacular.doodle.drawing.paint
-import io.nacular.doodle.geometry.Rectangle
 import io.nacular.doodle.geometry.Size
+import io.nacular.doodle.layout.constraints.Strength
 import io.nacular.doodle.theme.ThemeManager
 import io.nacular.doodle.theme.adhoc.DynamicTheme
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlin.math.max
 
 /**
  * Simple contacts app based on https://phonebook-pi.vercel.app/
@@ -89,31 +88,12 @@ class ContactsApp(
             // Happens after header is added to ensure view goes below create button
             router.fireAction()
 
-            display += CreateButton(appAssets)
-
-            // Setup layout that manages how Header, CreateButton, and current View are positioned
-            display.layout = object: Layout {
-                // Header needs to be sized based on its minimumSize, so this layout should respond to any changes to it.
-                override fun requiresLayout(
-                    child: Positionable,
-                    of   : PositionableContainer,
-                    old  : View.SizePreferences,
-                    new  : View.SizePreferences
-                ) = new.minimumSize != old.minimumSize
-
-                override fun layout(container: PositionableContainer) {
-                    val mainView = container.children[1]
-                    val button   = container.children[2]
-
-                    header.size     = Size(container.width, header.minimumSize.height)
-                    mainView.bounds = Rectangle(INSET, header.height, max(0.0, header.width - 2 * INSET), max(0.0, container.height - header.height))
-
-                    button.bounds = when {
-                        header.filterCentered -> Rectangle(container.width - appAssets.createButtonLargeSize.width - 20, (header.naturalHeight - appAssets.createButtonLargeSize.height) / 2, appAssets.createButtonLargeSize.width, appAssets.createButtonLargeSize.height)
-                        else                  -> Rectangle(container.width - appAssets.createButtonSmallSize.width - 20, container.height - appAssets.createButtonSmallSize.height - 40,      appAssets.createButtonSmallSize.width, appAssets.createButtonSmallSize.height)
-                    }
-                }
+            // Reset layout whenever display children change since the layout stores the display's children internally.
+            display.childrenChanged += { _,_,_,_ ->
+                updateLayout(display, appAssets)
             }
+
+            display += CreateButton(appAssets)
 
             display.fill(appAssets.background.paint)
         }
@@ -130,6 +110,49 @@ class ContactsApp(
         }
 
         header.searchEnabled = view == contactList
+    }
+
+    private fun updateLayout(display: Display, appAssets: AppConfig) {
+        display.layout = object: Layout {
+            // Header needs to be sized based on its minimumSize, so this layout should respond to any changes to it.
+            override fun requiresLayout(
+                child: Positionable,
+                of   : PositionableContainer,
+                old  : View.SizePreferences,
+                new  : View.SizePreferences
+            ) = new.minimumSize != old.minimumSize
+
+            private val delegate = io.nacular.doodle.layout.constraints.constrain(header, display.children[1], display.children[2]) { header_, mainView, button ->
+                header_.width  eq parent.width
+                (header_.height eq header.minimumSize.height) .. Strength.Strong
+
+                mainView.top    eq header_.height
+                mainView.left   eq INSET
+                mainView.width  eq max(0.0, header_.width - 2 * INSET)
+                mainView.height eq max(0.0, parent.height - header_.height)
+
+                lateinit var buttonSize: Size
+
+                when {
+                    header.filterCentered -> {
+                        buttonSize = appAssets.createButtonLargeSize
+                        button.top eq (header.naturalHeight - buttonSize.height) / 2
+                    }
+                    else                  -> {
+                        buttonSize = appAssets.createButtonSmallSize
+                        button.bottom eq parent.bottom - 40
+                    }
+                }
+
+                button.left   eq max(20, parent.width - buttonSize.width - 20)
+                button.width  eq buttonSize.width
+                button.height eq buttonSize.height
+            }
+
+            override fun layout(container: PositionableContainer) {
+                delegate.layout(container)
+            }
+        }
     }
 
     override fun shutdown() { /* no-op */ }

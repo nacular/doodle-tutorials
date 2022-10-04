@@ -24,8 +24,7 @@ import io.nacular.doodle.drawing.rect
 import io.nacular.doodle.drawing.text
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Size
-import io.nacular.doodle.layout.constant
-import io.nacular.doodle.layout.constrain
+import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.system.Cursor.Companion.Pointer
 import io.nacular.doodle.utils.roundToNearest
 import kotlinx.coroutines.CoroutineScope
@@ -340,15 +339,15 @@ class Calculator(
 
             // Place output outside grid so the height can be more easily controlled
             val constraints = constrain(output, gridPanel) { output, grid ->
-                output.top    = parent.top
-                output.left   = parent.left
-                output.right  = parent.right
-                output.height = constant(outputHeight)
+                output.top    eq 0
+                output.left   eq 0
+                output.right  eq parent.right
+                output.height eq outputHeight
 
-                grid.top      = output.bottom + buttonSpacing
-                grid.left     = output.left
-                grid.right    = output.right
-                grid.bottom   = parent.bottom
+                grid.top      eq output.bottom + buttonSpacing
+                grid.left     eq output.left
+                grid.right    eq output.right
+                grid.bottom   eq parent.bottom
             }
 
             layout = object: Layout by constraints {

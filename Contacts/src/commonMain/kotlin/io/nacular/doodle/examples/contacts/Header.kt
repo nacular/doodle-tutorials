@@ -25,7 +25,8 @@ import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Rectangle
 import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.geometry.path
-import io.nacular.doodle.layout.cassowary.constrain
+import io.nacular.doodle.layout.constraints.Strength.Companion.Strong
+import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.system.Cursor.Companion.Pointer
 import io.nacular.doodle.system.Cursor.Companion.Text
 import io.nacular.doodle.utils.observable
@@ -79,6 +80,7 @@ class Header(
 
         init {
             cursor             = Text
+            minimumSize        = Size(searchIconSize.width + 40.0, 0.0)
             clipCanvasToBounds = false
 
             val clearButton = PathIconButton(pathData = assets.deleteIcon, pathMetrics = pathMetrics).apply {
@@ -109,8 +111,8 @@ class Header(
                 textField.height  eq parent.height
                 textField.centerY eq parent.centerY
                 clear.width       eq 22
-                clear.right       eq parent.right - 20
-                clear.centerY     eq parent.centerY
+                (clear.right       eq parent.right - 20) .. Strong
+                clear.centerY     eq textField.centerY
             }
 
             pointerChanged += clicked {
@@ -165,7 +167,7 @@ class Header(
             filter.bounds = when {
                 container.width > filterCenterAboveWidth -> Rectangle((container.width - filterNaturalWidth) / 2,        logo.bounds.center.y - filter.height / 2, filterNaturalWidth, filter.height)
                 container.width > filterRightAboveWidth  -> Rectangle( container.width - filterNaturalWidth - 2 * INSET, logo.bounds.center.y - filter.height / 2, filterNaturalWidth, filter.height)
-                else                                     -> Rectangle(logo.x, logo.bounds.bottom + INSET, max(0.0, container.width - 4 * INSET), filter.height)
+                else                                     -> Rectangle(logo.x, logo.bounds.bottom + INSET, max(filter.minimumSize.width, container.width - 4 * INSET), filter.height)
             }
         }.then {
             minimumSize = Size(width, max(0.0, filterBox.bounds.bottom + 8))

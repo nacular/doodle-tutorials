@@ -1,7 +1,6 @@
 package io.nacular.doodle.examples
 
 import io.nacular.doodle.controls.buttons.Button
-import io.nacular.doodle.controls.buttons.HyperLink
 import io.nacular.doodle.controls.buttons.PushButton
 import io.nacular.doodle.controls.text.Label
 import io.nacular.doodle.controls.theme.CommonTextButtonBehavior
@@ -16,7 +15,8 @@ import io.nacular.doodle.examples.DataStore.Filter.Active
 import io.nacular.doodle.examples.DataStore.Filter.Completed
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Size
-import io.nacular.doodle.layout.constrain
+import io.nacular.doodle.layout.constraints.Strength.Companion.Strong
+import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.text.TextDecoration.Companion.UnderLine
 import io.nacular.doodle.text.invoke
 
@@ -99,14 +99,29 @@ class FilterBox(private val config              : TodoConfig,
         height    = 41.0
         children += listOf(itemsLeft, all, active, completed, clearAll)
         layout    = constrain(itemsLeft, all, active, completed, clearAll) { label, all_, active_, completed_, clearAll ->
-            listOf(label, all_, active_, completed_, clearAll).forEach { it.centerY = parent.centerY }
+            listOf(label, all_, active_, completed_, clearAll).forEach { it.centerY eq parent.centerY }
             val spacing     = 6.0
-            label.left      = parent.left  + 15
-            clearAll.right  = parent.right
-            clearAll.height = parent.height
-            all_.left       = parent.left + (parent.width - { all.width + active.width + completed.width + spacing * 2 }) / 2
-            active_.left    = all_.right    + spacing
-            completed_.left = active_.right + spacing
+
+            label.left eq 15
+            label.width.preserve
+
+            clearAll.width.preserve
+            (clearAll.right eq parent.right) .. Strong
+            clearAll.height eq parent.height
+
+            (all_.left eq (parent.width - (all_.width + active_.width + completed_.width + spacing * 2)) / 2) .. Strong
+            all_.width.preserve
+
+            active_.left    eq all_.right    + spacing
+            active_.width.preserve
+
+            completed_.left eq active_.right + spacing
+            completed_.width.preserve
+
+            all_.left       greaterEq label.right      + spacing
+            active_.left    greaterEq all_.right       + spacing
+            completed_.left greaterEq active_.right    + spacing
+            clearAll.left   greaterEq completed_.right + spacing
         }
     }
 

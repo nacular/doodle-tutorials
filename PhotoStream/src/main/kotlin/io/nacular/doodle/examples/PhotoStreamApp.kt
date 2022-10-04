@@ -19,10 +19,8 @@ import io.nacular.doodle.image.Image
 import io.nacular.doodle.image.ImageLoader
 import io.nacular.doodle.image.height
 import io.nacular.doodle.image.width
-import io.nacular.doodle.layout.constant
-import io.nacular.doodle.layout.constrain
+import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.layout.fill
-import io.nacular.doodle.layout.min
 import io.nacular.doodle.theme.ThemeManager
 import io.nacular.doodle.theme.adhoc.DynamicTheme
 import io.nacular.doodle.theme.basic.list.basicVerticalListBehavior
@@ -184,9 +182,9 @@ class PhotoStreamApp(display    : Display,
         }
 
         display.layout = constrain(display.children[0]) {
-            it.width   = min(parent.width, constant(imageHeight))
-            it.height  = parent.height
-            it.centerX = parent.centerX
+            it.width   eq min(parent.width, imageHeight)
+            it.height  eq parent.height
+            it.centerX eq parent.centerX
         }
     }
 

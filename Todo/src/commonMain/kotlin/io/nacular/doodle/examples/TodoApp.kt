@@ -1,38 +1,67 @@
-@file:Suppress("EXPERIMENTAL_UNSIGNED_LITERALS")
 package io.nacular.doodle.examples
 
 import io.nacular.doodle.application.Application
-import io.nacular.doodle.controls.*
-import io.nacular.doodle.controls.buttons.*
-import io.nacular.doodle.controls.list.*
+import io.nacular.doodle.controls.IndexedItem
+import io.nacular.doodle.controls.buttons.Button
+import io.nacular.doodle.controls.buttons.HyperLink
+import io.nacular.doodle.controls.itemVisualizer
 import io.nacular.doodle.controls.list.MutableList
+import io.nacular.doodle.controls.list.listEditor
 import io.nacular.doodle.controls.panels.ScrollPanel
-import io.nacular.doodle.controls.text.*
-import io.nacular.doodle.controls.theme.*
-import io.nacular.doodle.core.*
-import io.nacular.doodle.drawing.*
+import io.nacular.doodle.controls.text.Label
+import io.nacular.doodle.controls.theme.CommonLabelBehavior
+import io.nacular.doodle.core.Behavior
+import io.nacular.doodle.core.Container
+import io.nacular.doodle.core.Display
+import io.nacular.doodle.core.View
+import io.nacular.doodle.core.container
+import io.nacular.doodle.core.plusAssign
+import io.nacular.doodle.drawing.Canvas
+import io.nacular.doodle.drawing.Color
 import io.nacular.doodle.drawing.Color.Companion.Black
 import io.nacular.doodle.drawing.Color.Companion.Transparent
 import io.nacular.doodle.drawing.Color.Companion.White
+import io.nacular.doodle.drawing.Font
 import io.nacular.doodle.drawing.Font.Style.Italic
+import io.nacular.doodle.drawing.FontLoader
+import io.nacular.doodle.drawing.PatternPaint
+import io.nacular.doodle.drawing.Stroke
+import io.nacular.doodle.drawing.TextMetrics
+import io.nacular.doodle.drawing.height
+import io.nacular.doodle.drawing.opacity
+import io.nacular.doodle.drawing.paint
+import io.nacular.doodle.drawing.rect
 import io.nacular.doodle.event.PointerListener.Companion.released
 import io.nacular.doodle.examples.DataStore.DataStoreListModel
 import io.nacular.doodle.examples.DataStore.Filter
-import io.nacular.doodle.examples.DataStore.Filter.*
+import io.nacular.doodle.examples.DataStore.Filter.Active
+import io.nacular.doodle.examples.DataStore.Filter.Completed
 import io.nacular.doodle.focus.FocusManager
-import io.nacular.doodle.geometry.*
-import io.nacular.doodle.image.*
-import io.nacular.doodle.layout.*
+import io.nacular.doodle.geometry.Point
+import io.nacular.doodle.geometry.Rectangle
+import io.nacular.doodle.geometry.Size
+import io.nacular.doodle.image.Image
+import io.nacular.doodle.image.ImageLoader
+import io.nacular.doodle.layout.Insets
+import io.nacular.doodle.layout.constraints.Strength
+import io.nacular.doodle.layout.constraints.Strength.Companion.Strong
+import io.nacular.doodle.layout.constraints.constrain
+import io.nacular.doodle.layout.fill
 import io.nacular.doodle.theme.ThemeManager
 import io.nacular.doodle.theme.adhoc.DynamicTheme
-import io.nacular.doodle.theme.basic.list.*
+import io.nacular.doodle.theme.basic.list.BasicListBehavior
+import io.nacular.doodle.theme.basic.list.BasicVerticalListPositioner
+import io.nacular.doodle.theme.basic.list.TextEditOperation
+import io.nacular.doodle.theme.basic.list.basicItemGenerator
 import io.nacular.doodle.theme.native.NativeHyperLinkStyler
 import io.nacular.doodle.utils.Dimension.Height
 import io.nacular.doodle.utils.Encoder
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import kotlin.Result.Companion.success
-import kotlin.math.max
-import kotlin.math.min
 
 /**
  * This app is designed to run both top-level and nested. The filter buttons use hyperlinks in the spec,
@@ -115,7 +144,7 @@ private class TaskEditOperation(focusManager: FocusManager?, list: MutableList<T
 
     override fun invoke() = container {
         children += textField
-        layout    = constrain(textField) { fill(Insets(top = 1.0, left = 58.0, bottom = 1.0))(it) }
+        layout    = constrain(textField) { it.edges eq parent.edges + Insets(top = 1.0, left = 58.0, bottom = 1.0) }
     }
 }
 
@@ -143,6 +172,7 @@ private class TodoView(private val config              : TodoConfig,
             acceptsThemes   = false
             foregroundColor = config.headerColor
         }
+        lateinit var list: View
         val footer   = Footer(textMetrics, linkStyler, config)
         val taskList = object: Container() {
             init {
@@ -157,7 +187,7 @@ private class TodoView(private val config              : TodoConfig,
                 }
 
                 // List containing Tasks. It is mutable since items can be edited
-                val list = MutableList(DataStoreListModel(dataStore), itemVisualizer = visualizer, fitContent = setOf(Height)).apply {
+                list = MutableList(DataStoreListModel(dataStore), itemVisualizer = visualizer, fitContent = setOf(Height)).apply {
                     val rowHeight = 58.0
                     font          = config.listFont
                     cellAlignment = fill
@@ -197,21 +227,12 @@ private class TodoView(private val config              : TodoConfig,
                 )
 
                 layout = constrain(children[0], children[1], children[2]) { input, panel, filter ->
-                    listOf(input, panel, filter).forEach { it.width = parent.width }
-                    input.top     = parent.top
-                    panel.top     = input.bottom
-                    panel.height  = parent.height - input.height - filter.height
-                    filter.bottom = parent.bottom
-                } then {
-                    val oldHeight = height
-
-                    val minHeight = children[0].height + (children[2].takeIf { it.visible }?.height ?: 0.0)
-
-                    // Override height to reduce chance footer (pinned to the list bottom) does not get clipped
-                    height = max(min(children[0].height + list.height + (children[2].takeIf { it.visible }?.height ?: 0.0),
-                            parent!!.height - (y + footer.height + 65 + 5)), minHeight)
-
-                    if (oldHeight != height) doLayout()
+                    listOf(input, panel, filter).forEach { it.width eq parent.width }
+                    input.top     eq 0
+                    panel.top     eq input.bottom
+                    filter.top    eq panel.bottom
+                    filter.bottom eq parent.bottom
+                    filter.height.preserve
                 }
             }
 
@@ -232,15 +253,19 @@ private class TodoView(private val config              : TodoConfig,
         children += listOf(header, taskList, footer)
 
         layout = constrain(header, taskList, footer) { header, body, footer ->
-            listOf(header, body, footer).forEach { it.centerX = parent.centerX }
-            header.top   = parent.top    +  9
-            body.top     = header.bottom +  5
-            body.width   = min(550.0, parent.width)
-            footer.top   = body.bottom   + 65
-            footer.width = body.width
-        } then {
-            // force layout since taskList's size depends on footer location
-            taskList.relayout()
+            listOf(header, body, footer).forEach { it.centerX eq parent.centerX }
+            header.top    eq        9
+            header.height.preserve
+
+            body.top     eq        header.bottom + 5
+            body.width   eq        min(550.0, parent.width - 10)
+            body.height  greaterEq taskList.children[0].height + taskList.children[2].height
+            (body.height eq        taskList.children[0].height + list.height + taskList.children[2].height) .. Strength.Medium
+
+            footer.top   eq body.bottom + 65
+            footer.width eq body.width
+            footer.height.preserve
+            (footer.bottom lessEq parent.bottom.readOnly) .. Strong
         }
     }
 }
@@ -283,7 +308,7 @@ class TodoApp(display             : Display,
 
             display += TodoView(config, dataStore, linkStyler, textMetrics, focusManager, filterButtonProvider)
 
-            display.layout = constrain(display.children[0]) { fill(it) }
+            display.layout = constrain(display.children[0]) { it.edges eq parent.edges }
 
             display.fill(config.appBackground.paint)
         }

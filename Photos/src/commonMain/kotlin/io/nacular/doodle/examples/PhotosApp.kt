@@ -47,19 +47,19 @@ import io.nacular.doodle.image.Image
 import io.nacular.doodle.image.ImageLoader
 import io.nacular.doodle.image.height
 import io.nacular.doodle.image.width
-import io.nacular.doodle.layout.ConstraintLayout
 import io.nacular.doodle.layout.Insets
 import io.nacular.doodle.layout.ListLayout
 import io.nacular.doodle.layout.WidthSource.Parent
-import io.nacular.doodle.layout.constant
-import io.nacular.doodle.layout.constrain
-import io.nacular.doodle.layout.fill
+import io.nacular.doodle.layout.constraints.Bounds
+import io.nacular.doodle.layout.constraints.ConstraintDslContext
+import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.system.Cursor.Companion.Text
 import io.nacular.doodle.theme.ThemeManager
 import io.nacular.doodle.theme.adhoc.DynamicTheme
 import io.nacular.doodle.theme.basic.range.BasicCircularSliderBehavior
 import io.nacular.doodle.theme.basic.spinner.SpinnerTextEditOperation
 import io.nacular.doodle.utils.Dimension.Width
+import io.nacular.doodle.utils.PropertyObserver
 import io.nacular.doodle.utils.PropertyObservers
 import io.nacular.doodle.utils.Resizer
 import io.nacular.doodle.utils.SetPool
@@ -92,7 +92,7 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
      */
     private inner class Property(
         private val property  : KMutableProperty0<Double>,
-                    updateWhen: PropertyObservers<Any, Any>,
+        private val updateWhen: PropertyObservers<Any, Any>,
                     suffix    : String = ""
     ): View() {
         private fun <T, M: SpinnerModel<T>> spinnerVisualizer(suffix: String = "") = itemVisualizer { item: Int, previous: View?, context: Spinner<T, M> ->
@@ -136,25 +136,28 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
             }
         }
 
+        private val callBack: PropertyObserver<Any, Any> = { _,_,_ -> spinner.set(property.get().toInt()) }
+
         init {
-            updateWhen += { _,_,_ -> spinner.set(property.get().toInt()) }
+            updateWhen += callBack
 
             children += listOf(spinner, Label(property.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }))
 
             // Label is centered below spinner, which is stretched to fit its parent's width
             layout = constrain(children[0], children[1]) { spinner, label ->
-                spinner.left   = parent.left
-                spinner.right  = parent.right
-                spinner.height = constant(spinnerHeight)
-                label.bottom   = parent.bottom
-                label.centerX  = parent.centerX
-            }.then {
-                // Update view's height after layout to ensure children visible
-                (children[0].height + children[1].height).takeIf { it != height }?.let {
-                    height = it
-                    doLayout()
-                }
+                spinner.top    eq 0
+                spinner.left   eq 0
+                spinner.right  eq parent.right
+                spinner.height eq spinnerHeight
+                label.top      eq spinner.bottom + 2
+                label.centerX  eq parent.centerX
+                label.height   eq label.height.readOnly
             }
+        }
+
+        override fun removedFromDisplay() {
+            println("removedFromDisplay")
+            updateWhen -= callBack
         }
     }
 
@@ -167,27 +170,28 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
         val spacing = 10.0
 
         layout = constrain(children[0], property1, property2) { label, first, second ->
-            label.top      = second.top
-            label.left     = parent.left + spacing
-            label.height   = constant(spinnerHeight)
-            first.top      = second.top
-            first.right    = second.left - spacing
-            first.width    = second.width
-            second.centerY = parent.centerY
-            second.right   = parent.right - spacing
-            second.width   = (parent.width - spacing * 3) / 3
-        }.then {
-            height = children.maxOf { it.bounds.bottom } + 2 * spacing
-            doLayout()
+            label.top      eq second.top
+            label.left     eq spacing
+            label.height   eq spinnerHeight
+            first.centerY  eq parent.centerY
+            first.right    eq second.left - spacing
+            first.width    eq second.width
+            first.height   eq 50
+            second.height  eq 50
+            second.top     eq first.top.readOnly
+            second.right   eq parent.right - spacing
+            second.width   eq (parent.width - spacing * 3) / 3
+
+            parent.height eq max(first.bottom, second.bottom) + spacing
         }
     }
 
-    // Used to cache listeners so they can be cleaned up when photo changes
+    // Used to cache listeners, so they can be cleaned up when photo changes
     private val photoBoundsChanged   : PropertyObservers<View, Rectangle>       = SetPool()
     private val photoTransformChanged: PropertyObservers<View, AffineTransform> = SetPool()
 
-    var photo: View? = null; set(new) {
-        field?.let { photo ->
+    var photo: View? by io.nacular.doodle.utils.observable(null) {old, new ->
+        old?.let { photo ->
             (photoBoundsChanged    as SetPool).forEach { photo.boundsChanged    -= it }
             (photoTransformChanged as SetPool).forEach { photo.transformChanged -= it }
         }
@@ -196,7 +200,7 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
 
         val computeAngle: (View) -> Measure<Angle> = { (it.transform as? AffineTransform2D)?.computeAngle() ?: (0 * degrees) }
 
-        field = new?.also { photo ->
+        new?.also { photo ->
             val photoAngle = object: Any() {
                 var angle by observable(computeAngle(photo) `in` degrees) { _,_,new ->
                     if ((new * degrees).normalize() != computeAngle(photo).normalize()) {
@@ -232,7 +236,7 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
 
     init {
         insets = Insets(top = 48.0, left = 20.0, right = 20.0)
-        layout = ListLayout(widthSource = Parent)
+        layout = ListLayout(widthSource = Parent).then { height = (children.lastOrNull()?.bounds?.bottom ?: 280.0) + insets.left + 8 }
         width  = 300.0 + insets.left
         height = 280.0 + insets.left + 8
     }
@@ -287,15 +291,14 @@ class PhotosApp(display     : Display,
         val propertyPanel = PropertyPanel(focusManager).apply { opacity = 0f }
 
         // Helper for constraining property panel layout
-        val constrainPanel = {
-            display.layout = (display.layout as ConstraintLayout).constrain(propertyPanel) {
-                when {
-                    panelVisible -> it.bottom = parent.bottom - buttonInset / 2
-                    else         -> it.top    = parent.bottom - buttonInset * 2
-                }
-
-                it.centerX = parent.centerX
+        val panelConstraints: ConstraintDslContext.(Bounds) -> Unit = {
+            when {
+                panelVisible -> it.bottom eq parent.bottom - buttonInset / 2
+                else         -> it.top    eq parent.bottom - buttonInset * 2
             }
+
+            it.height  eq it.height.readOnly
+            it.centerX eq parent.centerX
         }
 
         // Used to show/hide panel
@@ -317,7 +320,7 @@ class PhotosApp(display     : Display,
                 val end   = if (panelVisible) 0f else 1f
 
                 // removing layout constraints from panel when it is animating
-                display.layout = (display.layout as ConstraintLayout).unconstrain(propertyPanel)
+                display.layout = (display.layout as io.nacular.doodle.layout.constraints.ConstraintLayout).unconstrain(propertyPanel, panelConstraints)
 
                 // Animate property panel show/hide
                 (animate (start to end) using fixedTimeLinear(250 * milliseconds)) {
@@ -325,7 +328,7 @@ class PhotosApp(display     : Display,
                     propertyPanel.opacity = it
                 }.completed += {
                     panelVisible = !panelVisible
-                    constrainPanel()
+                    (display.layout as io.nacular.doodle.layout.constraints.ConstraintLayout).constrain(propertyPanel, panelConstraints)
                 }
             }
         }
@@ -424,14 +427,13 @@ class PhotosApp(display     : Display,
         display += listOf(mainContainer, propertyPanel, panelToggle)
 
         display.layout = constrain(mainContainer, panelToggle, propertyPanel) { main, toggle, panel ->
-            fill(main)
+            main.edges eq parent.edges
 
-            toggle.width   = panel.width - 24
-            toggle.centerX = panel.centerX
-            toggle.bottom  = panel.top + 22 + 40
-        }
-
-        constrainPanel()
+            toggle.width   eq panel.width - 24
+            toggle.height  eq 50
+            toggle.centerX eq panel.centerX
+            toggle.bottom  eq panel.top + 22 + 40
+        }.constrain(propertyPanel, panelConstraints)
 
         display.relayout()
     }

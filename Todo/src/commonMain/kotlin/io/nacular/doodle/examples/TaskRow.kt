@@ -11,8 +11,8 @@ import io.nacular.doodle.event.PointerListener
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Rectangle
 import io.nacular.doodle.layout.Insets
-import io.nacular.doodle.layout.constant
-import io.nacular.doodle.layout.constrain
+import io.nacular.doodle.layout.constraints.Strength.Companion.Strong
+import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.text.TextDecoration
 import io.nacular.doodle.text.invoke
 import io.nacular.doodle.utils.HorizontalAlignment.Left
@@ -77,11 +77,12 @@ class TaskRow(config: TodoConfig, dataStore: DataStore, task: Task): View() {
         this.task = task
         children += listOf   (check, label, delete)
         layout    = constrain(check, label, delete) { check, label, delete ->
-            listOf(check, label, delete).forEach { it.height = parent.height  }
-            listOf(check,        delete).forEach { it.width  = constant(60.0) }
-            label.left   = check.right
-            label.right  = delete.left
-            delete.right = parent.right
+            listOf(check, label, delete).forEach { it.height eq parent.height }
+            listOf(check,        delete).forEach { it.width  eq 60.0          }
+            check.left   eq 0
+            label.left   eq check.right
+            label.right  eq delete.left
+            (delete.right eq parent.right) .. Strong
         }
 
         // Used to show/hide the delete button

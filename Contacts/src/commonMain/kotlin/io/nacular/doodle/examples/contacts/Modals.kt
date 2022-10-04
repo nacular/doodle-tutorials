@@ -17,7 +17,7 @@ import io.nacular.doodle.examples.SuspendingModal
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.layout.Insets
-import io.nacular.doodle.layout.cassowary.constrain
+import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.system.Cursor.Companion.Pointer
 
 /**

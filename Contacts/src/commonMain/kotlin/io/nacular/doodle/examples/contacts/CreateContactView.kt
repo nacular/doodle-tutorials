@@ -12,7 +12,7 @@ import io.nacular.doodle.geometry.PathMetrics
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.image.Image
-import io.nacular.doodle.layout.cassowary.constrain
+import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.theme.native.NativeTextFieldStyler
 import io.nacular.doodle.utils.Dimension.Width
 import kotlin.math.min
@@ -91,8 +91,9 @@ class CreateContactView(
         children += listOf(label, back, avatar, spacer, form, button)
 
         layout = constrain(label, back, avatar, spacer, form, button) { (label, back, avatar, spacer, form, button) ->
-            label.top  eq 2 * INSET
-            label.left eq     INSET
+            label.top    eq 2 * INSET
+            label.left   eq     INSET
+            label.height eq label.height.readOnly
 
             back.top  eq label.bottom + 2 * INSET
             back.left eq label.left
@@ -100,7 +101,7 @@ class CreateContactView(
             avatar.top  eq label.bottom + 3.0 / 2 * INSET
             avatar.left eq back.right + 2 * INSET
 
-            spacer.top   eq avatar.bottom
+            spacer.top   eq avatar.bottom.readOnly
             spacer.left  eq back.left
             spacer.right eq parent.right - INSET
 

@@ -16,7 +16,7 @@ import io.nacular.doodle.drawing.TextMetrics
 import io.nacular.doodle.geometry.PathMetrics
 import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.geometry.path
-import io.nacular.doodle.layout.cassowary.constrain
+import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.text.invoke
 import io.nacular.doodle.theme.native.NativeHyperLinkStyler
 import io.nacular.doodle.utils.Dimension.Width

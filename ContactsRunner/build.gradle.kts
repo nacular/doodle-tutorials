@@ -40,8 +40,7 @@ kotlin {
                     else                       -> error("Unsupported OS: $osName")
                 }
 
-                val osArch = System.getProperty("os.arch")
-                val targetArch = when (osArch) {
+                val targetArch = when (val osArch = System.getProperty("os.arch")) {
                     "x86_64", "amd64" -> "x64"
                     "aarch64"         -> "arm64"
                     else              -> error("Unsupported arch: $osArch")
