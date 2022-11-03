@@ -12,6 +12,8 @@ import io.nacular.doodle.controls.spinner.Spinner
 import io.nacular.doodle.controls.spinner.SpinnerModel
 import io.nacular.doodle.controls.spinner.spinnerEditor
 import io.nacular.doodle.controls.text.Label
+import io.nacular.doodle.controls.text.TextField
+import io.nacular.doodle.controls.text.TextInput
 import io.nacular.doodle.controls.theme.simpleButtonRenderer
 import io.nacular.doodle.core.Container
 import io.nacular.doodle.core.Display
@@ -258,10 +260,17 @@ private class FixedAspectPhoto(private var image: Image): View() {
                 old.height != height -> size = Size(height * aspectRation, height)
             }
         }
+        val tf = TextField("Write something here")
+        tf.size = Size(230, 32)
+
+        children += tf
     }
 
     override fun render(canvas: Canvas) {
+        println("children: ${children.size}")
+        children.forEach { it.render(canvas) }
         canvas.image(image, destination = bounds.atOrigin)
+
     }
 }
 
