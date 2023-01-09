@@ -100,7 +100,7 @@ class FilterBox(private val config              : TodoConfig,
         children += listOf(itemsLeft, all, active, completed, clearAll)
         layout    = constrain(itemsLeft, all, active, completed, clearAll) { label, all_, active_, completed_, clearAll ->
             listOf(label, all_, active_, completed_, clearAll).forEach { it.centerY eq parent.centerY }
-            val spacing     = 6.0
+            val spacing = 6.0
 
             label.left eq 15
             label.width.preserve

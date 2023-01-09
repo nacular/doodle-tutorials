@@ -4,7 +4,6 @@ import io.nacular.doodle.controls.buttons.PushButton
 import io.nacular.doodle.controls.text.Label
 import io.nacular.doodle.controls.theme.simpleTextButtonRenderer
 import io.nacular.doodle.core.container
-import io.nacular.doodle.core.plusAssign
 import io.nacular.doodle.core.then
 import io.nacular.doodle.drawing.Color
 import io.nacular.doodle.drawing.Color.Companion.Lightgray

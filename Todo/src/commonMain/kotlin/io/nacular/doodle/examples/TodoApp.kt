@@ -15,7 +15,6 @@ import io.nacular.doodle.core.Container
 import io.nacular.doodle.core.Display
 import io.nacular.doodle.core.View
 import io.nacular.doodle.core.container
-import io.nacular.doodle.core.plusAssign
 import io.nacular.doodle.drawing.Canvas
 import io.nacular.doodle.drawing.Color
 import io.nacular.doodle.drawing.Color.Companion.Black
@@ -43,10 +42,10 @@ import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.image.Image
 import io.nacular.doodle.image.ImageLoader
 import io.nacular.doodle.layout.Insets
-import io.nacular.doodle.layout.constraints.Strength
+import io.nacular.doodle.layout.constraints.Strength.Companion.Medium
 import io.nacular.doodle.layout.constraints.Strength.Companion.Strong
 import io.nacular.doodle.layout.constraints.constrain
-import io.nacular.doodle.layout.fill
+import io.nacular.doodle.layout.constraints.fill
 import io.nacular.doodle.theme.ThemeManager
 import io.nacular.doodle.theme.adhoc.DynamicTheme
 import io.nacular.doodle.theme.basic.list.BasicListBehavior
@@ -56,12 +55,15 @@ import io.nacular.doodle.theme.basic.list.basicItemGenerator
 import io.nacular.doodle.theme.native.NativeHyperLinkStyler
 import io.nacular.doodle.utils.Dimension.Height
 import io.nacular.doodle.utils.Encoder
+import io.nacular.doodle.utils.diff.Delete
+import io.nacular.doodle.utils.diff.Insert
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlin.Result.Companion.success
+import kotlin.math.min
 
 /**
  * This app is designed to run both top-level and nested. The filter buttons use hyperlinks in the spec,
@@ -125,7 +127,8 @@ data class TodoConfig(
         val deleteHoverColor      : Color  = Color(0xAF5B5Eu),
         val taskCompletedColor    : Color  = Color(0xD9D9D9u),
         val clearCompletedText    : String = "Clear completed",
-        val filterButtonForeground: Color  = Color(0x777777u)
+        val textFieldBackground   : Color  = White,
+        val filterButtonForeground: Color  = Color(0x777777u),
 )
 
 /**
@@ -206,10 +209,31 @@ private class TodoView(private val config              : TodoConfig,
                         },
                     )
 
-                    itemsChanged += { _, removed, added, moved ->
+                    itemsChanged += { _, differences ->
                         // Scroll when a single item added
-                        if (added.size == 1 && moved.isEmpty() && removed.size <= 1) {
-                            scrollTo(added.keys.first())
+                        var numAdded    = 0
+                        var numRemoved  = 0
+                        var indexInList = 0
+
+                        differences.forEach {
+                            when (it) {
+                                is Insert -> {
+                                    if (it.items.size > 1) {
+                                        return@forEach
+                                    }
+
+                                    ++numAdded
+                                    ++indexInList
+                                }
+                                is Delete -> {
+                                    numRemoved += it.items.size
+                                }
+                                else      -> indexInList += it.items.size
+                            }
+                        }
+
+                        if (numAdded == 1 && numRemoved <= 1) {
+                            scrollTo(indexInList)
                         }
                     }
 
@@ -222,13 +246,14 @@ private class TodoView(private val config              : TodoConfig,
 
                 children += listOf(
                     TaskCreationBox(focusManager, textMetrics, config, dataStore),
-                    ScrollPanel    (list).apply { contentWidthConstraints = { parent.width - parent.scrollBarWidth } },
+                    ScrollPanel    (list).apply { contentWidthConstraints = { it eq width - verticalScrollBarWidth } },
                     FilterBox      (config, dataStore, textMetrics, filterButtonProvider)
                 )
 
                 layout = constrain(children[0], children[1], children[2]) { input, panel, filter ->
                     listOf(input, panel, filter).forEach { it.width eq parent.width }
                     input.top     eq 0
+                    input.height.preserve
                     panel.top     eq input.bottom
                     filter.top    eq panel.bottom
                     filter.bottom eq parent.bottom
@@ -252,20 +277,24 @@ private class TodoView(private val config              : TodoConfig,
 
         children += listOf(header, taskList, footer)
 
+        list.boundsChanged += { _,_,_ -> doLayout() }
+
         layout = constrain(header, taskList, footer) { header, body, footer ->
             listOf(header, body, footer).forEach { it.centerX eq parent.centerX }
             header.top    eq        9
             header.height.preserve
 
+            val minHeight = taskList.children[0].height + (taskList.children[2].takeIf { it.visible }?.height ?: 0.0)
+
             body.top     eq        header.bottom + 5
             body.width   eq        min(550.0, parent.width - 10)
-            body.height  greaterEq taskList.children[0].height + taskList.children[2].height
-            (body.height eq        taskList.children[0].height + list.height + taskList.children[2].height) .. Strength.Medium
+            body.height  greaterEq minHeight
+            (body.height eq        minHeight + list.height) .. Medium
 
             footer.top   eq body.bottom + 65
             footer.width eq body.width
             footer.height.preserve
-            (footer.bottom lessEq parent.bottom.readOnly) .. Strong
+            (footer.bottom lessEq parent.bottom) .. Strong
         }
     }
 }

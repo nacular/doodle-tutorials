@@ -1,8 +1,8 @@
 package io.nacular.doodle.examples.contacts
 
-import io.nacular.doodle.animation.NoneUnit
-import io.nacular.doodle.animation.speedUpSlowDown
-import io.nacular.doodle.animation.transition.Transition
+import io.nacular.doodle.animation.NumericAnimationPlan
+import io.nacular.doodle.animation.transition.easeInOutCubic
+import io.nacular.doodle.animation.tweenFloat
 import io.nacular.doodle.drawing.Color
 import io.nacular.doodle.drawing.Color.Companion.Black
 import io.nacular.doodle.drawing.Color.Companion.White
@@ -54,8 +54,8 @@ interface AppConfig {
     val searchIcon      : String get() = "M12.5 11h-.79l-.28-.27A6.471 6.471 0 0 0 13 6.5 6.5 6.5 0 1 0 6.5 13c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L17.49 16l-4.99-5Zm-6 0C4.01 11 2 8.99 2 6.5S4.01 2 6.5 2 11 4.01 11 6.5 8.99 11 6.5 11Z"
     val deleteIcon      : String get() = "M14 1.41 12.59 0 7 5.59 1.41 0 0 1.41 5.59 7 0 12.59 1.41 14 7 8.41 12.59 14 14 12.59 8.41 7Z"
 
-    val slowTransition  : (Float, Float) -> Transition<NoneUnit> get() = speedUpSlowDown(250 * milliseconds)
-    val fastTransition  : (Float, Float) -> Transition<NoneUnit> get() = speedUpSlowDown(100 * milliseconds)
+    val slowTransition  : NumericAnimationPlan<Float, Double> get() = tweenFloat(easeInOutCubic, 250 * milliseconds)
+    val fastTransition  : NumericAnimationPlan<Float, Double> get() = tweenFloat(easeInOutCubic, 100 * milliseconds)
 
     val createButtonLargeSize: Size get() = Size(186, 45)
     val createButtonSmallSize: Size get() = Size(68)

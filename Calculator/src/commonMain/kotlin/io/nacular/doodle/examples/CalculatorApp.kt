@@ -2,7 +2,6 @@ package io.nacular.doodle.examples
 
 import io.nacular.doodle.application.Application
 import io.nacular.doodle.core.Display
-import io.nacular.doodle.core.plusAssign
 import io.nacular.doodle.drawing.FontLoader
 import io.nacular.doodle.drawing.TextMetrics
 import io.nacular.doodle.layout.constraints.constrain

@@ -1,7 +1,7 @@
 package io.nacular.doodle.examples
 
 import io.nacular.doodle.animation.Animator
-import io.nacular.doodle.animation.impl.AnimatorImpl
+import io.nacular.doodle.animation.AnimatorImpl
 import io.nacular.doodle.application.Modules.Companion.DragDropModule
 import io.nacular.doodle.application.Modules.Companion.FocusModule
 import io.nacular.doodle.application.Modules.Companion.ImageModule

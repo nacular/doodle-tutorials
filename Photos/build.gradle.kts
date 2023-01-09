@@ -3,7 +3,7 @@ plugins {
 }
 
 kotlin {
-    jsTargets ()
+    jsTargets (BOTH)
     jvmTargets()
 
     val doodleVersion    : String by project

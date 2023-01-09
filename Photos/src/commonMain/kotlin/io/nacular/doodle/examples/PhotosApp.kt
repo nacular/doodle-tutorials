@@ -1,7 +1,9 @@
 package io.nacular.doodle.examples
 
 import io.nacular.doodle.animation.Animator
-import io.nacular.doodle.animation.fixedTimeLinear
+import io.nacular.doodle.animation.invoke
+import io.nacular.doodle.animation.transition.easeOutBack
+import io.nacular.doodle.animation.tweenFloat
 import io.nacular.doodle.application.Application
 import io.nacular.doodle.controls.buttons.PushButton
 import io.nacular.doodle.controls.itemVisualizer
@@ -19,7 +21,6 @@ import io.nacular.doodle.core.View
 import io.nacular.doodle.core.center
 import io.nacular.doodle.core.container
 import io.nacular.doodle.core.height
-import io.nacular.doodle.core.plusAssign
 import io.nacular.doodle.core.then
 import io.nacular.doodle.datatransport.Files
 import io.nacular.doodle.datatransport.dragdrop.DropEvent
@@ -156,7 +157,6 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
         }
 
         override fun removedFromDisplay() {
-            println("removedFromDisplay")
             updateWhen -= callBack
         }
     }
@@ -170,19 +170,19 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
         val spacing = 10.0
 
         layout = constrain(children[0], property1, property2) { label, first, second ->
-            label.top      eq second.top
-            label.left     eq spacing
-            label.height   eq spinnerHeight
-            first.centerY  eq parent.centerY
-            first.right    eq second.left - spacing
-            first.width    eq second.width
-            first.height   eq 50
-            second.height  eq 50
-            second.top     eq first.top.readOnly
-            second.right   eq parent.right - spacing
-            second.width   eq (parent.width - spacing * 3) / 3
+            label.top     eq second.top
+            label.left    eq spacing
+            label.height  eq spinnerHeight
+            first.centerY eq parent.centerY.writable
+            first.right   eq second.left - spacing
+            first.width   eq second.width
+            first.height  eq 50
+            second.height eq 50
+            second.top    eq first.top.readOnly
+            second.right  eq parent.right - spacing
+            second.width  eq (parent.width - spacing * 3) / 3
 
-            parent.height eq max(first.bottom, second.bottom) + spacing
+            parent.height.writable eq max(first.bottom, second.bottom) + spacing
         }
     }
 
@@ -323,7 +323,7 @@ class PhotosApp(display     : Display,
                 display.layout = (display.layout as io.nacular.doodle.layout.constraints.ConstraintLayout).unconstrain(propertyPanel, panelConstraints)
 
                 // Animate property panel show/hide
-                (animate (start to end) using fixedTimeLinear(250 * milliseconds)) {
+                animate(start to end, tweenFloat(easeOutBack, 250 * milliseconds)) {
                     propertyPanel.y       = display.height - buttonInset * 2 - ((propertyPanel.height - 30) * it.toDouble())
                     propertyPanel.opacity = it
                 }.completed += {

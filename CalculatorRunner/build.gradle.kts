@@ -4,7 +4,10 @@ plugins {
 }
 
 kotlin {
-    js().browser()
+    js {
+        browser()
+        binaries.executable()
+    }
 
     jvm {
         withJava()
@@ -18,7 +21,7 @@ kotlin {
     val doodleVersion: String by project
 
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 implementation(project(":Calculator"))
             }

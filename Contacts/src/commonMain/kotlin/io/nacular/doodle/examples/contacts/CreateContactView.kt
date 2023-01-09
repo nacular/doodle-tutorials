@@ -15,6 +15,7 @@ import io.nacular.doodle.image.Image
 import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.theme.native.NativeTextFieldStyler
 import io.nacular.doodle.utils.Dimension.Width
+import kotlin.math.max
 import kotlin.math.min
 
 /**

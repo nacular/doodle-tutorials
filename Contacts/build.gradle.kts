@@ -4,7 +4,7 @@ plugins {
 }
 
 kotlin {
-    jsTargets ()
+    jsTargets (BOTH)
     jvmTargets()
 
     val kodeinVersion       : String by project

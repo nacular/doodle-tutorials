@@ -8,7 +8,6 @@ import io.nacular.doodle.controls.theme.CommonTextButtonBehavior
 import io.nacular.doodle.core.Behavior
 import io.nacular.doodle.core.Layout.Companion.simpleLayout
 import io.nacular.doodle.core.container
-import io.nacular.doodle.core.plusAssign
 import io.nacular.doodle.core.then
 import io.nacular.doodle.drawing.Canvas
 import io.nacular.doodle.drawing.Stroke
@@ -67,7 +66,7 @@ class ContactView(
             this += HyperLink(
                 url  = "tel:${contact.phoneNumber}",
                 text = contact.phoneNumber,
-                icon = PathIcon(path = path(assets.phoneIcon), pathMetrics = pathMetrics, fill = assets.phoneNumber),
+                icon = PathIcon(path = path(assets.phoneIcon)!!, pathMetrics = pathMetrics, fill = assets.phoneNumber),
             ).apply {
                 font            = assets.small
                 acceptsThemes   = false

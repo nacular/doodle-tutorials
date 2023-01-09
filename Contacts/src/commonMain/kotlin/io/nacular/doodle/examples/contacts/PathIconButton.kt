@@ -13,7 +13,7 @@ import io.nacular.doodle.geometry.path
  * @param pathMetrics for measuring Path
  * @param pathData to create Path
  */
-class PathIconButton(pathMetrics: PathMetrics, pathData: String): PushButton(icon = PathIcon(path(pathData), pathMetrics = pathMetrics)) {
+class PathIconButton(pathMetrics: PathMetrics, pathData: String): PushButton(icon = PathIcon(path(pathData)!!, pathMetrics = pathMetrics)) {
     init {
         acceptsThemes = false
         behavior      = simpleButtonRenderer { button, canvas ->

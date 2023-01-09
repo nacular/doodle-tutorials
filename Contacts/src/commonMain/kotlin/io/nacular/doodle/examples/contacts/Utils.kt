@@ -12,7 +12,6 @@ import io.nacular.doodle.controls.icons.PathIcon
 import io.nacular.doodle.controls.text.TextField
 import io.nacular.doodle.core.View
 import io.nacular.doodle.core.container
-import io.nacular.doodle.core.plusAssign
 import io.nacular.doodle.drawing.Canvas
 import io.nacular.doodle.drawing.Color
 import io.nacular.doodle.drawing.Color.Companion.Black
@@ -108,7 +107,7 @@ fun formTextField(
  */
 private fun <T> iconField(pathMetrics: PathMetrics, path: String, visualizer: () -> FieldVisualizer<T>) = field<T> {
     container {
-        val icon        = PathIcon<View>(path(path), pathMetrics = pathMetrics)
+        val icon        = PathIcon<View>(path(path)!!, pathMetrics = pathMetrics)
         val iconSize    = icon.size(this)
         focusable       = false
         foregroundColor = Black

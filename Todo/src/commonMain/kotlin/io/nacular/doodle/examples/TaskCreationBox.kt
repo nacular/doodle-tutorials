@@ -51,6 +51,7 @@ class TaskCreationBox(private val focusManager: FocusManager, textMetrics: TextM
             foregroundColor   = config.labelForeground
             placeHolderFont   = config.placeHolderFont
             placeHolderColor  = config.placeHolderColor
+            backgroundColor   = config.textFieldBackground
             keyChanged       += KeyListener.released { event ->
                 if (event.code == KeyCode.Enter && text.isNotBlank()) {
                     dataStore.add(Task(text.trim()))
@@ -63,7 +64,7 @@ class TaskCreationBox(private val focusManager: FocusManager, textMetrics: TextM
             listOf(button, textField).forEach { it.height eq parent.height }
             button.left     eq 0
             button.width.preserve
-            textField.left  eq button.right
+            textField.left   eq button.right
             (textField.right eq parent.right) .. Strong
         }
 

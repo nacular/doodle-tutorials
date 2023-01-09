@@ -7,7 +7,6 @@ import io.nacular.doodle.core.Layout
 import io.nacular.doodle.core.Positionable
 import io.nacular.doodle.core.PositionableContainer
 import io.nacular.doodle.core.View
-import io.nacular.doodle.core.plusAssign
 import io.nacular.doodle.drawing.paint
 import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.layout.constraints.Strength
@@ -16,6 +15,7 @@ import io.nacular.doodle.theme.adhoc.DynamicTheme
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlin.math.max
 
 /**
  * Simple contacts app based on https://phonebook-pi.vercel.app/
@@ -89,7 +89,7 @@ class ContactsApp(
             router.fireAction()
 
             // Reset layout whenever display children change since the layout stores the display's children internally.
-            display.childrenChanged += { _,_,_,_ ->
+            display.childrenChanged += { _,_ ->
                 updateLayout(display, appAssets)
             }
 
@@ -100,7 +100,7 @@ class ContactsApp(
     }
 
     private fun scrollPanel(content: View) = ScrollPanel(content).apply {
-        contentWidthConstraints = { parent.width - parent.scrollBarWidth }
+        contentWidthConstraints = { it eq width - verticalScrollBarWidth }
     }
 
     private fun setMainView(display: Display, view: View) {
@@ -113,7 +113,7 @@ class ContactsApp(
     }
 
     private fun updateLayout(display: Display, appAssets: AppConfig) {
-        display.layout = object: Layout {
+        display.layout = if (display.children.size < 3) null else object: Layout {
             // Header needs to be sized based on its minimumSize, so this layout should respond to any changes to it.
             override fun requiresLayout(
                 child: Positionable,
@@ -123,8 +123,9 @@ class ContactsApp(
             ) = new.minimumSize != old.minimumSize
 
             private val delegate = io.nacular.doodle.layout.constraints.constrain(header, display.children[1], display.children[2]) { header_, mainView, button ->
-                header_.width  eq parent.width
-                (header_.height eq header.minimumSize.height) .. Strength.Strong
+                header_.top     eq 0
+                header_.width   eq parent.width
+                header_.height  eq header.minimumSize.height
 
                 mainView.top    eq header_.height
                 mainView.left   eq INSET
@@ -144,7 +145,7 @@ class ContactsApp(
                     }
                 }
 
-                button.left   eq max(20, parent.width - buttonSize.width - 20)
+                button.left   eq max(20.0, parent.width - buttonSize.width - 20)
                 button.width  eq buttonSize.width
                 button.height eq buttonSize.height
             }

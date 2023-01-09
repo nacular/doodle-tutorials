@@ -6,6 +6,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJsProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinTargetContainerWithJsPresetFunctions
 import org.jetbrains.kotlin.gradle.dsl.KotlinTargetContainerWithPresetFunctions
+import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
 
 private fun KotlinJsTargetDsl.configure() {
@@ -23,12 +24,12 @@ private fun KotlinJsTargetDsl.configure() {
     }
 }
 
-fun KotlinJsProjectExtension.jsTargets() {
-    js().configure()
+fun KotlinJsProjectExtension.jsTargets(compiler: KotlinJsCompilerType = defaultJsCompilerType) {
+    js(compiler).configure()
 }
 
-fun KotlinTargetContainerWithJsPresetFunctions.jsTargets() {
-    js().configure()
+fun KotlinTargetContainerWithJsPresetFunctions.jsTargets(compiler: KotlinJsCompilerType = defaultJsCompilerType) {
+    js(compiler).configure()
 }
 
 fun KotlinTargetContainerWithPresetFunctions.jvmTargets() {
