@@ -42,7 +42,6 @@ import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.image.Image
 import io.nacular.doodle.image.ImageLoader
 import io.nacular.doodle.layout.Insets
-import io.nacular.doodle.layout.constraints.Strength.Companion.Medium
 import io.nacular.doodle.layout.constraints.Strength.Companion.Strong
 import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.layout.constraints.fill
@@ -107,28 +106,28 @@ class LinkFilterButtonProvider(private val dataStore: DataStore, router: Router,
  * General styling config
  */
 data class TodoConfig(
-        val listFont              : Font,
-        val titleFont             : Font,
-        val lineColor             : Color  = Color(0xEDEDEDu),
-        val filterFont            : Font,
-        val footerFont            : Font,
-        val headerColor           : Color  = Color(0xAF2F2Fu) opacity 0.15f,
-        val deleteColor           : Color  = Color(0xCC9A9Au),
-        val appBackground         : Color  = Color(0xF5F5F5u),
-        val boldFooterFont        : Font,
-        val selectAllColor        : Color  = Color(0x737373u),
-        val checkForeground       : Image,
-        val checkBackground       : Image,
-        val placeHolderFont       : Font,
-        val placeHolderText       : String = "What needs to be done?",
-        val placeHolderColor      : Color  = Color(0xE6E6E6u),
-        val labelForeground       : Color  = Color(0x4D4D4Du),
-        val footerForeground      : Color  = Color(0xBFBFBFu),
-        val deleteHoverColor      : Color  = Color(0xAF5B5Eu),
-        val taskCompletedColor    : Color  = Color(0xD9D9D9u),
-        val clearCompletedText    : String = "Clear completed",
-        val textFieldBackground   : Color  = White,
-        val filterButtonForeground: Color  = Color(0x777777u),
+    val listFont              : Font,
+    val titleFont             : Font,
+    val lineColor             : Color  = Color(0xEDEDEDu),
+    val filterFont            : Font,
+    val footerFont            : Font,
+    val headerColor           : Color  = Color(0xAF2F2Fu) opacity 0.15f,
+    val deleteColor           : Color  = Color(0xCC9A9Au),
+    val appBackground         : Color  = Color(0xF5F5F5u),
+    val boldFooterFont        : Font,
+    val selectAllColor        : Color  = Color(0x737373u),
+    val checkForeground       : Image,
+    val checkBackground       : Image,
+    val placeHolderFont       : Font,
+    val placeHolderText       : String = "What needs to be done?",
+    val placeHolderColor      : Color  = Color(0xE6E6E6u),
+    val labelForeground       : Color  = Color(0x4D4D4Du),
+    val footerForeground      : Color  = Color(0xBFBFBFu),
+    val deleteHoverColor      : Color  = Color(0xAF5B5Eu),
+    val taskCompletedColor    : Color  = Color(0xD9D9D9u),
+    val clearCompletedText    : String = "Clear completed",
+    val textFieldBackground   : Color  = White,
+    val filterButtonForeground: Color  = Color(0x777777u),
 )
 
 /**
@@ -255,9 +254,12 @@ private class TodoView(private val config              : TodoConfig,
                     input.top     eq 0
                     input.height.preserve
                     panel.top     eq input.bottom
-                    filter.top    eq panel.bottom
-                    filter.bottom eq parent.bottom
-                    filter.height.preserve
+
+                    if (children[2].visible) {
+                        filter.top    eq panel.bottom
+                        filter.bottom eq parent.bottom
+                        filter.height.preserve
+                    }
                 }
             }
 
@@ -286,10 +288,9 @@ private class TodoView(private val config              : TodoConfig,
 
             val minHeight = taskList.children[0].height + (taskList.children[2].takeIf { it.visible }?.height ?: 0.0)
 
-            body.top     eq        header.bottom + 5
-            body.width   eq        min(550.0, parent.width - 10)
-            body.height  greaterEq minHeight
-            (body.height eq        minHeight + list.height) .. Medium
+            body.top    eq header.bottom + 5
+            body.width  eq min(550.0, parent.width - 10)
+            body.height eq minHeight + list.height
 
             footer.top   eq body.bottom + 65
             footer.width eq body.width
@@ -322,14 +323,14 @@ class TodoApp(display             : Display,
             val listFont   = fonts(titleFont) { size =  24 }!!
             val footerFont = fonts(titleFont) { size =  10 }!!
             val config     = TodoConfig(
-                    listFont        = listFont,
-                    titleFont       = titleFont,
-                    footerFont      = footerFont,
-                    filterFont      = fonts(titleFont ) { size   = 14     }!!,
-                    boldFooterFont  = fonts(footerFont) { weight = 400    }!!,
-                    placeHolderFont = fonts(listFont  ) { style  = Italic }!!,
-                    checkForeground = images.load("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%22-10%20-18%20100%20135%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2250%22%20fill%3D%22none%22%20stroke%3D%22%23bddad5%22%20stroke-width%3D%223%22/%3E%3Cpath%20fill%3D%22%235dc2af%22%20d%3D%22M72%2025L42%2071%2027%2056l-4%204%2020%2020%2034-52z%22/%3E%3C/svg%3E")!!,
-                    checkBackground = images.load("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%22-10%20-18%20100%20135%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2250%22%20fill%3D%22none%22%20stroke%3D%22%23ededed%22%20stroke-width%3D%223%22/%3E%3C/svg%3E")!!
+                listFont        = listFont,
+                titleFont       = titleFont,
+                footerFont      = footerFont,
+                filterFont      = fonts(titleFont ) { size   = 14     }!!,
+                boldFooterFont  = fonts(footerFont) { weight = 400    }!!,
+                placeHolderFont = fonts(listFont  ) { style  = Italic }!!,
+                checkForeground = images.load("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%22-10%20-18%20100%20135%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2250%22%20fill%3D%22none%22%20stroke%3D%22%23bddad5%22%20stroke-width%3D%223%22/%3E%3Cpath%20fill%3D%22%235dc2af%22%20d%3D%22M72%2025L42%2071%2027%2056l-4%204%2020%2020%2034-52z%22/%3E%3C/svg%3E")!!,
+                checkBackground = images.load("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%22-10%20-18%20100%20135%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2250%22%20fill%3D%22none%22%20stroke%3D%22%23ededed%22%20stroke-width%3D%223%22/%3E%3C/svg%3E")!!
             )
 
             // install theme
