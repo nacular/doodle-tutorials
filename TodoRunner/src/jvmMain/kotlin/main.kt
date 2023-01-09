@@ -19,6 +19,7 @@ import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeHyperLinkBehav
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeScrollPanelBehavior
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeTextFieldBehavior
 import org.kodein.di.DI
+import org.kodein.di.DI.Module
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
 
@@ -38,7 +39,7 @@ fun main() {
 
     application(modules = listOf(FontModule, PointerModule, KeyboardModule, ImageModule, basicLabelBehavior(),
             nativeTextFieldBehavior(), nativeHyperLinkBehavior(), nativeScrollPanelBehavior(),
-            DI.Module(name = "AppModule") {
+            Module(name = "AppModule") {
                 bindSingleton<PersistentStore>      { FilePersistence()                        }
                 bindSingleton                       { DataStore(instance())                    }
                 bindSingleton<Router>               { TrivialRouter()                          }
@@ -46,6 +47,18 @@ fun main() {
             }
     )) {
         // load app
-        TodoApp(instance(), Dispatchers.UI, instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance())
+        TodoApp(
+            display              = instance(),
+            uiDispatcher         = Dispatchers.UI,
+            fonts                = instance(),
+            theme                = instance(),
+            themes               = instance(),
+            images               = instance(),
+            dataStore            = instance(),
+            linkStyler           = instance(),
+            textMetrics          = instance(),
+            focusManager         = instance(),
+            filterButtonProvider = instance()
+        )
     }
 }

@@ -22,10 +22,12 @@ import io.nacular.doodle.geometry.Circle
 import io.nacular.doodle.geometry.PathMetrics
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Size
-import io.nacular.doodle.layout.Constraints
 import io.nacular.doodle.layout.Insets
-import io.nacular.doodle.layout.constrain
-import io.nacular.doodle.layout.fill
+import io.nacular.doodle.layout.constraints.Bounds
+import io.nacular.doodle.layout.constraints.ConstraintDslContext
+import io.nacular.doodle.layout.constraints.Strength.Companion.Strong
+import io.nacular.doodle.layout.constraints.constrain
+import io.nacular.doodle.layout.constraints.fill
 import io.nacular.doodle.text.invoke
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -54,9 +56,9 @@ class ContactList(
     uiDispatcher: CoroutineDispatcher,
 ): DynamicTable<Contact, MutableListModel<Contact>>(contacts, SingleItemSelectionModel(), block = {
     // Specifies alignment for the table's cells
-    val alignment: Constraints.() -> Unit = {
-        left    = parent.left + INSET
-        centerY = parent.centerY
+    val alignment: ConstraintDslContext.(Bounds) -> Unit = {
+        it.left    eq INSET
+        it.centerY eq parent.centerY
     }
 
     // Used to render the name column
@@ -87,24 +89,24 @@ class ContactList(
         }
     }
 
-    column(Label("Name"        ), { name        }, nameVisualizer   ) { cellAlignment = alignment; headerAlignment = alignment                }
-    column(Label("Phone Number"), { phoneNumber }, TextVisualizer() ) { cellAlignment = alignment; headerAlignment = alignment                }
-    column(null,                                   toolsVisualizer  ) { cellAlignment = fill(Insets(top = 20.0, bottom = 20.0, right = 20.0)) }
+    column(Label("Name"        ), { name        }, nameVisualizer   ) { cellAlignment = alignment; headerAlignment = alignment                        }
+    column(Label("Phone Number"), { phoneNumber }, TextVisualizer() ) { cellAlignment = alignment; headerAlignment = alignment                        }
+    column(null,                                   toolsVisualizer  ) { cellAlignment = fill(Insets(top = 20.0, bottom = 20.0, right = 20.0), Strong) }
 }) {
     init {
         font = assets.small
 
         // Controls how the table's columns resize
         columnSizePolicy = object: ColumnSizePolicy {
-            override fun layout(width: Double, columns: List<Column>, startIndex: Int): Double {
-                columns[2].width = if (width > 672.0 - 2 * INSET) 100.0 else 0.0 // FIXME: factor out hard-coded width
-                columns[0].width = width / 2
-                columns[1].width = width - columns[0].width - columns[2].width
+            override fun layout(tableWidth: Double, columns: List<Column>, startIndex: Int): Double {
+                columns[2].width = if (tableWidth > 672.0 - 2 * INSET) 100.0 else 0.0 // FIXME: factor out hard-coded width
+                columns[0].width = tableWidth / 2
+                columns[1].width = tableWidth - columns[0].width - columns[2].width
 
-                return width
+                return tableWidth
             }
 
-            override fun widthChanged(width: Double, columns: List<Column>, index: Int, to: Double) {
+            override fun changeColumnWidth(tableWidth: Double, columns: List<Column>, index: Int, to: Double) {
                 // no-op
             }
         }
@@ -133,9 +135,9 @@ private class NameCell(private val textMetrics: TextMetrics, value: String): Vie
             children += Label(value)
 
             layout = constrain(children[0], children[1]) { icon, name ->
-                icon.centerY = parent.centerY
-                name.left    = icon.right + INSET
-                name.centerY = icon.centerY
+                icon.centerY eq parent.centerY
+                name.left    eq icon.right + INSET
+                name.centerY eq icon.centerY
             }.then {
                 size = Size(children[1].bounds.right, children[0].height)
             }
@@ -187,10 +189,10 @@ private class ToolCell(private val assets: AppConfig, private val pathMetrics: P
                 children += createButton(assets.trashIcon).apply { fired += { onDelete?.invoke() } }
 
                 layout = constrain(children[0], children[1]) { edit, delete ->
-                    delete.centerY = parent.centerY
-                    delete.right   = parent.right
-                    edit.centerY   = delete.centerY
-                    edit.right     = delete.left - 4
+                    delete.centerY eq parent.centerY
+                    delete.right   eq parent.right
+                    edit.centerY   eq delete.centerY
+                    edit.right     eq delete.left - 4
                 }
             }
             else     -> {

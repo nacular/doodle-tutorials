@@ -4,7 +4,7 @@ plugins {
 }
 
 kotlin {
-    jsTargets()
+    jsTargets(BOTH)
 
     val ktorVersion         : String by project
     val doodleVersion       : String by project

@@ -2,7 +2,7 @@
 
 import io.nacular.doodle.HTMLElement
 import io.nacular.doodle.animation.Animator
-import io.nacular.doodle.animation.impl.AnimatorImpl
+import io.nacular.doodle.animation.AnimatorImpl
 import io.nacular.doodle.application.Modules.Companion.DragDropModule
 import io.nacular.doodle.application.Modules.Companion.FocusModule
 import io.nacular.doodle.application.Modules.Companion.FontModule
@@ -57,7 +57,7 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.factory
 import org.kodein.di.instance
 
-@JsName("calculator")
+@JsExport
 fun calculator(element: HTMLElement) {
     application(root = element, modules = listOf(FontModule, PointerModule)) {
         // load app
@@ -65,7 +65,7 @@ fun calculator(element: HTMLElement) {
     }
 }
 
-@JsName("todo")
+@JsExport
 fun todo(element: HTMLElement) {
     class EmbeddedFilterButtonProvider(private val dataStore: DataStore): FilterButtonProvider {
         override fun invoke(text: String, filter: DataStore.Filter?, behavior: Behavior<Button>) = PushButton(text).apply {
@@ -92,7 +92,7 @@ fun todo(element: HTMLElement) {
     }
 }
 
-@JsName("photos")
+@JsExport
 fun photos(element: HTMLElement) {
     application(root = element, modules = listOf(
             FocusModule,
@@ -112,7 +112,7 @@ fun photos(element: HTMLElement) {
     }
 }
 
-@JsName("contacts")
+@JsExport
 fun contacts(element: HTMLElement) {
     val contacts = SimpleContactsModel(io.nacular.doodle.examples.contacts.LocalStorePersistence())
     val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
@@ -155,7 +155,7 @@ fun contacts(element: HTMLElement) {
     }
 }
 
-@JsName("contactList")
+@JsExport
 fun contactList(element: HTMLElement) {
     val contacts = SimpleContactsModel(NoOpPersistence)
     val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
@@ -186,7 +186,7 @@ fun contactList(element: HTMLElement) {
     }
 }
 
-@JsName("contactCreation")
+@JsExport
 fun contactCreation(element: HTMLElement) {
     val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
 
@@ -215,7 +215,7 @@ fun contactCreation(element: HTMLElement) {
     }
 }
 
-@JsName("contactEditing")
+@JsExport
 fun contactEditing(element: HTMLElement) {
     val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
 
@@ -248,7 +248,7 @@ fun contactEditing(element: HTMLElement) {
     }
 }
 
-@JsName("contactView")
+@JsExport
 fun contactView(element: HTMLElement) {
     val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
 
@@ -281,11 +281,11 @@ fun contactView(element: HTMLElement) {
     }
 }
 
-@JsName("contactsHeader")
+@JsExport
 fun contactsHeader(element: HTMLElement) {
     val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
 
-    application (root = element, modules = showcaseModules + Module(name = "PlatformModule") {
+    application(root = element, modules = showcaseModules + Module(name = "PlatformModule") {
         bindFactory<AppConfig, Header> {
             Header(
                 assets       = it,

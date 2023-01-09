@@ -12,7 +12,8 @@ import io.nacular.doodle.event.KeyListener
 import io.nacular.doodle.event.PointerListener
 import io.nacular.doodle.focus.FocusManager
 import io.nacular.doodle.geometry.Point
-import io.nacular.doodle.layout.constrain
+import io.nacular.doodle.layout.constraints.Strength.Companion.Strong
+import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.system.Cursor
 import io.nacular.measured.units.Angle
 import io.nacular.measured.units.times
@@ -50,6 +51,7 @@ class TaskCreationBox(private val focusManager: FocusManager, textMetrics: TextM
             foregroundColor   = config.labelForeground
             placeHolderFont   = config.placeHolderFont
             placeHolderColor  = config.placeHolderColor
+            backgroundColor   = config.textFieldBackground
             keyChanged       += KeyListener.released { event ->
                 if (event.code == KeyCode.Enter && text.isNotBlank()) {
                     dataStore.add(Task(text.trim()))
@@ -59,9 +61,11 @@ class TaskCreationBox(private val focusManager: FocusManager, textMetrics: TextM
         }
 
         layout = constrain(children[0], children[1]) { button, textField ->
-            listOf(button, textField).forEach { it.height = parent.height }
-            textField.left  = button.right
-            textField.right = parent.right
+            listOf(button, textField).forEach { it.height eq parent.height }
+            button.left     eq 0
+            button.width.preserve
+            textField.left   eq button.right
+            (textField.right eq parent.right) .. Strong
         }
 
         // Ensure TextField has focus when bar is clicked (happens if toggle invisible)

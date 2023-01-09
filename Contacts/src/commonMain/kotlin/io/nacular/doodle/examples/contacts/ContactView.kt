@@ -8,7 +8,6 @@ import io.nacular.doodle.controls.theme.CommonTextButtonBehavior
 import io.nacular.doodle.core.Behavior
 import io.nacular.doodle.core.Layout.Companion.simpleLayout
 import io.nacular.doodle.core.container
-import io.nacular.doodle.core.plusAssign
 import io.nacular.doodle.core.then
 import io.nacular.doodle.drawing.Canvas
 import io.nacular.doodle.drawing.Stroke
@@ -16,7 +15,7 @@ import io.nacular.doodle.drawing.TextMetrics
 import io.nacular.doodle.geometry.PathMetrics
 import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.geometry.path
-import io.nacular.doodle.layout.constrain
+import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.text.invoke
 import io.nacular.doodle.theme.native.NativeHyperLinkStyler
 import io.nacular.doodle.utils.Dimension.Width
@@ -67,7 +66,7 @@ class ContactView(
             this += HyperLink(
                 url  = "tel:${contact.phoneNumber}",
                 text = contact.phoneNumber,
-                icon = PathIcon(path = path(assets.phoneIcon), pathMetrics = pathMetrics, fill = assets.phoneNumber),
+                icon = PathIcon(path = path(assets.phoneIcon)!!, pathMetrics = pathMetrics, fill = assets.phoneNumber),
             ).apply {
                 font            = assets.small
                 acceptsThemes   = false
@@ -96,10 +95,10 @@ class ContactView(
             }
 
             layout = constrain(children[0], children[1]) { label, link ->
-                label.top  = parent.top   + INSET
-                label.left = parent.left  + INSET
-                link.top   = label.bottom + INSET
-                link.left  = label.left
+                label.top  eq INSET
+                label.left eq INSET
+                link.top   eq label.bottom + INSET
+                link.left  eq label.left
             }
         }
 

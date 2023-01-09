@@ -82,7 +82,7 @@ class SimpleContactsModel /*private constructor*/(private val filteredList: Filt
     companion object {
         operator fun invoke(persistentStore: PersistentStore<Contact>): SimpleContactsModel {
             val contacts = ObservableList(persistentStore.load()).apply {
-                changed += { _,_,_,_ ->
+                changed += { _,_ ->
                     persistentStore.save(this)
                 }
             }

@@ -2,15 +2,15 @@ package io.nacular.doodle.examples
 
 import io.nacular.doodle.animation.Animation
 import io.nacular.doodle.animation.Animator
-import io.nacular.doodle.animation.speedUpSlowDown
+import io.nacular.doodle.animation.invoke
+import io.nacular.doodle.animation.transition.easeInOutCubic
+import io.nacular.doodle.animation.tweenFloat
 import io.nacular.doodle.core.Display
 import io.nacular.doodle.core.Layout
 import io.nacular.doodle.core.Positionable
 import io.nacular.doodle.core.PositionableContainer
 import io.nacular.doodle.core.View
 import io.nacular.doodle.core.height
-import io.nacular.doodle.core.minusAssign
-import io.nacular.doodle.core.plusAssign
 import io.nacular.doodle.core.width
 import io.nacular.doodle.drawing.Canvas
 import io.nacular.doodle.drawing.Color.Companion.Black
@@ -22,8 +22,8 @@ import io.nacular.doodle.geometry.Rectangle
 import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.geometry.toPath
 import io.nacular.doodle.layout.Insets
-import io.nacular.doodle.utils.observable
-import io.nacular.measured.units.Time
+import io.nacular.doodle.utils.autoCanceling
+import io.nacular.measured.units.Time.Companion.milliseconds
 import io.nacular.measured.units.times
 import kotlinx.coroutines.CancellationException
 import kotlin.coroutines.resume
@@ -95,9 +95,7 @@ private class Dialog(contents: View, insets: Insets): View() {
 abstract class AbstractModal(display: Display, private val animate: Animator): View() {
     private var showing      = false
     private var showProgress = 0f
-    private var animation: Animation? by observable(null) { old,_ ->
-        old?.cancel()
-    }
+    private var animation: Animation<Float>? by autoCanceling()
 
     private val display_ = display
 
@@ -130,7 +128,7 @@ abstract class AbstractModal(display: Display, private val animate: Animator): V
             display_ += this
             display_.sizeChanged += sizeChanged
 
-            animation = (animate(0f to 1f) using speedUpSlowDown(250 * Time.milliseconds)) {
+            animation = animate(0f to 1f, tweenFloat(easeInOutCubic, 250 * milliseconds)) {
                 showProgress = it
                 children[0].opacity = it
                 rerenderNow()
@@ -187,9 +185,7 @@ class SuspendingModalImpl<T>(display: Display, animate: Animator, private val mo
 class ModelessImpl(display: Display, private val animate: Animator, modalInsets: Insets, contents: (Modeless) -> View): Modeless {
     private var showing      = false
     private var showProgress = 0f
-    private var animation: Animation? by observable(null) { old,_ ->
-        old?.cancel()
-    }
+    private var animation: Animation<Float>? by autoCanceling()
 
     private val dialog = Dialog(contents(this), modalInsets).apply {
         boundsChanged += { _,_,_ ->
@@ -213,8 +209,8 @@ class ModelessImpl(display: Display, private val animate: Animator, modalInsets:
 
             display_.sizeChanged += sizeChanged
 
-            animation = (animate(0f to 1f) using speedUpSlowDown(250 * Time.milliseconds)) {
-                showProgress = it
+            animation = animate(0f to 1f, tweenFloat(easeInOutCubic, 250 * milliseconds)) {
+                showProgress   = it
                 dialog.opacity = it
             }
         }

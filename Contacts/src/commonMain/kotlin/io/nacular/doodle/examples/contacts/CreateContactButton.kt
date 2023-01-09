@@ -2,6 +2,7 @@ package io.nacular.doodle.examples.contacts
 
 import io.nacular.doodle.animation.Animation
 import io.nacular.doodle.animation.Animator
+import io.nacular.doodle.animation.invoke
 import io.nacular.doodle.controls.buttons.Button
 import io.nacular.doodle.controls.buttons.PushButton
 import io.nacular.doodle.controls.icons.ImageIcon
@@ -16,6 +17,7 @@ import io.nacular.doodle.event.PointerEvent
 import io.nacular.doodle.event.PointerListener
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.system.Cursor.Companion.Pointer
+import io.nacular.doodle.utils.autoCanceling
 import io.nacular.doodle.utils.observable
 
 /**
@@ -32,10 +34,8 @@ class CreateContactButton(
                 navigator  : Navigator,
                 textMetrics: TextMetrics): PushButton("Create Contact") {
 
-    private var progress              by renderProperty(0f  )
-    private var animation: Animation? by observable    (null) { old,_ ->
-        old?.cancel()
-    }
+    private var progress                     by renderProperty(0f)
+    private var animation: Animation<Float>? by autoCanceling (  )
 
     init {
         font   = assets.smallBold
@@ -85,7 +85,7 @@ class CreateContactButton(
             override fun entered(event: PointerEvent) {
                 super.entered(event)
 
-                animation = (animate (0f to 1f) using assets.fastTransition) {
+                animation = animate(0f to 1f, using = assets.fastTransition) {
                     progress = it
                 }.apply {
                     completed += { animation = null }
@@ -95,7 +95,7 @@ class CreateContactButton(
             override fun exited(event: PointerEvent) {
                 super.exited(event)
 
-                animation = (animate (1f to 0f) using assets.fastTransition) {
+                animation = animate(1f to 0f, using = assets.fastTransition) {
                     progress = it
                 }.apply {
                     completed += { animation = null }

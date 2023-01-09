@@ -4,7 +4,6 @@ import io.nacular.doodle.controls.buttons.PushButton
 import io.nacular.doodle.controls.text.Label
 import io.nacular.doodle.controls.theme.simpleTextButtonRenderer
 import io.nacular.doodle.core.container
-import io.nacular.doodle.core.plusAssign
 import io.nacular.doodle.core.then
 import io.nacular.doodle.drawing.Color
 import io.nacular.doodle.drawing.Color.Companion.Lightgray
@@ -17,7 +16,7 @@ import io.nacular.doodle.examples.SuspendingModal
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.layout.Insets
-import io.nacular.doodle.layout.constrain
+import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.system.Cursor.Companion.Pointer
 
 /**
@@ -58,15 +57,17 @@ class ModalsImpl(private val textMetrics: TextMetrics, private val modals: Modal
             this += button("Ok",     assets.deleteBackground).apply { fired += { completed(true ) } }
 
             layout = constrain(children[0], children[1], children[2]) { text, cancel, ok ->
-                text.centerX = parent.centerX
+                text.top     eq 0
+                text.height  eq text.height.readOnly
+                text.centerX eq parent.centerX
 
-                ok.top       = text.bottom + INSET
-                ok.right     = parent.right
-                ok.width     = parent.width / 2
+                ok.top       eq text.bottom + INSET
+                ok.right     eq parent.right
+                ok.width     eq parent.width / 2
 
-                cancel.top   = ok.top
-                cancel.left  = parent.left
-                cancel.width = ok.width
+                cancel.top   eq ok.top
+                cancel.left  eq 0
+                cancel.width eq ok.width
             }.then {
                 idealSize = Size(300.0, children[2].bounds.bottom)
             }

@@ -1,7 +1,7 @@
 package io.nacular.doodle.examples.contacts
 
 import io.nacular.doodle.animation.Animator
-import io.nacular.doodle.animation.impl.AnimatorImpl
+import io.nacular.doodle.animation.AnimatorImpl
 import io.nacular.doodle.application.Application
 import io.nacular.doodle.application.Modules
 import io.nacular.doodle.core.Container
@@ -10,7 +10,6 @@ import io.nacular.doodle.core.Layout
 import io.nacular.doodle.core.View
 import io.nacular.doodle.core.center
 import io.nacular.doodle.core.height
-import io.nacular.doodle.core.plusAssign
 import io.nacular.doodle.core.width
 import io.nacular.doodle.coroutines.Dispatchers
 import io.nacular.doodle.drawing.Canvas
@@ -27,8 +26,8 @@ import io.nacular.doodle.geometry.Rectangle
 import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.geometry.impl.PathMetricsImpl
 import io.nacular.doodle.layout.Insets
-import io.nacular.doodle.layout.constrain
-import io.nacular.doodle.layout.fill
+import io.nacular.doodle.layout.constraints.constrain
+import io.nacular.doodle.layout.constraints.fill
 import io.nacular.doodle.theme.ThemeManager
 import io.nacular.doodle.theme.adhoc.DynamicTheme
 import io.nacular.doodle.theme.basic.BasicTheme

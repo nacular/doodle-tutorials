@@ -1,7 +1,7 @@
 package io.nacular.doodle.examples.contacts
 
 import io.nacular.doodle.animation.Animator
-import io.nacular.doodle.animation.impl.AnimatorImpl
+import io.nacular.doodle.animation.AnimatorImpl
 import io.nacular.doodle.examples.ModalFactory
 import io.nacular.doodle.examples.ModalFactoryImpl
 import kotlinx.coroutines.CoroutineDispatcher

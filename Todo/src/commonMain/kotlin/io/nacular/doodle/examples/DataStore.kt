@@ -40,7 +40,7 @@ class DataStore private constructor(private val tasks: ObservableList<Task>, pri
     val filterChanged: Pool<ChangeObserver<DataStore>> = SetPool()
 
     init {
-        tasks.changed += { _,_,_,_ ->
+        tasks.changed += { _,_, ->
             (changed as SetPool).forEach { it(this) }
         }
     }
@@ -75,7 +75,7 @@ class DataStore private constructor(private val tasks: ObservableList<Task>, pri
     companion object {
         operator fun invoke(persistentStore: PersistentStore): DataStore {
             val tasks = ObservableList(persistentStore.loadTasks()).apply {
-                changed += { _, _, _, _ ->
+                changed += { _,_ ->
                     persistentStore.save(this)
                 }
             }

@@ -70,6 +70,11 @@ const config = {
           },
         ],
       },
+      docs: {
+        sidebar: {
+          hideable: true,
+        }
+      },
       footer: {
         style: 'dark',
       },
@@ -78,7 +83,6 @@ const config = {
         darkTheme          : darkCodeTheme,
         additionalLanguages: ['kotlin', 'groovy'],
       },
-      hideableSidebar: true,
       image: 'img/site_preview.png',
       metadata: [{name: 'og:image:width', content: '380'},{name: 'og:image:height', content: '78'}],
     }),

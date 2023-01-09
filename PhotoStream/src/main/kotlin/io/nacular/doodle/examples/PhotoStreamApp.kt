@@ -12,17 +12,14 @@ import io.nacular.doodle.controls.list.DynamicList
 import io.nacular.doodle.controls.panels.ScrollPanel
 import io.nacular.doodle.core.Display
 import io.nacular.doodle.core.View
-import io.nacular.doodle.core.plusAssign
 import io.nacular.doodle.drawing.Canvas
 import io.nacular.doodle.geometry.Rectangle
 import io.nacular.doodle.image.Image
 import io.nacular.doodle.image.ImageLoader
 import io.nacular.doodle.image.height
 import io.nacular.doodle.image.width
-import io.nacular.doodle.layout.constant
-import io.nacular.doodle.layout.constrain
-import io.nacular.doodle.layout.fill
-import io.nacular.doodle.layout.min
+import io.nacular.doodle.layout.constraints.constrain
+import io.nacular.doodle.layout.constraints.fill
 import io.nacular.doodle.theme.ThemeManager
 import io.nacular.doodle.theme.adhoc.DynamicTheme
 import io.nacular.doodle.theme.basic.list.basicVerticalListBehavior
@@ -98,10 +95,10 @@ class UnSplashDataModel(
 
     // Internal list used to cache images loaded from unsplash
     private val loadedImages = ObservableList<Image>().also {
-        it.changed += { _ ,removed, added, moved ->
+        it.changed += { _, differences ->
             // notify model observers whenever the underlying list changes (due to image loads)
             changed.forEach {
-                it(this, removed, added, moved)
+                it(this, differences)
             }
         }
     }
@@ -180,13 +177,13 @@ class PhotoStreamApp(display    : Display,
 
         display += ScrollPanel(list).apply {
             // Ensure list's width is equal to scroll-panel's
-            contentWidthConstraints = { parent.width }
+            contentWidthConstraints = { it eq parent.width - verticalScrollBarWidth }
         }
 
         display.layout = constrain(display.children[0]) {
-            it.width   = min(parent.width, constant(imageHeight))
-            it.height  = parent.height
-            it.centerX = parent.centerX
+            it.width   eq min(parent.width, imageHeight)
+            it.height  eq parent.height
+            it.centerX eq parent.centerX
         }
     }
 

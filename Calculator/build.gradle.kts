@@ -3,7 +3,7 @@ plugins {
 }
 
 kotlin {
-    jsTargets ()
+    jsTargets (BOTH)
     jvmTargets()
 
     val mockkVersion     : String by project
@@ -11,7 +11,7 @@ kotlin {
     val coroutinesVersion: String by project
 
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 implementation(kotlin("stdlib-common"))
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
@@ -21,11 +21,10 @@ kotlin {
             }
         }
 
-        val commonTest by getting {
+        commonTest {
             dependencies {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
-                implementation("io.mockk:mockk-common:$mockkVersion")
             }
         }
 

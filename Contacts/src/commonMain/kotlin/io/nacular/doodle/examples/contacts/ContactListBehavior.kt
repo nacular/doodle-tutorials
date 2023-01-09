@@ -4,13 +4,16 @@ import io.nacular.doodle.controls.IndexedItem
 import io.nacular.doodle.controls.ItemVisualizer
 import io.nacular.doodle.controls.SimpleIndexedItem
 import io.nacular.doodle.controls.table.AbstractTableBehavior
+import io.nacular.doodle.controls.table.AbstractTableBehavior.FooterCellGenerator
+import io.nacular.doodle.controls.table.AbstractTableBehavior.HeaderCellGenerator
+import io.nacular.doodle.controls.table.AbstractTableBehavior.MetaRowPositioner
 import io.nacular.doodle.controls.table.Column
-import io.nacular.doodle.controls.table.HeaderGeometry
+import io.nacular.doodle.controls.table.MetaRowGeometry
 import io.nacular.doodle.controls.table.Table
 import io.nacular.doodle.controls.table.TableBehavior
 import io.nacular.doodle.core.View
 import io.nacular.doodle.core.container
-import io.nacular.doodle.core.plusAssign
+import io.nacular.doodle.core.view
 import io.nacular.doodle.drawing.Canvas
 import io.nacular.doodle.drawing.Stroke
 import io.nacular.doodle.drawing.height
@@ -20,7 +23,7 @@ import io.nacular.doodle.event.PointerEvent
 import io.nacular.doodle.event.PointerListener
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.layout.Insets
-import io.nacular.doodle.layout.constrain
+import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.system.Cursor.Companion.Pointer
 import io.nacular.doodle.theme.basic.VerticalListPositioner
 import io.nacular.doodle.utils.SetObserver
@@ -124,7 +127,7 @@ class ContactListBehavior(private val assets: AppConfig, private val navigator: 
     /**
      * Simple container that holds the column's header in a container with a bottom border.
      */
-    override val headerCellGenerator = object: AbstractTableBehavior.HeaderCellGenerator<Table<Contact, *>> {
+    override val headerCellGenerator = object: HeaderCellGenerator<Table<Contact, *>> {
         override fun <A> invoke(table: Table<Contact, *>, column: Column<A>) = container {
             column.header?.let { header ->
                 this += header
@@ -143,8 +146,16 @@ class ContactListBehavior(private val assets: AppConfig, private val navigator: 
         }
     }
 
-    override val headerPositioner = object: AbstractTableBehavior.HeaderPositioner<Table<Contact, *>> {
-        override fun invoke(table: Table<Contact, *>) = HeaderGeometry(0.0, TABLE_HEADER_HEIGHT)
+    override val footerCellGenerator = object: FooterCellGenerator<Table<Contact, *>> {
+        override fun <A> invoke(table: Table<Contact, *>, column: Column<A>) = view {}
+    }
+
+    override val headerPositioner = object: MetaRowPositioner<Table<Contact, *>> {
+        override fun invoke(table: Table<Contact, *>) = MetaRowGeometry(insetTop = 0.0, insetBottom = 0.0, TABLE_HEADER_HEIGHT)
+    }
+
+    override val footerPositioner = object: MetaRowPositioner<Table<Contact, *>> {
+        override fun invoke(table: Table<Contact, *>) = MetaRowGeometry(insetTop = 0.0, insetBottom = 0.0, TABLE_HEADER_HEIGHT)
     }
 
     // No overflow column will be in the Table
