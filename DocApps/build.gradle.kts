@@ -22,6 +22,7 @@ kotlin {
         implementation(project(":Todo"      ))
         implementation(project(":Photos"    ))
         implementation(project(":Contacts"  ))
+        implementation(project(":TabStrip"  ))
         implementation("io.nacular.doodle:browser:$doodleVersion")
     }
 }

@@ -22,6 +22,7 @@ import io.nacular.doodle.examples.NumberFormatterImpl
 import io.nacular.doodle.examples.PersistentStore
 import io.nacular.doodle.examples.PhotosApp
 import io.nacular.doodle.examples.Router
+import io.nacular.doodle.examples.TabStripApp
 import io.nacular.doodle.examples.TodoApp
 import io.nacular.doodle.examples.contacts.AppConfig
 import io.nacular.doodle.examples.contacts.AppConfigImpl
@@ -307,5 +308,16 @@ fun contactsHeader(element: HTMLElement) {
         ) {
             factory<AppConfig, Header>()(it)
         }
+    }
+}
+
+@JsExport
+fun tabStrip(element: HTMLElement) {
+    application(root = element, modules = listOf(PointerModule, Module(name = "AppModule") {
+        bindSingleton<Animator>    { AnimatorImpl   (instance(), instance()) }
+        bindSingleton<PathMetrics> { PathMetricsImpl(instance()            ) }
+    })) {
+        // load app
+        TabStripApp(instance(), instance(), instance())
     }
 }

@@ -7,6 +7,10 @@ import TabItem from '@theme/TabItem'
 
 import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
 
+import CodeBlock from '@theme/CodeBlock';
+import Gradle       from '!!raw-loader!../../Calculator/build.gradle.kts';
+import RunnerGradle from '!!raw-loader!../../CalculatorRunner/build.gradle.kts';
+
 # [Calculator](https://github.com/nacular/doodle-tutorials/tree/master/Calculator) Tutorial
 
 Our goal is to build the following calculator app using Doodle. This is a simple calculator that only
@@ -15,17 +19,11 @@ and has a convenience function for converting to a percentage.
 
 However, it does not have more advanced features, like parentheses, or other math operations. This means
 the implementation is simpler, and we can focus on the way Doodle is used instead of the complexity of the
-app itself.
-
-:::tip
-Play around with the calculator to get a feel for it.
-:::
+app itself. Play around with the calculator to get a feel for it.
 
 <DoodleCodeBlock functionName="calculator" height="500" />
 
-:::tip
 You can also see the full-screen app [here](https://nacular.github.io/doodle-tutorials/calculator).
-:::
 
 ---
 
@@ -46,111 +44,18 @@ like below. Therefore, we need a pure library for each app. This is why there is
 ```
 
 <Tabs>
-<TabItem value="app" label="Calculator">
+<TabItem value="Calculator">
 
 [**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/Calculator/build.gradle.kts)
 
-```kotlin title="build.gradle.kts"
-plugins {
-    kotlin("multiplatform")
-}
-
-kotlin {
-    // Defined in buildSrc/src/main/kotlin/Common.kt
-    jsTargets ()
-    jvmTargets()
-
-    // Defined in gradle.properties
-    val mockkVersion     : String by project
-    val mockkJsVersion   : String by project
-    val doodleVersion    : String by project
-    val coroutinesVersion: String by project
-
-    sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(kotlin("stdlib-common"))
-
-                // needed for async font discovery
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-common:$coroutinesVersion")
-
-                api ("io.nacular.doodle:core:$doodleVersion"    ) // required for Doodle
-                api ("io.nacular.doodle:controls:$doodleVersion") // provides things like buttons and panels
-            }
-        }
-
-       // ...
-    }
-}
-```
+<CodeBlock language="kotlin">{Gradle}</CodeBlock>
 
 </TabItem>
-<TabItem value="runner" label="CalculatorRunner">
+<TabItem value="CalculatorRunner">
 
 [**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/CalculatorRunner/build.gradle.kts)
 
-```kotlin title="build.gradle.kts"
-plugins {
-    kotlin("multiplatform")
-    application
-}
-
-kotlin {
-    js().browser()
-
-    jvm {
-        withJava()
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "11"
-            }
-        }
-    }
-
-    val doodleVersion: String by project
-
-    sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(project(":Calculator")) // app library
-            }
-        }
-
-        val jsMain by getting {
-            dependencies {
-                implementation ("io.nacular.doodle:browser:$doodleVersion") // required for Web app
-            }
-        }
-
-        val jvmMain by getting {
-            dependencies {
-                val osName = System.getProperty("os.name")
-                val targetOs = when {
-                    osName == "Mac OS X"       -> "macos"
-                    osName.startsWith("Win"  ) -> "windows"
-                    osName.startsWith("Linux") -> "linux"
-                    else                       -> error("Unsupported OS: $osName")
-                }
-
-                val osArch = System.getProperty("os.arch")
-                val targetArch = when (osArch) {
-                    "x86_64", "amd64" -> "x64"
-                    "aarch64"         -> "arm64"
-                    else              -> error("Unsupported arch: $osArch")
-                }
-
-                val target = "${targetOs}-${targetArch}"
-
-                implementation ("io.nacular.doodle:desktop-jvm-$target:$doodleVersion") // required for Desktop app
-            }
-        }
-    }
-}
-
-application {
-    mainClass.set("io.nacular.doodle.examples.MainKt")
-}
-```
+<CodeBlock language="kotlin">{RunnerGradle}</CodeBlock>
 
 </TabItem>
 </Tabs>
@@ -246,8 +151,8 @@ that manages its state directly. This makes sense for simple use-cases, but migh
 This View will be broken into a hierarchy of views, with two top-level items: a custom output and a [`GridPanel`](https://github.com/nacular/doodle/blob/master/Controls/src/commonMain/kotlin/io/nacular/doodle/controls/panels/GridPanel.kt#L42).
 
 <br />
-<img src="/doodle-tutorials/calc-top2.png" alt="doodle" />
-<img src="/doodle-tutorials/calc-bottom2.png" alt="doodle" style={{float:'right'}} />
+<img src="/doodle-tutorials/calc-top2.png" alt="calculator top" />
+<img src="/doodle-tutorials/calc-bottom2.png" alt="calculator bottom" style={{float:'right'}} />
 
 ### Calculator Output
 

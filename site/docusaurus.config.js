@@ -36,6 +36,11 @@ const config = {
     ],
   ],
 
+  markdown: {
+    mermaid: true,
+  },
+  themes: ['@docusaurus/theme-mermaid'],
+
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
@@ -82,6 +87,9 @@ const config = {
         theme              : require('prism-react-renderer/themes/dracula'),
         darkTheme          : darkCodeTheme,
         additionalLanguages: ['kotlin', 'groovy'],
+      },
+      mermaid: {
+        theme: {light: 'default', dark: 'dark'},
       },
       image: 'img/site_preview.png',
       metadata: [{name: 'og:image:width', content: '380'},{name: 'og:image:height', content: '78'}],

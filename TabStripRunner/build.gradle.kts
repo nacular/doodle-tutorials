@@ -23,13 +23,13 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation(project(":Calculator")) // app library
+                implementation(project(":TabStrip"))
             }
         }
 
         val jsMain by getting {
             dependencies {
-                implementation ("io.nacular.doodle:browser:$doodleVersion") // required for Web app
+                implementation ("io.nacular.doodle:browser:$doodleVersion")
             }
         }
 
@@ -51,7 +51,7 @@ kotlin {
 
                 val target = "${targetOs}-${targetArch}"
 
-                implementation ("io.nacular.doodle:desktop-jvm-$target:$doodleVersion") // required for Desktop app
+                implementation ("io.nacular.doodle:desktop-jvm-$target:$doodleVersion")
             }
         }
     }

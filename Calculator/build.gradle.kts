@@ -3,9 +3,11 @@ plugins {
 }
 
 kotlin {
+    // Defined in buildSrc/src/main/kotlin/Common.kt
     jsTargets (BOTH)
     jvmTargets()
 
+    // Defined in gradle.properties
     val mockkVersion     : String by project
     val doodleVersion    : String by project
     val coroutinesVersion: String by project
@@ -16,8 +18,8 @@ kotlin {
                 implementation(kotlin("stdlib-common"))
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
 
-                api("io.nacular.doodle:core:$doodleVersion"    )
-                api("io.nacular.doodle:controls:$doodleVersion")
+                api("io.nacular.doodle:core:$doodleVersion"    ) // required for Doodle
+                api("io.nacular.doodle:controls:$doodleVersion") // provides things like buttons and panels
             }
         }
 
