@@ -9,12 +9,12 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinTargetContainerWithPresetFunctions
 import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
 
-private fun KotlinJsTargetDsl.configure() {
+private fun KotlinJsTargetDsl.configure(vararg additoinalFlags: String) {
     compilations.all {
         kotlinOptions {
             moduleKind = "umd"
             sourceMapEmbedSources = "always"
-            freeCompilerArgs = listOf("-Xuse-experimental=kotlin.ExperimentalUnsignedTypes")
+            freeCompilerArgs = listOf("-Xuse-experimental=kotlin.ExperimentalUnsignedTypes") + additoinalFlags
         }
     }
     browser {
@@ -24,20 +24,20 @@ private fun KotlinJsTargetDsl.configure() {
     }
 }
 
-fun KotlinJsProjectExtension.jsTargets(compiler: KotlinJsCompilerType = defaultJsCompilerType) {
-    js(compiler).configure()
+fun KotlinJsProjectExtension.jsTargets(compiler: KotlinJsCompilerType = defaultJsCompilerType, vararg additoinalFlags: String) {
+    js(compiler).configure(*additoinalFlags)
 }
 
-fun KotlinTargetContainerWithJsPresetFunctions.jsTargets(compiler: KotlinJsCompilerType = defaultJsCompilerType) {
-    js(compiler).configure()
+fun KotlinTargetContainerWithJsPresetFunctions.jsTargets(compiler: KotlinJsCompilerType = defaultJsCompilerType, vararg additoinalFlags: String) {
+    js(compiler).configure(*additoinalFlags)
 }
 
-fun KotlinTargetContainerWithPresetFunctions.jvmTargets() {
+fun KotlinTargetContainerWithPresetFunctions.jvmTargets(vararg additoinalFlags: String) {
     jvm {
         compilations.all {
             kotlinOptions {
                 jvmTarget        = "1.8"
-                freeCompilerArgs = listOf("-Xuse-experimental=kotlin.ExperimentalUnsignedTypes")
+                freeCompilerArgs = listOf("-Xuse-experimental=kotlin.ExperimentalUnsignedTypes") + additoinalFlags
             }
         }
     }
