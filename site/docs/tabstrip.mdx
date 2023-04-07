@@ -2,17 +2,15 @@
 title: Animating Tab Strip
 hide_title: true
 ---
-import Tabs    from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
-
-import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
+import Tabs      from '@theme/Tabs'
+import TabItem   from '@theme/TabItem'
 import CodeBlock from '@theme/CodeBlock';
 
-import Gradle       from '!!raw-loader!../../TabStrip/build.gradle.kts';
-import RunnerGradle from '!!raw-loader!../../TabStripRunner/build.gradle.kts';
-
-import TabStripApp from '!!raw-loader!../../TabStrip/src/commonMain/kotlin/io/nacular/doodle/examples/TabStripApp.kt';
-import WebMain     from '!!raw-loader!../../TabStripRunner/src/jsMain/kotlin/main.kt';
+import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
+import Gradle            from '!!raw-loader!../../TabStrip/build.gradle.kts';
+import RunnerGradle      from '!!raw-loader!../../TabStripRunner/build.gradle.kts';
+import TabStripApp       from '!!raw-loader!../../TabStrip/src/commonMain/kotlin/io/nacular/doodle/examples/TabStripApp.kt';
+import WebMain           from '!!raw-loader!../../TabStripRunner/src/jsMain/kotlin/main.kt';
 
 
 # [TabStrip](https://github.com/nacular/doodle-tutorials/tree/master/TabStrip) Tutorial
@@ -68,9 +66,7 @@ like below. Therefore, we need a pure library for the app. This is why there is 
 
 ## Defining Our Application
 
-All Doodle apps must implement the [`Application`](https://github.com/nacular/doodle/blob/master/Core/src/commonMain/kotlin/io/nacular/doodle/application/Application.kt#L4)
-interface. The framework will then initialize our app via the constructor. Our app will be fairly simple: just create
-an instance of our calculator and add it to the display.
+All Doodle apps must implement the [`Application`](https://nacular.github.io/doodle/docs/applications) interface. The framework will then initialize our app via the constructor. Our app will be fairly simple: just create an instance of our calculator and add it to the display.
 
 Doodle apps can be defined in `commonMain`, since they do not require any platform-specific dependencies. Therefore, we will do
 the same and place ours in `commonMain/kotlin/io/nacular/doodle/examples`.

@@ -1,10 +1,8 @@
 package io.nacular.doodle.examples
 
 import io.nacular.doodle.animation.Animator
-import io.nacular.doodle.animation.invoke
-import io.nacular.doodle.animation.transition.easeOutBack
-import io.nacular.doodle.animation.tweenFloat
 import io.nacular.doodle.application.Application
+import io.nacular.doodle.controls.PopupManager
 import io.nacular.doodle.controls.buttons.PushButton
 import io.nacular.doodle.controls.itemVisualizer
 import io.nacular.doodle.controls.range.CircularSlider
@@ -51,8 +49,6 @@ import io.nacular.doodle.image.width
 import io.nacular.doodle.layout.Insets
 import io.nacular.doodle.layout.ListLayout
 import io.nacular.doodle.layout.WidthSource.Parent
-import io.nacular.doodle.layout.constraints.Bounds
-import io.nacular.doodle.layout.constraints.ConstraintDslContext
 import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.system.Cursor.Companion.Text
 import io.nacular.doodle.theme.ThemeManager
@@ -69,7 +65,6 @@ import io.nacular.measured.units.Angle
 import io.nacular.measured.units.Angle.Companion.atan2
 import io.nacular.measured.units.Angle.Companion.degrees
 import io.nacular.measured.units.Measure
-import io.nacular.measured.units.Time.Companion.milliseconds
 import io.nacular.measured.units.normalize
 import io.nacular.measured.units.times
 import kotlinx.coroutines.CoroutineScope
@@ -277,6 +272,7 @@ class PhotosApp(display     : Display,
                 themeManager: ThemeManager,
                 theme       : DynamicTheme,
                 animate     : Animator,
+                popup       : PopupManager,
     private val images      : ImageLoader): Application {
 
     init {
@@ -285,21 +281,21 @@ class PhotosApp(display     : Display,
         themeManager.selected = theme
 
         val buttonInset  = 20.0
-        var panelVisible = false
+//        var panelVisible = false
 
         // Contains controls to show/update photo properties
         val propertyPanel = PropertyPanel(focusManager).apply { opacity = 0f }
 
         // Helper for constraining property panel layout
-        val panelConstraints: ConstraintDslContext.(Bounds) -> Unit = {
-            when {
-                panelVisible -> it.bottom eq parent.bottom - buttonInset / 2
-                else         -> it.top    eq parent.bottom - buttonInset * 2
-            }
-
-            it.height  eq it.height.readOnly
-            it.centerX eq parent.centerX
-        }
+//        val panelConstraints: ConstraintDslContext.(Bounds) -> Unit = {
+//            when {
+//                panelVisible -> it.bottom eq parent.bottom - buttonInset / 2
+//                else         -> it.top    eq parent.bottom - buttonInset * 2
+//            }
+//
+//            it.height  eq it.height.readOnly
+//            it.centerX eq parent.centerX
+//        }
 
         // Used to show/hide panel
         val panelToggle = PushButton().apply {
@@ -316,21 +312,30 @@ class PhotosApp(display     : Display,
             }
 
             fired += {
-                val start = if (panelVisible) 1f else 0f
-                val end   = if (panelVisible) 0f else 1f
-
-                // removing layout constraints from panel when it is animating
-                display.layout = (display.layout as io.nacular.doodle.layout.constraints.ConstraintLayout).unconstrain(propertyPanel, panelConstraints)
-
-                // Animate property panel show/hide
-                animate(start to end, tweenFloat(easeOutBack, 250 * milliseconds)) {
-                    propertyPanel.y       = display.height - buttonInset * 2 - ((propertyPanel.height - 30) * it.toDouble())
-                    propertyPanel.opacity = it
-                }.completed += {
-                    panelVisible = !panelVisible
-                    (display.layout as io.nacular.doodle.layout.constraints.ConstraintLayout).constrain(propertyPanel, panelConstraints)
+                popup.show(propertyPanel) {
+                    it.bottom  eq parent.bottom - buttonInset / 2
+                    it.centerX eq parent.centerX
+                    it.width.preserve
+                    it.height.preserve
                 }
             }
+
+//            fired += {
+//                val start = if (panelVisible) 1f else 0f
+//                val end   = if (panelVisible) 0f else 1f
+//
+//                // removing layout constraints from panel when it is animating
+//                display.layout = (display.layout as io.nacular.doodle.layout.constraints.ConstraintLayout).unconstrain(propertyPanel, panelConstraints)
+//
+//                // Animate property panel show/hide
+//                animate(start to end, tweenFloat(easeOutBack, 250 * milliseconds)) {
+//                    propertyPanel.y       = display.height - buttonInset * 2 - ((propertyPanel.height - 30) * it.toDouble())
+//                    propertyPanel.opacity = it
+//                }.completed += {
+//                    panelVisible = !panelVisible
+//                    (display.layout as io.nacular.doodle.layout.constraints.ConstraintLayout).constrain(propertyPanel, panelConstraints)
+//                }
+//            }
         }
 
         // Holds images and serves as drop-target
@@ -433,7 +438,12 @@ class PhotosApp(display     : Display,
             toggle.height  eq 50
             toggle.centerX eq panel.centerX
             toggle.bottom  eq panel.top + 22 + 40
-        }.constrain(propertyPanel, panelConstraints)
+
+            panel.top      eq parent.bottom - buttonInset * 2
+
+            panel.height   eq panel.height.readOnly
+            panel.centerX  eq parent.centerX
+        } //.constrain(propertyPanel, panelConstraints)
 
         display.relayout()
     }

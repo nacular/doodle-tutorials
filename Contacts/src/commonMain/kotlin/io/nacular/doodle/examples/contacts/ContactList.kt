@@ -76,7 +76,7 @@ class ContactList(
             else        -> ToolCell(assets, pathMetrics, context.selected).apply {
                 onDelete = {
                     appScope.launch(uiDispatcher) {
-                        if (modals.confirmDelete(assets, context.item).show()) {
+                        if (modals.confirmDelete(assets, context.item)) {
                             contacts.remove(context.item)
                             // show toast
                         }

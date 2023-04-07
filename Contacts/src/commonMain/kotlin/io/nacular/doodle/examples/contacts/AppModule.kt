@@ -2,8 +2,6 @@ package io.nacular.doodle.examples.contacts
 
 import io.nacular.doodle.animation.Animator
 import io.nacular.doodle.animation.AnimatorImpl
-import io.nacular.doodle.examples.ModalFactory
-import io.nacular.doodle.examples.ModalFactoryImpl
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import org.kodein.di.DI.Module
@@ -22,10 +20,9 @@ import org.kodein.di.instance
  */
 fun appModule(appScope: CoroutineScope, uiDispatcher: CoroutineDispatcher, contacts: SimpleContactsModel) = Module(name = "AppModule") {
     bindSingleton<Animator>     { AnimatorImpl     (instance(), instance())             }
-    bindSingleton<ModalFactory> { ModalFactoryImpl (instance(), instance())             }
     bindSingleton<Navigator>    { NavigatorImpl    (instance(), contacts)               }
     bindSingleton<AppButtons>   { AppButtonsImpl   (instance(), instance(), instance()) }
-    bindSingleton<Modals>       { ModalsImpl       (instance(), instance())             }
+    bindSingleton<Modals>       { ModalsImpl       (instance(), instance(), instance()) }
 
     bindFactory<AppConfig, ContactList> {
         ContactList(

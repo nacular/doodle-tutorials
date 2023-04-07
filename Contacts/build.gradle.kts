@@ -24,8 +24,6 @@ kotlin {
                 api("io.nacular.doodle:controls:$doodleVersion")
                 api("io.nacular.doodle:themes:$doodleVersion")
                 api("io.nacular.doodle:animation:$doodleVersion")
-
-                api(project(":Modal"))
             }
         }
     }

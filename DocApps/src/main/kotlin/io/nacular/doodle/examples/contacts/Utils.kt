@@ -17,8 +17,6 @@ import io.nacular.doodle.drawing.Color.Companion.Black
 import io.nacular.doodle.drawing.Color.Companion.White
 import io.nacular.doodle.drawing.opacity
 import io.nacular.doodle.drawing.rect
-import io.nacular.doodle.examples.ModalFactory
-import io.nacular.doodle.examples.ModalFactoryImpl
 import io.nacular.doodle.examples.contacts.ContactsModel.EditContext
 import io.nacular.doodle.geometry.PathMetrics
 import io.nacular.doodle.geometry.Point
@@ -75,6 +73,7 @@ object NoOpContacts: ContactsModel {
 val showcaseModules = listOf(
     Modules.FontModule,
     Modules.ImageModule,
+    Modules.ModalModule,
     Modules.FocusModule,
     Modules.PointerModule,
     Modules.KeyboardModule,
@@ -83,13 +82,12 @@ val showcaseModules = listOf(
     NativeTheme.nativeHyperLinkBehavior(),
     NativeTheme.nativeScrollPanelBehavior(),
     Module(name = "DummyModule") {
-        bindSingleton<PathMetrics>  { PathMetricsImpl(instance()) }
-        bindInstance<Router>        { EmbeddedRouter (          ) }
-        bindSingleton<Animator>     { AnimatorImpl     (instance(), instance())             }
-        bindSingleton<ModalFactory> { ModalFactoryImpl (instance(), instance())             }
-        bindInstance <Navigator>    { NoOpNavigator                                          }
-        bindSingleton<AppButtons>   { AppButtonsImpl   (instance(), instance(), instance()) }
-        bindSingleton<Modals>       { ModalsImpl       (instance(), instance())             }
+        bindSingleton<PathMetrics> { PathMetricsImpl(instance()) }
+        bindInstance<Router>       { EmbeddedRouter (          ) }
+        bindSingleton<Animator>    { AnimatorImpl   (instance(), instance())             }
+        bindInstance <Navigator>   { NoOpNavigator                                       }
+        bindSingleton<AppButtons>  { AppButtonsImpl (instance(), instance(), instance()) }
+        bindSingleton<Modals>      { ModalsImpl     (instance(), instance(), instance()) }
     }
 )
 

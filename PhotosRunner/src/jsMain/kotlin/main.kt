@@ -5,6 +5,7 @@ import io.nacular.doodle.animation.AnimatorImpl
 import io.nacular.doodle.application.Modules.Companion.DragDropModule
 import io.nacular.doodle.application.Modules.Companion.FocusModule
 import io.nacular.doodle.application.Modules.Companion.KeyboardModule
+import io.nacular.doodle.application.Modules.Companion.PopupModule
 import io.nacular.doodle.application.application
 import io.nacular.doodle.image.ImageLoader
 import io.nacular.doodle.image.impl.ImageLoaderImpl
@@ -20,6 +21,7 @@ import org.kodein.di.instance
 fun main() {
     application(modules = listOf(
         FocusModule,
+        PopupModule,
         KeyboardModule,
         DragDropModule,
         BasicTheme.basicLabelBehavior(),
@@ -32,6 +34,6 @@ fun main() {
         }
     )) {
         // load app
-        PhotosApp(instance(), instance(), instance(), instance(), instance(), instance())
+        PhotosApp(instance(), instance(), instance(), instance(), instance(), instance(), instance())
     }
 }

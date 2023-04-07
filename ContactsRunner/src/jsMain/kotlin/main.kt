@@ -2,6 +2,7 @@ import io.nacular.doodle.application.Modules.Companion.FocusModule
 import io.nacular.doodle.application.Modules.Companion.FontModule
 import io.nacular.doodle.application.Modules.Companion.ImageModule
 import io.nacular.doodle.application.Modules.Companion.KeyboardModule
+import io.nacular.doodle.application.Modules.Companion.ModalModule
 import io.nacular.doodle.application.Modules.Companion.PointerModule
 import io.nacular.doodle.application.application
 import io.nacular.doodle.coroutines.Dispatchers
@@ -38,6 +39,7 @@ fun main() {
     application (modules = listOf(
         FontModule,
         ImageModule,
+        ModalModule,
         FocusModule,
         PointerModule,
         KeyboardModule,

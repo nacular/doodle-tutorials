@@ -2,14 +2,13 @@
 title: Calculator
 hide_title: true
 ---
-import Tabs    from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+import Tabs      from '@theme/Tabs'
+import TabItem   from '@theme/TabItem'
+import CodeBlock from '@theme/CodeBlock';
 
 import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
-
-import CodeBlock from '@theme/CodeBlock';
-import Gradle       from '!!raw-loader!../../Calculator/build.gradle.kts';
-import RunnerGradle from '!!raw-loader!../../CalculatorRunner/build.gradle.kts';
+import Gradle            from '!!raw-loader!../../Calculator/build.gradle.kts';
+import RunnerGradle      from '!!raw-loader!../../CalculatorRunner/build.gradle.kts';
 
 # [Calculator](https://github.com/nacular/doodle-tutorials/tree/master/Calculator) Tutorial
 
@@ -64,12 +63,9 @@ like below. Therefore, we need a pure library for each app. This is why there is
 
 ## Defining Our Application
 
-All Doodle apps must implement the [`Application`](https://github.com/nacular/doodle/blob/master/Core/src/commonMain/kotlin/io/nacular/doodle/application/Application.kt#L4)
-interface. The framework will then initialize our app via the constructor. Our app will be fairly simple: just create
-an instance of our calculator and add it to the display.
+All Doodle apps must implement the [`Application`](https://nacular.github.io/doodle/docs/applications) interface. The framework will then initialize our app via the constructor. Our app will be fairly simple: just create an instance of our calculator and add it to the display.
 
-Doodle apps can be defined in `commonMain`, since they do not require any platform-specific dependencies. Therefore, we will do
-the same and place ours in `commonMain/kotlin/io/nacular/doodle/examples`.
+Doodle apps can be defined in `commonMain`, since they do not require any platform-specific dependencies. Therefore, we will do the same and place ours in `commonMain/kotlin/io/nacular/doodle/examples`.
 
 [**CalculatorApp.kt**](https://github.com/nacular/doodle-tutorials/blob/master/Calculator/src/commonMain/kotlin/io/nacular/doodle/examples/CalculatorApp.kt#L11)
 
@@ -96,10 +92,7 @@ Notice that `shutdown` is a no-op, since we don't have any cleanup to do when th
 
 ## Launching on Web and Desktop
 
-Doodle apps can be [launched](https://nacular.github.io/doodle/docs/applications) in a few different ways on Web and Desktop. We defined our app logic
-in a multi-platform `Calculator` library (no `main` functions), so it can be used on both platforms. Notice that we are only using a library here because we also want
-to run the Calculator in our documentation app. That app will run it as an embedded Web app, which becomes easier if it is a library. Otherwise,
-we could have defined our platform `main` functions directly in the `Calculator` module. Instead, we created a separate `CalculatorRunner` module that contains our `main` functions.
+Doodle apps can be [launched](https://nacular.github.io/doodle/docs/applications) in a few different ways on Web and Desktop. We defined our app logic in a multi-platform `Calculator` library (no `main` functions), so it can be used on both platforms. Notice that we are only using a library here because we also want to run the Calculator in our documentation app. That app will run it as an embedded Web app, which becomes easier if it is a library. Otherwise, we could have defined our platform `main` functions directly in the `Calculator` module. Instead, we created a separate `CalculatorRunner` module that contains our `main` functions.
 
 ## Creating A Fullscreen Web App
 
@@ -121,17 +114,12 @@ fun fullScreen() {
 ```
 
 :::tip
-Normally this would just be your `main` function, but this would prevent the app from being used as a library. Which
-is what happens to allow both an embedded (in the docs) and full-screen version.
+Normally this would just be your `main` function, but this would prevent the app from being used as a library. Which is what happens to allow both an embedded (in the docs) and full-screen version.
 :::
 
-Use the `application` function to launch top-level apps. It takes a list of modules to and a lambda that builds the
-app. This lambda is within a Kodein injection context, which means we can inject dependencies into our app via
-`instance`, `provider`, etc.
+Use the `application` function to launch top-level apps. It takes a list of modules to and a lambda that builds the app. This lambda is within a Kodein injection context, which means we can inject dependencies into our app via `instance`, `provider`, etc.
 
-Notice that we have included the [`PointerModule`](https://github.com/nacular/doodle/blob/master/Browser/src/jsMain/kotlin/io/nacular/doodle/application/Modules.kt#L62).
-This is needed to enable mouse or pointer interactions. Our app will not directly know we loaded this module, but pointer
-related events will only work because we have.
+Notice that we have included the [`PointerModule`](https://nacular.github.io/doodle/docs/pointer_input/overview). This is needed to enable mouse or pointer interactions. Our app will not directly know we loaded this module, but pointer related events will only work because we have.
 
 :::tip
 Check out Kodein to learn more about how it handles dependency injection.
@@ -140,15 +128,13 @@ Check out Kodein to learn more about how it handles dependency injection.
 The `application` function also takes an optional HTML element within which the app will be hosted. The app will be hosted in
 `document.body` if no element is specified.
 
-App launching is the only part of our code that is platform-specific. This makes sense, since it is the only time we might need to know
-about an HTML element; say when embedding our app in a non-Doodle context.
+App launching is the only part of our code that is platform-specific. This makes sense, since it is the only time we might need to know about an HTML element; say when embedding our app in a non-Doodle context.
 
 ## The Calculator View
 
-We will implement our calculator as a single [`View`](https://github.com/nacular/doodle/blob/master/Core/src/commonMain/kotlin/io/nacular/doodle/core/View.kt#L65)
-that manages its state directly. This makes sense for simple use-cases, but might not be the right choice for larger apps.
+We will implement our calculator as a single [`View`](https://nacular.github.io/doodle/docs/views) that manages its state directly. This makes sense for simple use-cases, but might not be the right choice for larger apps.
 
-This View will be broken into a hierarchy of views, with two top-level items: a custom output and a [`GridPanel`](https://github.com/nacular/doodle/blob/master/Controls/src/commonMain/kotlin/io/nacular/doodle/controls/panels/GridPanel.kt#L42).
+This View will be broken into a hierarchy of views, with two top-level items: a custom output and a [`GridPanel`](https://nacular.github.io/doodle/docs/ui_components/overview#gridpanel).
 
 <br />
 <img src="/doodle-tutorials/calc-top2.png" alt="calculator top" />
@@ -354,7 +340,7 @@ simpler to understand.
 
 ## Button Styling
 
-The calculator buttons come in a few different color schemes. But they all share the same [`Behavior`](https://github.com/nacular/doodle/blob/master/Core/src/commonMain/kotlin/io/nacular/doodle/core/Behavior.kt#L7),
+The calculator buttons come in a few different color schemes. But they all share the same [`Behavior`](https://nacular.github.io/doodle/docs/rendering/behaviors),
 defined by [`CalcButtonBehavior`](https://github.com/nacular/doodle-tutorials/blob/master/Calculator/src/commonMain/kotlin/io/nacular/doodle/examples/CalcButtonBehavior.kt#L16).
 Buttons--like many Views--let you define their look-and-feel using a `Behavior`. Ours is fairly simple; it draws the rounded rectangle
 for the button background and centers the text above it. These are both managed with the right color based on the button's state.

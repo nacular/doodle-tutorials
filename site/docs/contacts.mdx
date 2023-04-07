@@ -2,10 +2,13 @@
 title: Contacts
 hide_title: true
 ---
-import Tabs    from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+import Tabs      from '@theme/Tabs'
+import TabItem   from '@theme/TabItem'
+import CodeBlock from '@theme/CodeBlock';
 
 import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
+import Gradle            from '!!raw-loader!../../Contacts/build.gradle.kts';
+import RunnerGradle      from '!!raw-loader!../../ContactsRunner/build.gradle.kts';
 
 # [Contacts](https://github.com/nacular/doodle-tutorials/tree/master/Contacts) Tutorial
 
@@ -50,108 +53,14 @@ like below. Therefore, we need a pure library for the app. This is why there is 
 
 [**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/Contacts/build.gradle.kts)
 
-```kotlin title="build.gradle.kts"
-plugins {
-    kotlin("multiplatform"       )
-    kotlin("plugin.serialization")
-}
-
-kotlin {
-    jsTargets ()
-    jvmTargets()
-
-    val kodeinVersion       : String by project
-    val doodleVersion       : String by project
-    val coroutinesVersion   : String by project
-    val serializationVersion: String by project
-
-    sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(kotlin("stdlib-common"))
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-                api("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
-                api("org.kodein.di:kodein-di:$kodeinVersion")
-
-                api("io.nacular.doodle:core:$doodleVersion"    )
-                api("io.nacular.doodle:controls:$doodleVersion")
-                api("io.nacular.doodle:themes:$doodleVersion")
-                api("io.nacular.doodle:animation:$doodleVersion")
-
-                api(project(":Modal"))
-            }
-        }
-    }
-}
-```
+<CodeBlock language="kotlin">{Gradle}</CodeBlock>
 
 </TabItem>
 <TabItem value="runner" label="ContactsRunner">
 
 [**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/ContactsRunner/build.gradle.kts)
 
-```kotlin title="build.gradle.kts"
-plugins {
-    kotlin("multiplatform")
-    application
-}
-
-kotlin {
-    js().browser()
-
-    jvm {
-        withJava()
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "11"
-            }
-        }
-    }
-
-    val doodleVersion: String by project
-
-    sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(project(":Contacts"))
-            }
-        }
-
-        val jsMain by getting {
-            dependencies {
-                implementation("io.nacular.doodle:browser:$doodleVersion")
-            }
-        }
-
-        val jvmMain by getting {
-            dependencies {
-                val osName = System.getProperty("os.name")
-                val targetOs = when {
-                    osName == "Mac OS X"       -> "macos"
-                    osName.startsWith("Win"  ) -> "windows"
-                    osName.startsWith("Linux") -> "linux"
-                    else                       -> error("Unsupported OS: $osName")
-                }
-
-                val osArch = System.getProperty("os.arch")
-                val targetArch = when (osArch) {
-                    "x86_64", "amd64" -> "x64"
-                    "aarch64"         -> "arm64"
-                    else              -> error("Unsupported arch: $osArch")
-                }
-
-                val target = "${targetOs}-${targetArch}"
-
-                implementation("io.nacular.doodle:desktop-jvm-$target:$doodleVersion")
-            }
-        }
-    }
-}
-
-application {
-    mainClass.set("MainKt")
-}
-```
+<CodeBlock language="kotlin">{RunnerGradle}</CodeBlock>
 
 :::warning
 The desktop application uses placeholder icons in some cases to work-around a known [Skiko bug](https://github.com/JetBrains/skiko/issues/518)
@@ -221,11 +130,7 @@ Notice that `shutdown` is a no-op, since we don't have any cleanup to do when th
 
 ### Async Assets
 
-The app uses custom fonts and images, both of which require async loading via [`FontLoader`](https://github.com/nacular/doodle/blob/master/Core/src/commonMain/kotlin/io/nacular/doodle/drawing/FontLoader.kt#L38)
-and [`ImageLoader`](https://github.com/nacular/doodle/blob/master/Core/src/commonMain/kotlin/io/nacular/doodle/image/ImageLoader.kt#L6). It is easiest to load these within
-the app itself (instead of trying to load them in the launcher and injecting). We are using the `AppConfig` interface to hold these assets and many different
-app attributes. The ContactsApp therefore needs to create an instance of this config, which must happen asynchronously since it internally loads
-fonts and images. This is what the `assets` factory does, and why the app needs a `CoroutineScope` and `CoroutineDispatcher` injected.
+The app uses custom fonts and images, both of which require async loading via [`FontLoader`](https://nacular.github.io/doodle/docs/rendering/text#fonts) and [`ImageLoader`](https://nacular.github.io/doodle/docs/rendering/images). It is easiest to load these within the app itself (instead of trying to load them in the launcher and injecting). We are using the `AppConfig` interface to hold these assets and many different app attributes. The ContactsApp therefore needs to create an instance of this config, which must happen asynchronously since it internally loads fonts and images. This is what the `assets` factory does, and why the app needs a `CoroutineScope` and `CoroutineDispatcher` injected.
 
 ```kotlin title="ContactsApp.kt"
 class ContactsApp(
@@ -247,8 +152,7 @@ class ContactsApp(
 }
 ```
 
-Our launcher creates the `appScope` ahead of app creation and injects it, along with `Dispatchers.UI`
-([web](https://github.com/nacular/doodle/blob/master/Browser/src/jsMain/kotlin/io/nacular/doodle/coroutines/Dispatchers.kt#L8), [desktop](https://github.com/nacular/doodle/blob/master/Desktop/src/jvmMain/kotlin/io/nacular/doodle/coroutines/Dispatchers.kt#L8)).
+Our launcher creates the `appScope` ahead of app creation and injects it, along with `Dispatchers.UI` ([web](https://nacular.github.io/doodle-api/browser/io.nacular.doodle.coroutines/-dispatchers), [desktop](https://nacular.github.io/doodle-api/desktop/io.nacular.doodle.coroutines/-dispatchers)).
 
 ```kotlin title="main.kt"
 fun main() {
@@ -273,8 +177,8 @@ fun main() {
 
 Like most apps, we will use Views that rely on [Behaviors](https://nacular.github.io/doodle/docs/rendering/behaviors) to control their look and
 feel. This includes things like [TextField](https://nacular.github.io/doodle/docs/ui_components/overview#textfield), [Label](https://nacular.github.io/doodle/docs/ui_components/overview#label),
-[ScrollPanel](https://github.com/nacular/doodle/blob/master/Core/src/commonMain/kotlin/io/nacular/doodle/controls/panels/ScrollPanel.kt#L52), and
-[`HyperLink`](https://github.com/nacular/doodle/blob/master/Controls/src/commonMain/kotlin/io/nacular/doodle/controls/buttons/HyperLink.kt#L9).
+[ScrollPanel](https://nacular.github.io/doodle-api/core/io.nacular.doodle.controls.panels/-scroll-panel), and
+[`HyperLink`](https://nacular.github.io/doodle-api/controls/io.nacular.doodle.controls.buttons/-hyper-link).
 Therefore, we need to either provide these behaviors directly to each View, or use a [Theme](https://nacular.github.io/doodle/docs/themes) that
 automatically binds behaviors to them. The latter approach is much simpler.
 
@@ -596,7 +500,7 @@ private inner class FilterBox: View() {
 
 This is the main view within the app. It displays the contacts in a [Table](https://nacular.github.io/doodle/docs/ui_components/overview#table) with
 three columns: _Name_, _Phone Number_, and an untitled one to hold the edit/delete tool buttons. This View extends Doodle's
-[`DynamicTable`](https://github.com/nacular/doodle/blob/master/Controls/src/commonMain/kotlin/io/nacular/doodle/controls/table/DynamicTable.kt#L65),
+[`DynamicTable`](https://nacular.github.io/doodle/docs/ui_components/overview#table),
 which means it responds automatically to change in its underlying model. This is precisely what we need since Contacts will be added, edited, and
 deleted.
 
@@ -641,7 +545,7 @@ class ContactList(
 ```
 
 :::tip
-ContactList uses a [`SingleItemSelectionModel`](https://github.com/nacular/doodle/blob/master/Controls/src/commonMain/kotlin/io/nacular/doodle/controls/SelectionModel.kt#L117)
+ContactList uses a [`SingleItemSelectionModel`](https://nacular.github.io/doodle-api/controls/io.nacular.doodle.controls/-single-item-selection-model)
 to ensure that only one row can be highlighted at a time.
 :::
 
@@ -655,7 +559,7 @@ the table is below a threshold.
 
 #### [Custom Table Behavior](https://github.com/nacular/doodle-tutorials/blob/master/Contacts/src/commonMain/kotlin/io/nacular/doodle/examples/contacts/ContactListBehavior.kt#L29)
 
-The `ContactList` uses a custom [`TableBehavior`](https://github.com/nacular/doodle/blob/master/Controls/src/commonMain/kotlin/io/nacular/doodle/controls/table/TableBehavior.kt#L135)
+The `ContactList` uses a custom [`TableBehavior`](https://nacular.github.io/doodle-api/controls/io.nacular.doodle.controls.table/-table-behavior)
 via `ContactListBehavior`. Doodle's [Table](https://nacular.github.io/doodle/docs/ui_components/overview#table) is very customizable, since it
 delegates a lot of functionality to `TableBehavior`. We use this fact to specify how the header and body cells look and are positioned, as well as
 the way selection highlighting works.
@@ -879,7 +783,7 @@ class ContactView(/*...*/): ContactCommon(/*...*/) {
 
 :::tip
 This view uses a customized HyperLink that contains an icon. HyperLinks are Buttons whose behaviors can be modified. In this case, we want the link
-to behave like a normal link, but fully customize the rendering. This is why we need to use `linkStyler`, which is a [`NativeHyperLinkStyler`](https://github.com/nacular/doodle/blob/master/Themes/src/commonMain/kotlin/io/nacular/doodle/theme/native/NativeHyperLinkBehavior.kt#L7).
+to behave like a normal link, but fully customize the rendering. This is why we need to use `linkStyler`, which is a [`NativeHyperLinkStyler`](https://nacular.github.io/doodle-api/themes/io.nacular.doodle.theme.native/-native-hyper-link-styler).
 :::
 
 ### Contact Editing

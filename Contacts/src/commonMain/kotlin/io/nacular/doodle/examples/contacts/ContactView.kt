@@ -3,6 +3,7 @@ package io.nacular.doodle.examples.contacts
 import io.nacular.doodle.controls.buttons.Button
 import io.nacular.doodle.controls.buttons.HyperLink
 import io.nacular.doodle.controls.icons.PathIcon
+import io.nacular.doodle.controls.modal.ModalManager
 import io.nacular.doodle.controls.text.Label
 import io.nacular.doodle.controls.theme.CommonTextButtonBehavior
 import io.nacular.doodle.core.Behavior

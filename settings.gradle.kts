@@ -9,7 +9,6 @@ include(
     "Todo",
     "TodoRunner",
     "PhotoStream",
-    "Modal",
     "Contacts",
     "ContactsRunner",
     "TabStrip",

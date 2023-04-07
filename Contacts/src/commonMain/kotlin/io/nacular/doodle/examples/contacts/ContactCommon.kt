@@ -43,7 +43,7 @@ abstract class ContactCommon(
         font = assets.small
         fired += {
             appScope.launch(uiDispatcher) {
-                if (modals.confirmDelete(assets, this@ContactCommon.contact).show()) {
+                if (modals.confirmDelete(assets, this@ContactCommon.contact)) {
                     contacts -= this@ContactCommon.contact
                     navigator.showContactList()
                 }
