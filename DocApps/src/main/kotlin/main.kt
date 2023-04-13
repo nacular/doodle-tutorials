@@ -11,7 +11,6 @@ import io.nacular.doodle.application.Modules.Companion.ImageModule
 import io.nacular.doodle.application.Modules.Companion.KeyboardModule
 import io.nacular.doodle.application.Modules.Companion.ModalModule
 import io.nacular.doodle.application.Modules.Companion.PointerModule
-import io.nacular.doodle.application.Modules.Companion.PopupModule
 import io.nacular.doodle.application.application
 import io.nacular.doodle.controls.buttons.Button
 import io.nacular.doodle.controls.buttons.PushButton
@@ -101,7 +100,6 @@ fun photos(element: HTMLElement) {
     application(root = element, modules = listOf(
             FocusModule,
             ImageModule,
-            PopupModule,
             KeyboardModule,
             DragDropModule,
             basicLabelBehavior(),
@@ -113,7 +111,7 @@ fun photos(element: HTMLElement) {
             }
     )) {
         // load app
-        PhotosApp(instance(), instance(), instance(), instance(), instance(), instance(), instance())
+        PhotosApp(instance(), instance(), instance(), instance(), instance(), instance())
     }
 }
 
