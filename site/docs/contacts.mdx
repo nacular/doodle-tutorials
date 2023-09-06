@@ -4,16 +4,14 @@ hide_title: true
 ---
 import Tabs      from '@theme/Tabs'
 import TabItem   from '@theme/TabItem'
-import CodeBlock from '@theme/CodeBlock';
 
-import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
-import Gradle            from '!!raw-loader!../../Contacts/build.gradle.kts';
-import RunnerGradle      from '!!raw-loader!../../ContactsRunner/build.gradle.kts';
+import Gradle              from '!!raw-loader!../../Contacts/build.gradle.kts';
+import RunnerGradle        from '!!raw-loader!../../ContactsRunner/build.gradle.kts';
+import {KPlayground}       from '../src/components/KotlinPlayground'
 
 # [Contacts](https://github.com/nacular/doodle-tutorials/tree/master/Contacts) Tutorial
 
-This tutorial shows how you might build a simple app to track a list of contacts, each with a name and phone number. It is inspired by [phonebook-pi.vercel.app](https://phonebook-pi.vercel.app/), which
-was built using React.
+This tutorial shows how you might build a simple app to track a list of contacts, each with a name and phone number. It is inspired by [phonebook-pi.vercel.app](https://phonebook-pi.vercel.app/), which was built using React.
 
 The app is multiplatform and is initialized with different dependencies based on the hosting situation.
 For example, the one embedded in these docs does not support deep linking, as the router used is a memory only implementation.
@@ -36,7 +34,7 @@ in `commonMain` etc.. This setup is used here because the app are also launched 
 like below. Therefore, we need a pure library for the app. This is why there is an app and a runner.
 
 ```mermaid
- classDiagram
+classDiagram
       Contacts      <|-- ContactsRunner
       Contacts      <|-- DocApps
       ContactsRunner: commonMain.resources
@@ -53,18 +51,17 @@ like below. Therefore, we need a pure library for the app. This is why there is 
 
 [**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/Contacts/build.gradle.kts)
 
-<CodeBlock language="kotlin">{Gradle}</CodeBlock>
+<KPlayground>{Gradle}</KPlayground>
 
 </TabItem>
 <TabItem value="runner" label="ContactsRunner">
 
 [**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/ContactsRunner/build.gradle.kts)
 
-<CodeBlock language="kotlin">{RunnerGradle}</CodeBlock>
+<KPlayground>{RunnerGradle}</KPlayground>
 
 :::warning
-The desktop application uses placeholder icons in some cases to work-around a known [Skiko bug](https://github.com/JetBrains/skiko/issues/518)
-related to SVG path data parsing.
+The desktop application uses placeholder icons in some cases to work-around a known [Skiko bug](https://github.com/JetBrains/skiko/issues/518) related to SVG path data parsing.
 :::
 
 </TabItem>
@@ -74,55 +71,55 @@ related to SVG path data parsing.
 
 ## The Application
 
-[`ContactsApp`](https://github.com/nacular/doodle-tutorials/blob/master/Contacts/src/commonMain/kotlin/io/nacular/doodle/examples/contacts/ContactsApp.kt) is the entry point into our application. This is where the general structure of our app is defined. Note that Doodle creates all apps
-via constructor and passes their dependencies that way. This means the ContactsApp can begin work on setting up its views, layout, and routing
-directly in `init`.
+[`ContactsApp`](https://github.com/nacular/doodle-tutorials/blob/master/Contacts/src/commonMain/kotlin/io/nacular/doodle/examples/contacts/ContactsApp.kt) is the entry point into our application. This is where the general structure of our app is defined. Note that Doodle creates all apps via constructor and passes their dependencies that way. This means the ContactsApp can begin work on setting up its views, layout, and routing directly in `init`.
 
 
 [**ContactsApp.kt**](https://github.com/nacular/doodle-tutorials/blob/master/Contacts/src/commonMain/kotlin/io/nacular/doodle/examples/contacts/ContactsApp.kt#L19)
 
-```kotlin title="ContactsApp.kt"
+**ContactsApp.kt**
+
+<KPlayground>{`
 class ContactsApp(/*...*/): Application {
-
+\n
     // ...
-
+\n
     init {
         // Coroutine used to load assets
         appScope.launch(uiDispatcher) {
             val appAssets = assets()
-
+\n
             themeManager.selected = theme // Install theme
-
+\n
             header      = Header     (appAssets)
             contactList = ContactList(appAssets)
-
+\n
             // Register handlers for different routes
             router[""                      ] = { _,_        -> /* Contact List     */ }
             router["/add"                  ] = { _,_        -> /* Contact Creation */ }
             router["/contact/([0-9]+)"     ] = { _, matches -> /* Contact          */ }
             router["/contact/([0-9]+)/edit"] = { _, matches -> /* Contact Editing  */ }
-
+\n
             display += header
-
+\n
             // Happens after header is added to ensure view goes below create button
             router.fireAction()
-
+\n
             display += CreateButton(appAssets)
-
+\n
             // Setup layout that manages how Header, CreateButton, and current View are positioned
             display.layout = simpleLayout { container ->
                 // ...
             }
-
+\n
             display.fill(appAssets.background.paint)
         }
     }
-
+\n
     // ...
-
+\n
     override fun shutdown() { /* no-op */ }
 }
-```
+`}</KPlayground>
 
 :::tip
 Notice that `shutdown` is a no-op, since we don't have any cleanup to do when the app closes.
@@ -132,7 +129,9 @@ Notice that `shutdown` is a no-op, since we don't have any cleanup to do when th
 
 The app uses custom fonts and images, both of which require async loading via [`FontLoader`](https://nacular.github.io/doodle/docs/rendering/text#fonts) and [`ImageLoader`](https://nacular.github.io/doodle/docs/rendering/images). It is easiest to load these within the app itself (instead of trying to load them in the launcher and injecting). We are using the `AppConfig` interface to hold these assets and many different app attributes. The ContactsApp therefore needs to create an instance of this config, which must happen asynchronously since it internally loads fonts and images. This is what the `assets` factory does, and why the app needs a `CoroutineScope` and `CoroutineDispatcher` injected.
 
-```kotlin title="ContactsApp.kt"
+**ContactsApp.kt**
+
+<KPlayground>{`
 class ContactsApp(
     // ...
     assets      : suspend () -> AppConfig,
@@ -147,18 +146,20 @@ class ContactsApp(
             // ...
         }
     }
-
+\n
     // ...
 }
-```
+`}</KPlayground>
 
 Our launcher creates the `appScope` ahead of app creation and injects it, along with `Dispatchers.UI` ([web](https://nacular.github.io/doodle-api/browser/io.nacular.doodle.coroutines/-dispatchers), [desktop](https://nacular.github.io/doodle-api/desktop/io.nacular.doodle.coroutines/-dispatchers)).
 
-```kotlin title="main.kt"
+**main.kt**
+
+<KPlayground>{`
 fun main() {
     // ...
     val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
-
+\n
     application (modules = listOf(
         // ...
     )) {
@@ -171,23 +172,20 @@ fun main() {
         )
     }
 }
-```
+`}</KPlayground>
 
 ### Theming
 
-Like most apps, we will use Views that rely on [Behaviors](https://nacular.github.io/doodle/docs/rendering/behaviors) to control their look and
-feel. This includes things like [TextField](https://nacular.github.io/doodle/docs/ui_components/overview#textfield), [Label](https://nacular.github.io/doodle/docs/ui_components/overview#label),
-[ScrollPanel](https://nacular.github.io/doodle-api/core/io.nacular.doodle.controls.panels/-scroll-panel), and
-[`HyperLink`](https://nacular.github.io/doodle-api/controls/io.nacular.doodle.controls.buttons/-hyper-link).
-Therefore, we need to either provide these behaviors directly to each View, or use a [Theme](https://nacular.github.io/doodle/docs/themes) that
-automatically binds behaviors to them. The latter approach is much simpler.
+Like most apps, we will use Views that rely on [Behaviors](https://nacular.github.io/doodle/docs/rendering/behaviors) to control their look and feel. This includes things like [TextField](https://nacular.github.io/doodle/docs/ui_components/overview#textfield), [Label](https://nacular.github.io/doodle/docs/ui_components/overview#label), [ScrollPanel](https://nacular.github.io/doodle-api/core/io.nacular.doodle.controls.panels/-scroll-panel), and [`HyperLink`](https://nacular.github.io/doodle-api/controls/io.nacular.doodle.controls.buttons/-hyper-link). Therefore, we need to either provide these behaviors directly to each View, or use a [Theme](https://nacular.github.io/doodle/docs/themes) that automatically binds behaviors to them. The latter approach is much simpler.
 
 In this case, we use the following behaviors by installing [Modules](https://nacular.github.io/doodle/docs/applications#dependencies) when initializing the app.
 
-```kotlin title="main.kt"
+**main.kt**
+
+<KPlayground>{`
 fun main() {
     // ...
-
+\n
     application (modules = listOf(
         // ...
         basicLabelBehavior       (),
@@ -205,19 +203,17 @@ fun main() {
         )
     }
 }
-```
+`}</KPlayground>
 
 :::info
-Notice that we also install modules to get support for [fonts](https://nacular.github.io/doodle/docs/rendering/text#fonts),
-[images](https://nacular.github.io/doodle/docs/rendering/images), [pointer](https://nacular.github.io/doodle/docs/pointer_input/overview),
-[keyboard](https://nacular.github.io/doodle/docs/keyboard) and others.
+Notice that we also install modules to get support for [fonts](https://nacular.github.io/doodle/docs/rendering/text#fonts), [images](https://nacular.github.io/doodle/docs/rendering/images), [pointer](https://nacular.github.io/doodle/docs/pointer_input/overview), [keyboard](https://nacular.github.io/doodle/docs/keyboard) and others.
 :::
 
-The `Behavior` modules used can be consumed in our app via the [DynamicTheme](https://nacular.github.io/doodle/docs/themes#dynamic-themes) instance.
-This theme picks up all registered behaviors and installs them to the View type they are supposed to bind to. We can therefore inject this
-`Theme` and a [ThemeManager](https://nacular.github.io/doodle/docs/themes#thememanager) into the app's constructor.
+The `Behavior` modules used can be consumed in our app via the [DynamicTheme](https://nacular.github.io/doodle/docs/themes#dynamic-themes) instance. This theme picks up all registered behaviors and installs them to the View type they are supposed to bind to. We can therefore inject this `Theme` and a [ThemeManager](https://nacular.github.io/doodle/docs/themes#thememanager) into the app's constructor.
 
-```kotlin title="ContactsApp.kt"
+**ContactsApp.kt**
+
+<KPlayground>{`
 class ContactsApp(
     // ...
     theme       : DynamicTheme,
@@ -232,17 +228,17 @@ class ContactsApp(
             // ...
         }
     }
-
+\n
     // ...
 }
-```
+`}</KPlayground>
 
 ### Routing
 
-This app relies on navigation and routes to display various screens. The Web (full screen) version supports deep linking as a result. The mapping between
-various routes and handlers is established in the [`ContactsApp`](https://github.com/nacular/doodle-tutorials/blob/master/Contacts/src/commonMain/kotlin/io/nacular/doodle/examples/contacts/ContactsApp.kt#L19).
+This app relies on navigation and routes to display various screens. The Web (full screen) version supports deep linking as a result. The mapping between various routes and handlers is established in the [`ContactsApp`](https://github.com/nacular/doodle-tutorials/blob/master/Contacts/src/commonMain/kotlin/io/nacular/doodle/examples/contacts/ContactsApp.kt#L19).
 
-```kotlin title="ContactsApp.kt"
+**ContactsApp.kt**
+<KPlayground>{`
 class ContactsApp(
     // ...
     router: Router,
@@ -252,32 +248,32 @@ class ContactsApp(
     init {
         appScope.launch(uiDispatcher) {
             // ...
-
+\n
             // Register handlers for different routes
             router[""                      ] = { _,_        -> /* Contact List     */ }
             router["/add"                  ] = { _,_        -> /* Contact Creation */ }
             router["/contact/([0-9]+)"     ] = { _, matches -> /* Contact          */ }
             router["/contact/([0-9]+)/edit"] = { _, matches -> /* Contact Editing  */ }
-
+\n
             // ...
         }
     }
-
+\n
     // ...
 }
-```
+`}</KPlayground>
+
 :::info
-The [`Router`](https://github.com/nacular/doodle-tutorials/blob/master/Contacts/src/commonMain/kotlin/io/nacular/doodle/examples/contacts/Router.kt#L9)
-interface supports registration of handlers by regex strings. This allows for routes that contain variable data.
+The [`Router`](https://github.com/nacular/doodle-tutorials/blob/master/Contacts/src/commonMain/kotlin/io/nacular/doodle/examples/contacts/Router.kt#L9) interface supports registration of handlers by regex strings. This allows for routes that contain variable data.
 :::
 
 ### Responsive Layout
 
-The app has 3 top-level Views that are visible at all times. The [Header](#header), main View, and Create Button. These are all placed within the
-[Display](https://nacular.github.io/doodle/docs/display), and are positioned, sized according to the specified [Layout](https://nacular.github.io/doodle/docs/positioning).
-That layout looks like this:
+The app has 3 top-level Views that are visible at all times. The [Header](#header), main View, and Create Button. These are all placed within the [Display](https://nacular.github.io/doodle/docs/display), and are positioned, sized according to the specified [Layout](https://nacular.github.io/doodle/docs/positioning). That layout looks like this:
 
-```kotlin title="ContactsApp.kt"
+**ContactsApp.kt**
+
+<KPlayground>{`
 class ContactsApp(
     // ...
     display: Display,
@@ -287,7 +283,7 @@ class ContactsApp(
     init {
         appScope.launch(uiDispatcher) {
             // ...
-
+\n
             display.layout = object: Layout {
                 // Header needs to be sized based on its minimumSize, so this layout should respond to any changes to it.
                 override fun requiresLayout(
@@ -296,35 +292,32 @@ class ContactsApp(
                     old  : View.SizePreferences,
                     new  : View.SizePreferences
                 ) = new.minimumSize != old.minimumSize
-
+\n
                 override fun layout(container: PositionableContainer) {
                     val mainView = container.children[1]
                     val button   = container.children[2]
-
+\n
                     header.size     = Size(container.width, header.minimumSize.height)
                     mainView.bounds = Rectangle(INSET, header.height, max(0.0, header.width - 2 * INSET), max(0.0, container.height - header.height))
-
+\n
                     button.bounds = when {
                         container.width > header.filterCenterAboveWidth -> Rectangle(container.width - appAssets.createButtonLargeSize.width - 20, (header.naturalHeight - appAssets.createButtonLargeSize.height) / 2, appAssets.createButtonLargeSize.width, appAssets.createButtonLargeSize.height)
                         else                                            -> Rectangle(container.width - appAssets.createButtonSmallSize.width - 20, container.height - appAssets.createButtonSmallSize.height - 40,      appAssets.createButtonSmallSize.width, appAssets.createButtonSmallSize.height)
                     }
                 }
             }
-
+\n
             // ...
         }
     }
-
+\n
     // ...
 }
-```
+`}</KPlayground>
 
-The Header is placed at the top and allowed to resize based on the `Display`'s width. The header will update its `minimumSize` and `idealSize` based
-on its width, which in turn will trigger a re-layout (see `requiresLayout` above). The main View is always seated below the Header and takes the
-remaining space within the `Display`.
+The Header is placed at the top and allowed to resize based on the `Display`'s width. The header will update its `minimumSize` and `idealSize` based on its width, which in turn will trigger a re-layout (see `requiresLayout` above). The main View is always seated below the Header and takes the remaining space within the `Display`.
 
-Notice that the Create Button is a floating View. It is aligned to the right of the Header when there is sufficient space, but pops down to the
-bottom-right when the app's width is below a threshold. The Header and other Views also adapt their internal layouts based on the app's width
+Notice that the Create Button is a floating View. It is aligned to the right of the Header when there is sufficient space, but pops down to the bottom-right when the app's width is below a threshold. The Header and other Views also adapt their internal layouts based on the app's width
 
 :::tip
 The Create Button needs to be above all other Views, so the app ensures it is added to the `Display` last.
@@ -336,30 +329,30 @@ The Create Button needs to be above all other Views, so the app ensures it is ad
 
 ### [Header](https://github.com/nacular/doodle-tutorials/blob/master/Contacts/src/commonMain/kotlin/io/nacular/doodle/examples/contacts/Header.kt#L35)
 
-The app's header (which is always visible) provides a way to [filter](#filterbox) the [Contact List](#contact-list)
-and navigate back to it whenever the logo area is clicked. It also positions its contents in a way that allows the floating create button to sit along side them as though it is a child.
+The app's header (which is always visible) provides a way to [filter](#filterbox) the [Contact List](#contact-list) and navigate back to it whenever the logo area is clicked. It also positions its contents in a way that allows the floating create button to sit along side them as though it is a child.
 
 <DoodleCodeBlock functionName="contactsHeader" height="200" />
 
-```kotlin title="Header.kt"
+**Header.kt**
+<KPlayground>{`
 class Header(/*...*/): View() {
-
+\n
     /** Search box that filters which contacts are shown */
     private inner class FilterBox: View() {
         // ...
     }
-
+\n
             val naturalHeight          =  64.0
     private val filterRightAboveWidth  = 672.0
     private val filterCenterAboveWidth = 800.0
     private val filterBox: FilterBox
-
+\n
     val filterCentered: Boolean get() = width > filterCenterAboveWidth
-
+\n
     var searchEnabled by observable(true) { _,new ->
         filterBox.enabled = new
     }
-
+\n
     init {
         children += Photo(assets.logo).apply { size = Size(40) }
         children += Label("Phonebook").apply {
@@ -369,17 +362,17 @@ class Header(/*...*/): View() {
             foregroundColor = assets.header
         }
         children += FilterBox().apply { size = Size(300, 45); font = assets.medium }.also { filterBox = it }
-
+\n
         val filterNaturalWidth = 300.0
-
+\n
         layout = Layout.simpleLayout { container ->
             val logo   = container.children[0]
             val label  = container.children[1]
             val filter = container.children[2]
-
+\n
             logo.position  = Point(2 * INSET, (naturalHeight - logo.height) / 2)
             label.position = Point(logo.bounds.right + 10, logo.bounds.center.y - label.height / 2)
-
+\n
             filter.bounds = when {
                 container.width > filterCenterAboveWidth -> Rectangle((container.width - filterNaturalWidth) / 2,        logo.bounds.center.y - filter.height / 2, filterNaturalWidth, filter.height)
                 container.width > filterRightAboveWidth  -> Rectangle( container.width - filterNaturalWidth - 2 * INSET, logo.bounds.center.y - filter.height / 2, filterNaturalWidth, filter.height)
@@ -389,7 +382,7 @@ class Header(/*...*/): View() {
             minimumSize = Size(width, max(0.0, filterBox.bounds.bottom + 8))
             idealSize   = minimumSize
         }
-
+\n
         // Custom cursor when pointer in the "clickable" region
         pointerMotionChanged += moved {
             cursor = when {
@@ -397,7 +390,7 @@ class Header(/*...*/): View() {
                 else         -> null
             }
         }
-
+\n
         // Show Contact list when "clickable" region clicked
         pointerChanged += clicked {
             if (it.inHotspot) {
@@ -405,10 +398,10 @@ class Header(/*...*/): View() {
             }
         }
     }
-
+\n
     private val PointerEvent.inHotspot get() = this@Header.toLocal(location, target).x < 220
 }
-```
+`}</KPlayground>
 
 :::tip
 The Header uses pointer tracking to update its Cursor and handle clicking within its hot spot.
@@ -416,18 +409,17 @@ The Header uses pointer tracking to update its Cursor and handle clicking within
 
 #### FilterBox
 
-The FilterBox is a simple wrapper around a [TextField](https://nacular.github.io/doodle/docs/ui_components/overview#textfield)
-that adds some iconography, handles styling and manages the animations.
+The FilterBox is a simple wrapper around a [TextField](https://nacular.github.io/doodle/docs/ui_components/overview#textfield) that adds some iconography, handles styling and manages the animations.
 
-```kotlin
+<KPlayground>{`
 private inner class FilterBox: View() {
-
+\n
     private var progress              by renderProperty(0f  )
     private var animation: Animation? by observable    (null) { old,_ -> old?.cancel() }
-
+\n
     private val searchIcon     = PathIcon<View>(path(assets.searchIcon), fill = assets.search, pathMetrics = pathMetrics)
     private val searchIconSize = searchIcon.size(this)
-
+\n
     val textField = TextField().apply {
         placeHolder      = "Search"
         borderVisible    = false
@@ -440,11 +432,11 @@ private inner class FilterBox: View() {
             }
         }
     }
-
+\n
     init {
         cursor             = Text
         clipCanvasToBounds = false
-
+\n
         val clearButton = PathIconButton(pathData = assets.deleteIcon, pathMetrics = pathMetrics).apply {
             size            = Size(22, 44)
             cursor          = Pointer
@@ -454,19 +446,19 @@ private inner class FilterBox: View() {
                 textField.text = ""
             }
         }
-
+\n
         textField.textChanged += { _,_,new ->
             when {
                 new.isBlank() -> contacts.filter = null
                 else          -> contacts.filter = { it.name.contains(new, ignoreCase = true) }
             }
-
+\n
             clearButton.visible = new.isNotBlank()
         }
-
+\n
         children += textField
         children += clearButton
-
+\n
         layout = constrain(children[0], children[1]) { textField, clear ->
             textField.left    = parent.left + searchIconSize.width + 2 * 20
             textField.height  = parent.height
@@ -475,12 +467,12 @@ private inner class FilterBox: View() {
             clear.right       = parent.right - 20
             clear.centerY     = parent.centerY
         }
-
+\n
         pointerChanged += clicked {
             focusManager.requestFocus(textField)
         }
     }
-
+\n
     override fun render(canvas: Canvas) {
         when {
             // draw shadow when animating (progress > 0)
@@ -490,114 +482,105 @@ private inner class FilterBox: View() {
             }
             else          -> canvas.rect(bounds.atOrigin, radius = 8.0, color = assets.searchSelected)
         }
-
+\n
         searchIcon.render(this, canvas, at = Point(20.0, (height - searchIconSize.height) / 2))
     }
 }
-```
+`}</KPlayground>
 
 ### [Contact List](https://github.com/nacular/doodle-tutorials/blob/master/Contacts/src/commonMain/kotlin/io/nacular/doodle/examples/contacts/ContactList.kt#L35)
 
-This is the main view within the app. It displays the contacts in a [Table](https://nacular.github.io/doodle/docs/ui_components/overview#table) with
-three columns: _Name_, _Phone Number_, and an untitled one to hold the edit/delete tool buttons. This View extends Doodle's
-[`DynamicTable`](https://nacular.github.io/doodle/docs/ui_components/overview#table),
-which means it responds automatically to change in its underlying model. This is precisely what we need since Contacts will be added, edited, and
-deleted.
+This is the main view within the app. It displays the contacts in a [Table](https://nacular.github.io/doodle/docs/ui_components/overview#table) with three columns: _Name_, _Phone Number_, and an untitled one to hold the edit/delete tool buttons. This View extends Doodle's [`DynamicTable`](https://nacular.github.io/doodle/docs/ui_components/overview#table), which means it responds automatically to change in its underlying model. This is precisely what we need since Contacts will be added, edited, and deleted.
 
 <DoodleCodeBlock functionName="contactList" height="550" />
 
-```kotlin title="ContactList.kt"
+**ContactList.kt**
+<KPlayground>{`
 class ContactList(
    // ...
 ): DynamicTable<Contact, MutableListModel<Contact>>(contacts, SingleItemSelectionModel(), block = {
     val alignment      : Constraints.() -> Unit          = // ...
     val nameVisualizer : CellVisualizer<Contact, String> = // ...
     val toolsVisualizer: CellVisualizer<Contact, Unit>   = // ...
-
+\n
     column(Label("Name"        ), { name        }, nameVisualizer   ) { cellAlignment = alignment; headerAlignment = alignment                }
     column(Label("Phone Number"), { phoneNumber }, TextVisualizer() ) { cellAlignment = alignment; headerAlignment = alignment                }
     column(null,                                   toolsVisualizer  ) { cellAlignment = fill(Insets(top = 20.0, bottom = 20.0, right = 20.0)) }
 }) {
     init {
         // ...
-
+\n
         // Controls how the table's columns resize
         columnSizePolicy = object: ColumnSizePolicy {
             override fun layout(width: Double, columns: List<Column>, startIndex: Int): Double {
                 columns[2].width = if (width > 672.0 - 2 * INSET) 100.0 else 0.0 // FIXME: factor out hard-coded width
                 columns[0].width = width / 2
                 columns[1].width = width - columns[0].width - columns[2].width
-
+\n
                 return width
             }
-
+\n
             override fun widthChanged(width: Double, columns: List<Column>, index: Int, to: Double) {
                 // no-op
             }
         }
-
+\n
         behavior      = ContactListBehavior(assets, navigator)
         acceptsThemes = false
     }
 }
-
+\n
 // ...
-```
+`}</KPlayground>
 
 :::tip
-ContactList uses a [`SingleItemSelectionModel`](https://nacular.github.io/doodle-api/controls/io.nacular.doodle.controls/-single-item-selection-model)
-to ensure that only one row can be highlighted at a time.
+ContactList uses a [`SingleItemSelectionModel`](https://nacular.github.io/doodle-api/controls/io.nacular.doodle.controls/-single-item-selection-model) to ensure that only one row can be highlighted at a time.
 :::
 
-The table's columns are defined (at construction time), and the sizing policy for their widths is specified in the `apply` block.
-`Table`s are all strongly-typed, so this one can only store `Contact`s. Which means each column can derive its data from some component of
-a `Contact`. The first two columns rely on `Contact.name` and `Contact.phoneNumber` respectively. But the last column takes no data in,
-since it will simply show buttons that fire events.
+The table's columns are defined (at construction time), and the sizing policy for their widths is specified in the `apply` block. `Table`s are all strongly-typed, so this one can only store `Contact`s. Which means each column can derive its data from some component of a `Contact`. The first two columns rely on `Contact.name` and `Contact.phoneNumber` respectively. But the last column takes no data in, since it will simply show buttons that fire events.
 
-The `columnSizePolicy` used sizes the columns so that they take up the entire table width and scale such that the 3rd one disappears when
-the table is below a threshold.
+The `columnSizePolicy` used sizes the columns so that they take up the entire table width and scale such that the 3rd one disappears when the table is below a threshold.
 
 #### [Custom Table Behavior](https://github.com/nacular/doodle-tutorials/blob/master/Contacts/src/commonMain/kotlin/io/nacular/doodle/examples/contacts/ContactListBehavior.kt#L29)
 
-The `ContactList` uses a custom [`TableBehavior`](https://nacular.github.io/doodle-api/controls/io.nacular.doodle.controls.table/-table-behavior)
-via `ContactListBehavior`. Doodle's [Table](https://nacular.github.io/doodle/docs/ui_components/overview#table) is very customizable, since it
-delegates a lot of functionality to `TableBehavior`. We use this fact to specify how the header and body cells look and are positioned, as well as
-the way selection highlighting works.
+The `ContactList` uses a custom [`TableBehavior`](https://nacular.github.io/doodle-api/controls/io.nacular.doodle.controls.table/-table-behavior) via `ContactListBehavior`. Doodle's [Table](https://nacular.github.io/doodle/docs/ui_components/overview#table) is very customizable, since it delegates a lot of functionality to `TableBehavior`. We use this fact to specify how the header and body cells look and are positioned, as well as the way selection highlighting works.
 
-```kotlin title="ContactListBehavior.kt"
+**ContactListBehavior.kt**
+
+<KPlayground>{`
 class ContactListBehavior(private val assets: AppConfig, private val navigator: Navigator): TableBehavior<Contact>() {
     private inner class ContactCell<T>(/*...*/): View() {
         // Represents each cell in the table's body
         // Navigates to ContactView on pointer press
         // Adds/removes row selection (for highlighting) on pointer enter/exit
     }
-
+\n
     private val selectionChanged: SetObserver<Table<Contact, *>, Int> = { table,_,_ ->
         // Repaint the Table to show selected rows
         table.bodyDirty()
     }
-
+\n
     override fun install(view: Table<Contact, *>) {
         view.selectionChanged += selectionChanged
     }
-
+\n
     override fun uninstall(view: Table<Contact, *>) {
         view.selectionChanged -= selectionChanged
     }
-
+\n
     override val headerCellGenerator = object: AbstractTableBehavior.HeaderCellGenerator<Table<Contact, *>> {
         override fun <A> invoke(table: Table<Contact, *>, column: Column<A>) = container {
             // Column header cell with underline
         }
     }
-
+\n
     override val headerPositioner = object: AbstractTableBehavior.HeaderPositioner<Table<Contact, *>> {
         override fun invoke(table: Table<Contact, *>) = HeaderGeometry(0.0, TABLE_HEADER_HEIGHT)
     }
-
+\n
     // No overflow column will be in the Table
     override val overflowColumnConfig: Nothing? = null
-
+\n
     @Suppress("UNCHECKED_CAST")
     override val cellGenerator: CellGenerator<Contact> = object: CellGenerator<Contact> {
         override fun <A> invoke(table: Table<Contact, *>, column: Column<A>, cell: A, row: Int, itemGenerator: ItemVisualizer<A, IndexedItem>, current: View?): View = when (current) {
@@ -605,19 +588,19 @@ class ContactListBehavior(private val assets: AppConfig, private val navigator: 
             else              -> ContactCell(table, column, cell, row, itemGenerator)
         }
     }
-
+\n
     override val rowPositioner: RowPositioner<Contact> = object: RowPositioner<Contact> {
         // Position rows like a vertical list
         private val delegate = VerticalListPositioner(ROW_HEIGHT)
-
+\n
         override fun rowBounds  (of: Table<Contact, *>, row: Contact, index: Int) = delegate.itemBounds (of.size,     of.insets, index)
         override fun row        (of: Table<Contact, *>, at: Point               ) = delegate.itemFor    (of.size,     of.insets,  at  )
         override fun minimumSize(of: Table<Contact, *>                          ) = delegate.minimumSize(of.numItems, of.insets       )
     }
-
+\n
     override fun renderBody(table: Table<Contact, *>, canvas: Canvas) {
         canvas.rect(table.bounds.atOrigin, color = assets.background)
-
+\n
         // Highlight selected rows
         table.selection.map { it to table[it] }.forEach { (index, row) ->
             row.onSuccess {
@@ -626,22 +609,20 @@ class ContactListBehavior(private val assets: AppConfig, private val navigator: 
         }
     }
 }
-```
+`}</KPlayground>
 
 :::tip
-Highlighting on pointer hover is handled by each cell in the Table. [`ContactCell`](https://github.com/nacular/doodle-tutorials/blob/master/Contacts/src/commonMain/kotlin/io/nacular/doodle/examples/contacts/ContactListBehavior.kt#L29)
-registers Pointer/MotionListeners and sets its row un/selected accordingly. This then results in `ContactListBehavior` redrawing the
-Table background and coloring the selected rows.
+Highlighting on pointer hover is handled by each cell in the Table. [`ContactCell`](https://github.com/nacular/doodle-tutorials/blob/master/Contacts/src/commonMain/kotlin/io/nacular/doodle/examples/contacts/ContactListBehavior.kt#L29) registers Pointer/MotionListeners and sets its row un/selected accordingly. This then results in `ContactListBehavior` redrawing the Table background and coloring the selected rows.
 :::
 
 ### [Contact Creation](https://github.com/nacular/doodle-tutorials/blob/master/Contacts/src/commonMain/kotlin/io/nacular/doodle/examples/contacts/CreateContactView.kt#L24)
 
-This View allows the user to create a new contact. It shows a preview of the avatar that will be used and takes text input for both the `name` and
-`phoneNumber`. This View uses child Views for these components, including a [Form](https://nacular.github.io/doodle/docs/ui_components/form) for the input fields.
+This View allows the user to create a new contact. It shows a preview of the avatar that will be used and takes text input for both the `name` and `phoneNumber`. This View uses child Views for these components, including a [Form](https://nacular.github.io/doodle/docs/ui_components/form) for the input fields.
 
 <DoodleCodeBlock functionName="contactCreation" height="550" />
 
-```kotlin title="CreateContactView.kt"
+**CreateContactView.kt**
+<KPlayground>{`
 class CreateContactView(
     // ...
 ): View() {
@@ -655,17 +636,17 @@ class CreateContactView(
             }
         }
     }
-
+\n
     init {
         lateinit var name       : String
         lateinit var phoneNumber: String
-
+\n
         val label = Label("Create Contact").apply {
             font    = assets.medium
             height  = 28.0
             fitText = setOf(Width)
         }
-
+\n
         val back   = buttons.back  (assets.backIcon)
         val avatar = DynamicAvatar (assets.blankAvatar).apply { size = Size(176); font = assets.medium }
         val button = buttons.create(assets.buttonBackground, assets.buttonForeground).apply {
@@ -676,14 +657,14 @@ class CreateContactView(
                 navigator.showContactList()
             }
         }
-
+\n
         val spacer = view {
             height = 64.0
             render = {
                 line(Point(0.0, height / 2), Point(width, height / 2), stroke = Stroke(assets.outline))
             }
         }
-
+\n
         val form = editForm(
             assets          = assets,
             button          = button,
@@ -695,29 +676,29 @@ class CreateContactView(
             phoneNumber    = phone_
             button.enabled = true
         }
-
+\n
         children += listOf(label, back, avatar, spacer, form, button)
-
+\n
         layout = constrain(label, back, avatar, spacer, form, button) { (label, back, avatar, spacer, form, button) ->
             // ...
         }.then {
             idealSize = Size(spacer.width + 2 * INSET, button.bounds.bottom + INSET)
         }
     }
-
+\n
     // Helper to use constrain with 6 items
     private operator fun <T> List<T>.component6() = this[5]
 }
-```
+`}</KPlayground>
 
 ### Contact View
 
-This View shows the details of a contact. It allows the user to edit or delete the contact. Editing jumps to the [Contact Editing](#contact-editing)
-screen.
+This View shows the details of a contact. It allows the user to edit or delete the contact. Editing jumps to the [Contact Editing](#contact-editing) screen.
 
 <DoodleCodeBlock functionName="contactView" height="550" />
 
-```kotlin title="ContactView.kt"
+**ContactView.kt**
+<KPlayground>{`
 class ContactView(/*...*/): ContactCommon(/*...*/) {
     init {
         edit.apply {
@@ -726,7 +707,7 @@ class ContactView(/*...*/): ContactCommon(/*...*/) {
                 navigator.showContactEdit(super.contact)
             }
         }
-
+\n
         val details = container {
             this += Label("Contact Details").apply {
                 font    = assets.small
@@ -734,7 +715,7 @@ class ContactView(/*...*/): ContactCommon(/*...*/) {
                 fitText = setOf(Width)
             }
             this += HyperLink(
-                url  = "tel:${contact.phoneNumber}",
+                url  = "tel:$\{contact.phoneNumber\}",
                 text = contact.phoneNumber,
                 icon = PathIcon(path = path(assets.phoneIcon), pathMetrics = pathMetrics, fill = assets.phoneNumber),
             ).apply {
@@ -746,24 +727,24 @@ class ContactView(/*...*/): ContactCommon(/*...*/) {
                         super.install(view)
                         val textSize = textMetrics.size(text, font)
                         val iconSize = icon!!.size(view)
-
+\n
                         // Ensure link's size includes icon and text
                         size = Size(textPosition(view).x + textSize.width, max(iconSize.height, textSize.height))
                     }
-
+\n
                     override fun render(view: HyperLink, canvas: Canvas) {
                         icon!!.render(view, canvas, at = iconPosition(view, icon = icon!!))
-
+\n
                         // Styled text with phoneNumberLink color and link's font
                         canvas.text(assets.phoneNumberLink.invoke { view.font(view.text) }, at = textPosition(view))
                     }
                 }) as Behavior<Button>
             }
-
+\n
             render = {
                 rect(bounds.atOrigin.inset(0.5), radius = 12.0, stroke = Stroke(assets.outline))
             }
-
+\n
             layout = constrain(children[0], children[1]) { label, link ->
                 label.top  = parent.top   + INSET
                 label.left = parent.left  + INSET
@@ -771,30 +752,28 @@ class ContactView(/*...*/): ContactCommon(/*...*/) {
                 link.left  = label.left
             }
         }
-
+\n
         setDetail(details)
-
+\n
         layout = simpleLayout { layoutCommonItems() }.then {
             idealSize = Size(spacer.width + 2 * INSET, details.bounds.bottom + INSET)
         }
     }
 }
-```
+`}</KPlayground>
 
 :::tip
-This view uses a customized HyperLink that contains an icon. HyperLinks are Buttons whose behaviors can be modified. In this case, we want the link
-to behave like a normal link, but fully customize the rendering. This is why we need to use `linkStyler`, which is a [`NativeHyperLinkStyler`](https://nacular.github.io/doodle-api/themes/io.nacular.doodle.theme.native/-native-hyper-link-styler).
+This view uses a customized HyperLink that contains an icon. HyperLinks are Buttons whose behaviors can be modified. In this case, we want the link to behave like a normal link, but fully customize the rendering. This is why we need to use `linkStyler`, which is a [`NativeHyperLinkStyler`](https://nacular.github.io/doodle-api/themes/io.nacular.doodle.theme.native/-native-hyper-link-styler).
 :::
 
 ### Contact Editing
 
-Contacts are edited using this View. It is fairly similar to the CreateContactView, in that it displays the contact's avatar, `name`, `phoneNumber`,
-and presents a form to modify them. It also has a delete button to remove the Contact. This View shares a lot of structure with `ContactView` that
-is placed in the `ContactCommon` base class.
+Contacts are edited using this View. It is fairly similar to the CreateContactView, in that it displays the contact's avatar, `name`, `phoneNumber`, and presents a form to modify them. It also has a delete button to remove the Contact. This View shares a lot of structure with `ContactView` that is placed in the `ContactCommon` base class.
 
 <DoodleCodeBlock functionName="contactEditing" height="620" />
 
-```kotlin title="EditContactView.kt"
+**EditContactView.kt**
+<KPlayground>{`
 class EditContactView(
     // ...
 ): ContactCommon(
@@ -803,7 +782,7 @@ class EditContactView(
     init {
         lateinit var newName       : String
         lateinit var newPhoneNumber: String
-
+\n
         edit.apply {
             enabled = false
             fired += {
@@ -814,27 +793,27 @@ class EditContactView(
                 }.onSuccess {
                     super.contact = it // updates its contact to the newly edited one
                 }
-
+\n
                 enabled = false
             }
         }
-
+\n
         val form = editForm(super.contact.name, super.contact.phoneNumber, assets, textFieldStyler, pathMetrics, edit) { name, phone ->
             // called whenever the Form becomes valid
             newName        = name
             newPhoneNumber = phone
             edit.enabled   = name != super.contact.name || phone != super.contact.phoneNumber
         }
-
+\n
         setDetail(form) // super class utility for specifying details view
-
+\n
         layout = simpleLayout {
             layoutCommonItems() // super class utility
-
+\n
             edit.position = Point(form.x, form.bounds.bottom + 2 * INSET)
         }.then {
             idealSize = Size(spacer.width + 2 * INSET, edit.bounds.bottom + INSET)
         }
     }
 }
-```
+`}</KPlayground>

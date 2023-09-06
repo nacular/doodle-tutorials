@@ -10,6 +10,7 @@ import io.nacular.doodle.controls.form.textField
 import io.nacular.doodle.controls.form.verticalLayout
 import io.nacular.doodle.controls.icons.PathIcon
 import io.nacular.doodle.controls.text.TextField
+import io.nacular.doodle.controls.text.TextField.Purpose.Telephone
 import io.nacular.doodle.core.View
 import io.nacular.doodle.core.container
 import io.nacular.doodle.drawing.Canvas
@@ -59,7 +60,7 @@ fun editForm(
 ) = Form {
     this(
         (name?.let        { Valid(it) } ?: Invalid()) to formTextField(assets, textFieldStyler, pathMetrics, "Name",         assets.nameIcon,  Regex(".+")        ) { textChanged += { _,_,new -> nameChanged(new) } },
-        (phoneNumber?.let { Valid(it) } ?: Invalid()) to formTextField(assets, textFieldStyler, pathMetrics, "Phone Number", assets.phoneIcon, Regex("[\\s,0-9]+")),
+        (phoneNumber?.let { Valid(it) } ?: Invalid()) to formTextField(assets, textFieldStyler, pathMetrics, "Phone Number", assets.phoneIcon, Regex("[\\s,0-9]+")) { purpose      = Telephone                       },
         onInvalid = { button.enabled = false }
     ) { name, phone ->
         result(name, phone)

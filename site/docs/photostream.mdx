@@ -3,10 +3,13 @@ title: Photo Stream
 hide_title: true
 ---
 
-import CodeBlock from '@theme/CodeBlock';
+import Gradle             from '!!raw-loader!../../PhotoStream/build.gradle.kts';
+import RunnerGradle       from '!!raw-loader!../../TabStripRunner/build.gradle.kts';
+import {KPlayground}      from '../src/components/KotlinPlayground'
+import PhotoStreamApp     from '!!raw-loader!../../PhotoStream/src/main/kotlin/io/nacular/doodle/examples/PhotoStreamApp.kt';
+import UnSplashDataModel  from '!!raw-loader!../../PhotoStream/src/main/kotlin/io/nacular/doodle/examples/UnSplashDataModel.kt';
+import CenterCroppedPhoto from '!!raw-loader!../../PhotoStream/src/main/kotlin/io/nacular/doodle/examples/CenterCroppedPhoto.kt';
 
-import Gradle       from '!!raw-loader!../../TabStrip/build.gradle.kts';
-import RunnerGradle from '!!raw-loader!../../TabStripRunner/build.gradle.kts';
 
 # [Photo Stream](https://github.com/nacular/doodle-tutorials/tree/master/PhotoStream) Tutorial
 
@@ -30,7 +33,7 @@ We also need Kotlin's Coroutines library to load images asynchronously.
 
 [**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/PhotoStream/build.gradle.kts)
 
-<CodeBlock language="kotlin">{Gradle}</CodeBlock>
+<KPlayground>{Gradle}</KPlayground>
 
 ## The Application
 
@@ -38,46 +41,7 @@ Our application will be fairly simple. It will create a [`DynamicList`](https://
 with a data model bound to Unsplash's APIs. This list will be within a [`ScrollPanel`](https://nacular.github.io/doodle-api/core/io.nacular.doodle.controls.panels/-scroll-panel)
 that fits the [`Display`](https://nacular.github.io/doodle/docs/display/overview) height.
 
-```kotlin
-class PhotoStreamApp(display    : Display,
-                     themes     : ThemeManager,
-                     theme      : DynamicTheme,
-                     httpClient : HttpClient,
-                     imageLoader: ImageLoader): Application {
-    init {
-        // For scroll panel behavior
-        themes.selected = theme
-
-        val appScope    = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-        val imageHeight = 400.0
-
-        // List to hold images
-        val list = DynamicList(
-            model          = UnSplashDataModel(appScope, httpClient, imageLoader),
-            itemVisualizer = itemVisualizer { image, recycledView, _ -> when(recycledView) {
-                is CenterCroppedPhoto -> recycledView.also { recycledView.image = image }
-                else                  -> CenterCroppedPhoto(image)
-            } }
-        ).apply {
-            behavior      = BasicListBehavior(rowHeight = imageHeight)
-            cellAlignment = fill
-        }
-
-        display += ScrollPanel(list).apply {
-            // Ensure list's width is equal to scroll-panel's
-            contentWidthConstraints = { parent.width }
-        }
-
-        display.layout = constrain(display.children[0]) {
-            it.width   = min(parent.width, constant(imageHeight))
-            it.height  = parent.height
-            it.centerX = parent.centerX
-        }
-    }
-
-    override fun shutdown() {}
-}
-```
+<KPlayground>{PhotoStreamApp}</KPlayground>
 
 DynamicList monitors its model for changes and updates whenever items are added, removed, or moved. This means we can simply change the underlying
 model to get a list that grows.
@@ -90,99 +54,75 @@ model to get a list that grows.
 
 DynamicList requires a [`DynamicListModel`](https://nacular.github.io/doodle-api/controls/io.nacular.doodle.controls/-dynamic-list-model) to hold its data, so we need to create one that binds to Unsplash.
 
-```kotlin
-class UnSplashDataModel(private val accessToken: String = "YOUR_ACCESS_TOKEN", /*...*/): DynamicListModel<Image> {
-    // ...
-
-    private var currentPage: Int by observable(-1) { /*...*/ }
-
-    private val pageSize               = 5
-    private val unsplashLocation get() = "https://api.unsplash.com/photos/?client_id=$accessToken&page=$currentPage&per_page=$pageSize"
-
-    override val size get() = loadedImages.size
-
-    override val changed = SetPool<ModelObserver<Image>>()
-
-    // Internal list used to cache images loaded from unsplash
-    private val loadedImages = ObservableList<Image>()
-
-    override fun get(index: Int): Image? = loadedImages.getOrNull(index).also {
-        // ...
-    }
-
-    override fun contains(value: Image           ) = value in loadedImages
-    override fun iterator(                       ) = loadedImages.iterator()
-    override fun section (range: ClosedRange<Int>) = loadedImages.subList(range.start, range.endInclusive + 1)
-}
-```
+<KPlayground>{UnSplashDataModel}</KPlayground>
 
 Our model will cache a local [`ObservableList`](https://nacular.github.io/doodle-api/core/io.nacular.doodle.utils/-observable-list) of images via `loadedImages`. This list will provide the model state our list uses to render. The model will then fetch paginated images from Unsplash and load the resulting urls asynchronously into this list.
 
 We track the `currentPage` and `pageSize` to fetch a growing list of pages from Unsplash. We fetch a new page whenever the `currentPage` is
 updated.
 
-```kotlin
+<KPlayground>{`
 class UnSplashDataModel(private val scope: CoroutineScope, /*...*/): DynamicListModel<Image> {
     // ...
-
+\n
     private var httpRequestJob: Job? by observable(null) { _,old,_ ->
         old?.cancel()
     }
-
+\n
     private var currentPage: Int by observable(-1) { _,_ ->
         fetchActive    = true
         httpRequestJob = scope.launch {
             val results = client.get<List<UnsplashPhoto>>(unsplashLocation)
-
+\n
             loadedImages.addAll(results.mapNotNull { imageLoader.load(it.urls.small) })
-
+\n
             fetchActive = false
-
+\n
             if (nextPageNeeded) {
                 nextPageNeeded  = false
                 currentPage    += 1
             }
         }
     }
-
+\n
     // ...
 }
-```
+`}</KPlayground>
 
 Fetches are performed using Ktor's HttpClient configured to read JSON data. These reads are done via Kotlin Serialization into the `UnsplashPhoto`
 data class. We only use the `small` value in the `urls` property from the JSON response, so our data classes are much simpler than the full
 Unsplash API.
 
-```kotlin
+<KPlayground>{`
 class UnSplashDataModel(httpClient: HttpClient, /*...*/): DynamicListModel<Image> {
     // ...
-
+\n
     @Serializable
     data class Urls(val small: String)
-
+\n
     @Serializable
     data class UnsplashPhoto(val id: String, val urls: Urls)
-
+\n
     // HTTP client configured to read JSON  returned from unsplash
     private val client = httpClient.config {
         install(JsonFeature) {
             serializer = KotlinxSerializer(Json { ignoreUnknownKeys = true })
         }
     }
-
+\n
     // ...
 }
-```
+`}</KPlayground>
 
 Our `loadedImages` list triggers an event whenever we add a new set of images to it. We use this fact to notify of changes to the model, which get
 reflected by the `DynamicList`.
 
-```kotlin
+<KPlayground>{`
 class UnSplashDataModel(/*...*/): DynamicListModel<Image> {
     // ...
-
+\n
     override val changed = SetPool<ModelObserver<Image>>()
-
+\n
     // Internal list used to cache images loaded from unsplash
     private val loadedImages = ObservableList<Image>().also {
         it.changed += { _ ,removed, added, moved ->
@@ -192,18 +132,18 @@ class UnSplashDataModel(/*...*/): DynamicListModel<Image> {
             }
         }
     }
-
+\n
     // ...
 }
-```
+`}</KPlayground>
 
 Finally, we need to decide when to fetch more images. We do this whenever `get` is called on the last image of the model. This happens when
 the `DynamicList` needs to present that image, and is a good indication that it has reached the end.
 
-```kotlin
+<KPlayground>{`
 class UnSplashDataModel(/*...*/): DynamicListModel<Image> {
     // ...
-
+\n
     override fun get(index: Int): Image? = loadedImages.getOrNull(index).also {
         // Load the next page if the last image is fetched from the model
         if (index == size - 1) {
@@ -213,10 +153,10 @@ class UnSplashDataModel(/*...*/): DynamicListModel<Image> {
             }
         }
     }
-
+\n
     // ...
 }
-```
+`}</KPlayground>
 
 ## Presenting The Images
 
@@ -226,11 +166,11 @@ Our `DynamicList` holds a list of `Image` items, but these are not `View`s. Whic
 It is also possible to change the way `BasicListBehavior` (and any `ListBehavior`) represents its rows by specifying it's [`RowGenerator`](https://nacular.github.io/doodle-api/controls/io.nacular.doodle.controls.theme/-tree-behavior/-row-generator).
 :::
 
-```kotlin
+<KPlayground>{`
 class PhotoStreamApp(/*...*/): Application {
     init {
         // ...
-
+\n
         val list = DynamicList(
             model          = UnSplashDataModel(appScope, httpClient, imageLoader),
             itemVisualizer = itemVisualizer { image, recycledView, _ -> when(recycledView) {
@@ -242,10 +182,10 @@ class PhotoStreamApp(/*...*/): Application {
             cellAlignment = fill
         }
     }
-
+\n
     // ...
 }
-```
+`}</KPlayground>
 
 :::tip
 `ItemVisualizer` is designed to support recycling. Each invocation may provide a recycled View that might be reusable for the new item. This lets
@@ -256,25 +196,4 @@ We will render each image as with a center-crop using `CenterCroppedPhoto`. This
 crop square's length is equal to the image's width or height (whichever is smaller). That center region is then scaled to fit the cropped photo View's
 bounds.
 
-```kotlin
-class CenterCroppedPhoto(image: Image): View() {
-    private lateinit var centerCrop: Rectangle
-
-    var image: Image = image
-        set(new) {
-            field        = new
-            val cropSize = min(image.width, image.height)
-            centerCrop   = Rectangle((image.width - cropSize) / 2, (image.height - cropSize) / 2, cropSize, cropSize)
-
-            rerender()
-        }
-
-    init {
-        this.image = image // ensure setter called, so centerCrop initialized
-    }
-
-    override fun render(canvas: Canvas) {
-        canvas.image(image, source = centerCrop, destination = bounds.atOrigin)
-    }
-}
-```
+<KPlayground>{CenterCroppedPhoto}</KPlayground>

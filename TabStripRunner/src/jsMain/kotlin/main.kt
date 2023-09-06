@@ -13,12 +13,14 @@ import org.kodein.di.instance
 /**
  * Creates a [TabStripApp]
  */
+//sampleStart
 fun main() {
     application(modules = listOf(PointerModule, Module(name = "AppModule") {
         bindSingleton<Animator>    { AnimatorImpl   (instance(), instance()) }
         bindSingleton<PathMetrics> { PathMetricsImpl(instance()            ) }
     })) {
         // load app
-        TabStripApp(instance(), instance(), instance())
+        TabStripApp(display = instance(), animator = instance(), pathMetrics = instance())
     }
 }
+//sampleEnd

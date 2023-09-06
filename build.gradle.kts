@@ -17,9 +17,9 @@ plugins {
 
 allprojects {
     repositories {
+        mavenLocal  ()
         mavenCentral()
         maven       { url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev") }
-        mavenLocal  ()
         maven       { url = uri("https://oss.sonatype.org/content/repositories/staging/") } // staging
     }
 

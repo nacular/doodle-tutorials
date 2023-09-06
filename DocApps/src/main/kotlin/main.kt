@@ -16,6 +16,7 @@ import io.nacular.doodle.controls.buttons.Button
 import io.nacular.doodle.controls.buttons.PushButton
 import io.nacular.doodle.core.Behavior
 import io.nacular.doodle.coroutines.Dispatchers
+import io.nacular.doodle.drawing.Color.Companion.White
 import io.nacular.doodle.examples.CalculatorApp
 import io.nacular.doodle.examples.DataStore
 import io.nacular.doodle.examples.FilterButtonProvider
@@ -25,6 +26,7 @@ import io.nacular.doodle.examples.PersistentStore
 import io.nacular.doodle.examples.PhotosApp
 import io.nacular.doodle.examples.Router
 import io.nacular.doodle.examples.TabStripApp
+import io.nacular.doodle.examples.TimedCardsApp
 import io.nacular.doodle.examples.TodoApp
 import io.nacular.doodle.examples.contacts.AppConfig
 import io.nacular.doodle.examples.contacts.AppConfigImpl
@@ -322,5 +324,35 @@ fun tabStrip(element: HTMLElement) {
     })) {
         // load app
         TabStripApp(instance(), instance(), instance())
+    }
+}
+
+@JsExport
+fun timedCards(element: HTMLElement) {
+    application(element, modules = listOf(
+        FontModule,
+        ImageModule,
+        ModalModule,
+        PointerModule,
+        KeyboardModule,
+        basicLabelBehavior(White),
+        Module(name = "App") {
+            bindSingleton<Animator> { AnimatorImpl(instance(), instance()) }
+        }
+    )) {
+        // load app
+        TimedCardsApp(
+            display      = instance(),
+            focusManager = instance(),
+            themeManager = instance(),
+            theme        = instance(),
+            images       = instance(),
+            fonts        = instance(),
+            animate      = instance(),
+            textMetrics  = instance(),
+            timer        = instance(),
+            scheduler    = instance(),
+            uiDispatcher = Dispatchers.UI
+        )
     }
 }

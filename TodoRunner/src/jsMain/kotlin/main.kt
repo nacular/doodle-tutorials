@@ -18,17 +18,38 @@ import org.kodein.di.instance
 /**
  * Creates a [TodoApp]
  */
+//sampleStart
 fun main() {
-    application(modules = listOf(FontModule, PointerModule, KeyboardModule, ImageModule, basicLabelBehavior(),
-        nativeTextFieldBehavior(), nativeHyperLinkBehavior(), nativeScrollPanelBehavior(smoothScrolling = true),
+    application(modules = listOf(
+        FontModule,
+        PointerModule,
+        KeyboardModule,
+        ImageModule,
+        basicLabelBehavior(),
+        nativeTextFieldBehavior(),
+        nativeHyperLinkBehavior(),
+        nativeScrollPanelBehavior(smoothScrolling = true),
         Module(name = "AppModule") {
-            bindSingleton<PersistentStore>      { LocalStorePersistence   (                                  ) }
-            bindSingleton                       { DataStore               (instance()                        ) }
-            bindSingleton<Router>               { TrivialRouter           (window                            ) }
+            bindSingleton<PersistentStore> { LocalStorePersistence() }
+            bindSingleton { DataStore(instance()) }
+            bindSingleton<Router> { TrivialRouter(window) }
             bindSingleton<FilterButtonProvider> { LinkFilterButtonProvider(instance(), instance(), instance()) }
         }
     )) {
         // load app
-        TodoApp(instance(), Dispatchers.UI, instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance())
+        TodoApp(
+            display              = instance(),
+            fonts                = instance(),
+            theme                = instance(),
+            themes               = instance(),
+            images               = instance(),
+            dataStore            = instance(),
+            linkStyler           = instance(),
+            textMetrics          = instance(),
+            focusManager         = instance(),
+            uiDispatcher         = Dispatchers.UI,
+            filterButtonProvider = instance()
+        )
     }
 }
+//sampleEnd

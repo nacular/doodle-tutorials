@@ -12,5 +12,7 @@ include(
     "Contacts",
     "ContactsRunner",
     "TabStrip",
-    "TabStripRunner"
+    "TabStripRunner",
+    "TimedCards",
+    "TimedCardsRunner",
 )

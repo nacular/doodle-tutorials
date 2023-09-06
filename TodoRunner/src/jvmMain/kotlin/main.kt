@@ -18,7 +18,6 @@ import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicLabelBehavior
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeHyperLinkBehavior
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeScrollPanelBehavior
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeTextFieldBehavior
-import org.kodein.di.DI
 import org.kodein.di.DI.Module
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance

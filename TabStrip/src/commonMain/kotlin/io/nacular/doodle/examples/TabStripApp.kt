@@ -11,6 +11,7 @@ import io.nacular.doodle.layout.constraints.constrain
 /**
  * Simple app that places a [TabStrip] at the center of the display.
  */
+//sampleStart
 class TabStripApp(display: Display, animator: Animator, pathMetrics: PathMetrics): Application {
     init {
         // creat and display a single TabStrip
@@ -25,3 +26,4 @@ class TabStripApp(display: Display, animator: Animator, pathMetrics: PathMetrics
 
     override fun shutdown() { /* no-op */ }
 }
+//sampleEnd

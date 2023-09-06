@@ -1,0 +1,732 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper docs-doc-page docs-version-current plugin-docs plugin-id-default docs-doc-id-timedcards">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v2.2.0">
+<title data-rh="true">Timed Cards | Doodle Tutorials</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://nacular.github.io/doodle-tutorials/img/site_preview.png"><meta data-rh="true" name="twitter:image" content="https://nacular.github.io/doodle-tutorials/img/site_preview.png"><meta data-rh="true" property="og:url" content="https://nacular.github.io/doodle-tutorials/docs/timedcards"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="og:image:width" content="380"><meta data-rh="true" name="og:image:height" content="78"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Timed Cards | Doodle Tutorials"><meta data-rh="true" name="description" content="This is a simple app that shows the flexibility of Doodle Carousels. It is inspired by Giulio Cuscito&#x27;s &quot;Timed Cards Opening&quot;. This app is multi-platform, which means it will run in the browser and as a desktop application."><meta data-rh="true" property="og:description" content="This is a simple app that shows the flexibility of Doodle Carousels. It is inspired by Giulio Cuscito&#x27;s &quot;Timed Cards Opening&quot;. This app is multi-platform, which means it will run in the browser and as a desktop application."><link data-rh="true" rel="icon" href="/doodle-tutorials/img/favicon.png"><link data-rh="true" rel="canonical" href="https://nacular.github.io/doodle-tutorials/docs/timedcards"><link data-rh="true" rel="alternate" href="https://nacular.github.io/doodle-tutorials/docs/timedcards" hreflang="en"><link data-rh="true" rel="alternate" href="https://nacular.github.io/doodle-tutorials/docs/timedcards" hreflang="x-default"><link rel="preconnect" href="https://www.google-analytics.com">
+<link rel="preconnect" href="https://www.googletagmanager.com">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KN5YH7BJYG"></script>
+<script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","G-KN5YH7BJYG",{anonymize_ip:!0})</script>
+
+
+
+<script src="https://unpkg.com/kotlin-playground@1"></script><link rel="stylesheet" href="/doodle-tutorials/assets/css/styles.f2d06e86.css">
+<link rel="preload" href="/doodle-tutorials/assets/js/runtime~main.91d6943e.js" as="script">
+<link rel="preload" href="/doodle-tutorials/assets/js/main.1f062b3e.js" as="script">
+</head>
+<body class="navigation-with-keyboard">
+<script>!function(){function e(e){document.documentElement.setAttribute("data-theme",e)}var t=function(){var e=null;try{e=localStorage.getItem("theme")}catch(e){}return e}();null!==t?e(t):window.matchMedia("(prefers-color-scheme: dark)").matches?e("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,e("light"))}()</script><div id="__docusaurus">
+<div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#docusaurus_skipToContent_fallback">Skip to main content</a></div><nav class="navbar navbar--fixed-top navbarHideable_m1mJ"><div class="navbar__inner"><div class="navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/doodle-tutorials/"><div class="navbar__logo"><img src="/doodle-tutorials/img/doodle.svg" alt="Doodle Logo" class="themedImage_ToTc themedImage--light_HNdA"><img src="/doodle-tutorials/img/doodle.svg" alt="Doodle Logo" class="themedImage_ToTc themedImage--dark_i4oU"></div></a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/doodle-tutorials/docs/introduction">Guide</a></div><div class="navbar__items navbar__items--right"><a href="https://github.com/nacular/doodle-tutorials" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link header-github-link" aria-label="GitHub repository"></a><a href="https://kotlinlang.slack.com/messages/doodle" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link header-slack-link" aria-label="Slack channel"></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="Switch between dark and light mode (currently light mode)" aria-label="Switch between dark and light mode (currently light mode)" aria-live="polite"><svg viewBox="0 0 24 24" width="24" height="24" class="lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" class="darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg></button></div><div class="searchBox_ZlJk"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="docusaurus_skipToContent_fallback" class="main-wrapper mainWrapper_z2l0 docsWrapper_BCFX"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docPage__5DB"><aside class="theme-doc-sidebar-container docSidebarContainer_b6E3"><div class="sidebar_njMd sidebarWithHideableNavbar_wUlq"><a tabindex="-1" class="sidebarLogo_isFc" href="/doodle-tutorials/"><img src="/doodle-tutorials/img/doodle.svg" alt="Doodle Logo" class="themedImage_ToTc themedImage--light_HNdA"><img src="/doodle-tutorials/img/doodle.svg" alt="Doodle Logo" class="themedImage_ToTc themedImage--dark_i4oU"></a><nav class="menu thin-scrollbar menu_SIkG"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/doodle-tutorials/docs/introduction">Introduction</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" href="/doodle-tutorials/docs/timedcards">Timed Cards</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/doodle-tutorials/docs/tabstrip">Animating Tab Strip</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/doodle-tutorials/docs/contacts">Contacts</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/doodle-tutorials/docs/calculator">Calculator</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/doodle-tutorials/docs/todo">Todo</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/doodle-tutorials/docs/photos">Photos</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/doodle-tutorials/docs/photostream">Photo Stream</a></li></ul></nav><button type="button" title="Collapse sidebar" aria-label="Collapse sidebar" class="button button--secondary button--outline collapseSidebarButton_PEFL"><svg width="20" height="20" aria-hidden="true" class="collapseSidebarButtonIcon_kv0_"><g fill="#7a7a7a"><path d="M9.992 10.023c0 .2-.062.399-.172.547l-4.996 7.492a.982.982 0 01-.828.454H1c-.55 0-1-.453-1-1 0-.2.059-.403.168-.551l4.629-6.942L.168 3.078A.939.939 0 010 2.528c0-.548.45-.997 1-.997h2.996c.352 0 .649.18.828.45L9.82 9.472c.11.148.172.347.172.55zm0 0"></path><path d="M19.98 10.023c0 .2-.058.399-.168.547l-4.996 7.492a.987.987 0 01-.828.454h-3c-.547 0-.996-.453-.996-1 0-.2.059-.403.168-.551l4.625-6.942-4.625-6.945a.939.939 0 01-.168-.55 1 1 0 01.996-.997h3c.348 0 .649.18.828.45l4.996 7.492c.11.148.168.347.168.55zm0 0"></path></g></svg></button></div></aside><main class="docMainContainer_gTbr"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><div class="theme-doc-markdown markdown"><h1><a href="https://github.com/nacular/doodle-tutorials/tree/master/TimedCards" target="_blank" rel="noopener noreferrer">TimedCards</a> Tutorial</h1><p>This is a simple app that shows the flexibility of Doodle Carousels. It is inspired by <a href="https://dribbble.com/shots/11012652--Timed-Cards-Opening" target="_blank" rel="noopener noreferrer">Giulio Cuscito&#x27;s &quot;Timed Cards Opening&quot;</a>. This app is multi-platform, which means it will run in the browser and as a desktop application.</p><p>The entire app rests on <a href="https://nacular.github.io/doodle/docs/ui_components/overview#carousel" target="_blank" rel="noopener noreferrer">Doodle&#x27;s powerful Carousel APIs</a> to create the layout and smooth, perfectly-timed transitions.</p><div class="doodle_u3ra"><div style="position:relative;height:538.875px"></div></div><div class="theme-admonition theme-admonition-tip alert alert--success admonition_LlT9"><div class="admonitionHeading_tbUL"><span class="admonitionIcon_kALy"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_S0QG"><p>You can also see the full-screen app <a href="https://nacular.github.io/doodle-tutorials/timedcards" target="_blank" rel="noopener noreferrer">here</a>.</p></div></div><hr><h2 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="project-setup">Project Setup<a class="hash-link" href="#project-setup" title="Direct link to heading">​</a></h2><p>This app (like the others in this tutorial) is created as a multi-platform library, with a multiplatform launcher that depends on it.
+This is not necessary to use Doodle. You could create a single multiplatform build with the common parts of your app
+in <code>commonMain</code> etc.. This setup is used here because the app are also launched by an app within <code>DocApps</code> when embedding it
+like below. Therefore, we need a pure library for the app. This is why there is an app and a runner.</p><div class="tabs-container tabList__CuJ"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_LNqP tabs__item--active">TimedCards</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_LNqP">TimedCardsRunner</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_Ymn6"><p><a href="https://github.com/nacular/doodle-tutorials/blob/master/TimedCards/build.gradle.kts" target="_blank" rel="noopener noreferrer"><strong>build.gradle.kts</strong></a></p><code theme="darcula" mode="kotlin" data-highlight-only="true">plugins {
+    kotlin(&quot;multiplatform&quot;)
+}
+
+kotlin {
+    jsTargets (BOTH)
+    jvmTargets()
+
+    val doodleVersion    : String by project
+    val coroutinesVersion: String by project
+
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation(kotlin(&quot;stdlib-common&quot;))
+
+                api(&quot;org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion&quot;)
+
+                api(&quot;io.nacular.doodle:core:$doodleVersion&quot;     )
+                api(&quot;io.nacular.doodle:controls:$doodleVersion&quot; )
+                api(&quot;io.nacular.doodle:animation:$doodleVersion&quot;)
+            }
+        }
+    }
+}</code></div><div role="tabpanel" class="tabItem_Ymn6" hidden=""><p><a href="https://github.com/nacular/doodle-tutorials/blob/master/TimedCardsRunner/build.gradle.kts" target="_blank" rel="noopener noreferrer"><strong>build.gradle.kts</strong></a></p><code theme="darcula" mode="kotlin" data-highlight-only="true">plugins {
+    kotlin(&quot;multiplatform&quot;)
+    application
+}
+
+kotlin {
+    js(IR) {
+        browser()
+        binaries.executable()
+    }
+
+    jvm {
+        withJava()
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = &quot;11&quot;
+            }
+        }
+    }
+
+    val doodleVersion: String by project
+
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                implementation(project(&quot;:TimedCards&quot;))
+            }
+        }
+
+        val jsMain by getting {
+            dependencies {
+                implementation (&quot;io.nacular.doodle:browser:$doodleVersion&quot;)
+            }
+        }
+
+        val jvmMain by getting {
+            dependencies {
+                val osName = System.getProperty(&quot;os.name&quot;)
+                val targetOs = when {
+                    osName == &quot;Mac OS X&quot;       -&gt; &quot;macos&quot;
+                    osName.startsWith(&quot;Win&quot;  ) -&gt; &quot;windows&quot;
+                    osName.startsWith(&quot;Linux&quot;) -&gt; &quot;linux&quot;
+                    else                       -&gt; error(&quot;Unsupported OS: $osName&quot;)
+                }
+
+                val targetArch = when (val osArch = System.getProperty(&quot;os.arch&quot;)) {
+                    &quot;x86_64&quot;, &quot;amd64&quot; -&gt; &quot;x64&quot;
+                    &quot;aarch64&quot;         -&gt; &quot;arm64&quot;
+                    else              -&gt; error(&quot;Unsupported arch: $osArch&quot;)
+                }
+
+                val target = &quot;${targetOs}-${targetArch}&quot;
+
+                implementation (&quot;io.nacular.doodle:desktop-jvm-$target:$doodleVersion&quot;)
+            }
+        }
+    }
+}
+
+application {
+    mainClass.set(&quot;MainKt&quot;)
+}
+
+installFullScreenDemo(&quot;Development&quot;)
+installFullScreenDemo(&quot;Production&quot; )</code></div></div></div><hr><h2 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="launching-on-web-and-desktop">Launching on Web and Desktop<a class="hash-link" href="#launching-on-web-and-desktop" title="Direct link to heading">​</a></h2><p>Doodle apps can be <a href="https://nacular.github.io/doodle/docs/applications" target="_blank" rel="noopener noreferrer">launched</a> in a few different ways on Web and Desktop. We defined our app logic in a multi-platform <code>TimedCards</code> library (no <code>main</code> functions), so it can be used on both platforms. Notice that we are only using a library here because we also want to run the TimedCards in our documentation app. That app will run it as an embedded Web app, which becomes easier if it is a library. Otherwise, we could have defined our platform <code>main</code> functions directly in the <code>TimedCards</code> module. Instead, we created a separate <code>TimedCardsRunner</code> module that contains our <code>main</code> functions.</p><p><strong>main.kt</strong></p><code theme="darcula" mode="kotlin" data-highlight-only="true">package io.nacular.doodle.examples
+
+import io.nacular.doodle.animation.Animator
+import io.nacular.doodle.animation.AnimatorImpl
+import io.nacular.doodle.application.Modules.Companion.FontModule
+import io.nacular.doodle.application.Modules.Companion.ImageModule
+import io.nacular.doodle.application.Modules.Companion.KeyboardModule
+import io.nacular.doodle.application.Modules.Companion.ModalModule
+import io.nacular.doodle.application.Modules.Companion.PointerModule
+import io.nacular.doodle.application.application
+import io.nacular.doodle.coroutines.Dispatchers
+import io.nacular.doodle.drawing.Color.Companion.White
+import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicLabelBehavior
+import org.kodein.di.DI.Module
+import org.kodein.di.bindSingleton
+import org.kodein.di.instance
+
+/**
+ * Creates a [TimedCardsApp]
+ */
+//sampleStart
+fun main() {
+    application(modules = listOf(
+        FontModule,
+        ImageModule,
+        ModalModule,
+        PointerModule,
+        KeyboardModule,
+        basicLabelBehavior(White),
+        Module(name = &quot;App&quot;) {
+            bindSingleton&lt;Animator&gt; { AnimatorImpl(instance(), instance()) }
+        }
+    )) {
+        // load app
+        TimedCardsApp(
+            display      = instance(),
+            focusManager = instance(),
+            themeManager = instance(),
+            theme        = instance(),
+            images       = instance(),
+            fonts        = instance(),
+            animate      = instance(),
+            textMetrics  = instance(),
+            timer        = instance(),
+            scheduler    = instance(),
+            uiDispatcher = Dispatchers.UI
+        )
+    }
+}
+//sampleEnd</code><hr><h2 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="defining-our-application">Defining Our Application<a class="hash-link" href="#defining-our-application" title="Direct link to heading">​</a></h2><p>All Doodle apps must implement the <a href="https://nacular.github.io/doodle/docs/applications" target="_blank" rel="noopener noreferrer"><code>Application</code></a> interface. The framework will then initialize our app via the constructor. Our app will be fairly simple: just create an instance of our calculator and add it to the display.</p><p>Doodle apps can be defined in <code>commonMain</code>, since they do not require any platform-specific dependencies. Therefore, we will do
+the same and place ours in <code>commonMain/kotlin/io/nacular/doodle/examples</code>.</p><p><a href="https://github.com/nacular/doodle-tutorials/blob/master/TimedCards/src/commonMain/kotlin/io/nacular/doodle/examples/TimedCardsApp.kt#L43" target="_blank" rel="noopener noreferrer"><strong>TimedCardsApp.kt</strong></a></p><code theme="darcula" mode="kotlin" data-highlight-only="true">package io.nacular.doodle.examples
+
+import io.nacular.doodle.animation.Animator
+import io.nacular.doodle.animation.invoke
+import io.nacular.doodle.animation.transition.easeInOutCubic
+import io.nacular.doodle.animation.tweenFloat
+import io.nacular.doodle.application.Application
+import io.nacular.doodle.controls.carousel.Carousel
+import io.nacular.doodle.controls.carousel.CarouselBehavior
+import io.nacular.doodle.controls.carousel.dampedTransitioner
+import io.nacular.doodle.controls.itemVisualizer
+import io.nacular.doodle.core.Display
+import io.nacular.doodle.core.center
+import io.nacular.doodle.core.then
+import io.nacular.doodle.drawing.FontLoader
+import io.nacular.doodle.drawing.TextMetrics
+import io.nacular.doodle.event.KeyCode.Companion.ArrowLeft
+import io.nacular.doodle.event.KeyCode.Companion.ArrowRight
+import io.nacular.doodle.event.KeyListener.Companion.pressed
+import io.nacular.doodle.event.PointerListener.Companion.on
+import io.nacular.doodle.event.PointerMotionListener.Companion.dragged
+import io.nacular.doodle.focus.FocusManager
+import io.nacular.doodle.geometry.Point.Companion.Origin
+import io.nacular.doodle.geometry.Size
+import io.nacular.doodle.image.ImageLoader
+import io.nacular.doodle.layout.constraints.Strength.Companion.Strong
+import io.nacular.doodle.layout.constraints.constrain
+import io.nacular.doodle.scheduler.AnimationScheduler
+import io.nacular.doodle.theme.Theme
+import io.nacular.doodle.theme.ThemeManager
+import io.nacular.doodle.time.Timer
+import io.nacular.measured.units.Time.Companion.seconds
+import io.nacular.measured.units.times
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+
+//sampleStart
+class TimedCardsApp(
+                display     : Display,
+                focusManager: FocusManager,
+                themeManager: ThemeManager,
+                theme       : Theme,
+    private val fonts       : FontLoader,
+    private val images      : ImageLoader,
+    private val timer       : Timer,
+    private val animate     : Animator,
+    private val textMetrics : TextMetrics,
+    private val scheduler   : AnimationScheduler,
+                uiDispatcher: CoroutineDispatcher,
+): Application {
+
+    private val appScope        = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val itemDefaultSize = Size(CARD_MAX_WIDTH, CARD_MAX_WIDTH * SMALL_CARD_ASPECT)
+
+    private lateinit var appFonts: Fonts
+
+    init {
+        appScope.launch(uiDispatcher) {
+            themeManager.selected = theme
+
+            appFonts = loadFonts(fonts)
+
+            // Carousel containing all the content
+            val carousel = Carousel(
+                createModel(images),
+                itemVisualizer { item, previous, context -&gt;
+                    when (previous) {
+                        is Card -&gt; previous.apply { update(item, context) }
+                        else    -&gt; Card(item, context, appFonts, itemDefaultSize)
+                    }
+                }
+            ).apply {
+                wrapAtEnds = true
+                behavior   = object: CarouselBehavior&lt;CardData&gt; {
+                    // Presenter controlling which items are shown and how they adjust
+                    // as the Carousel moves between frames.
+                    override val presenter = CardPresenter&lt;CardData&gt; { itemSize(it) }
+
+                    // Responsible for automatic movement between frames
+                    override val transitioner = dampedTransitioner&lt;CardData&gt;(timer, scheduler) { _,_,_, update -&gt;
+                        animate(0f to 1f, using = tweenFloat(easeInOutCubic, duration = 1.25 * seconds)) {
+                            update(it)
+                        }
+                    }
+                }
+
+                keyChanged += pressed {
+                    when (it.code) {
+                        ArrowLeft  -&gt; next    () // Move Carousel forward one
+                        ArrowRight -&gt; previous() // Move Carousel back one
+                    }
+                }
+
+                var touchLocation = Origin
+
+                // start/stop manual movement of the Carousel on pointer press/release
+                pointerChanged += on(
+                    pressed  = {
+                        touchLocation = toLocal(it.location, it.target)
+                        startManualMove()
+                        it.consume()
+                    },
+                    released = { completeManualMove() },
+                )
+
+                // perform manual movement of the Carousel
+                pointerMotionChanged += dragged {
+                    if (it.source == this) {
+                        moveManually(toLocal(it.location, it.target) - touchLocation)
+                        it.consume()
+                    }
+                }
+            }
+
+            val buttonControls = ButtonControls(carousel, textMetrics, appFonts)
+
+            display += carousel
+            display += buttonControls
+
+            display.layout = constrain(carousel, buttonControls) { carousel_, controls -&gt;
+                (carousel_.width  eq CAROUSEL_MAX_WIDTH                  )..Strong
+                carousel_.height eq carousel_.width  * MAIN_ASPECT_RATIO
+                carousel_.width  eq carousel_.height / MAIN_ASPECT_RATIO
+
+                carousel_.width  lessEq parent.width
+                carousel_.height lessEq parent.height
+                carousel_.center eq     parent.center
+
+                controls.height eq CONTROLS_HEIGHT
+                controls.bottom eq carousel_.bottom
+            }.then {
+                // done after Carousel&#x27;s size is properly determined in previous block, otherwise itemSize(carousel.size)
+                // won&#x27;t be accurate since it will use a captured value before the size is updated
+                // by the constraint.
+                buttonControls.x     = carousel.center.x - itemSize(carousel.size).width / 2
+                buttonControls.width = carousel.bounds.right - display.children[1].x
+            }
+
+            focusManager.requestFocus(carousel)
+        }
+    }
+
+    override fun shutdown() {
+        appScope.cancel()
+    }
+}
+//sampleEnd</code><div class="theme-admonition theme-admonition-tip alert alert--success admonition_LlT9"><div class="admonitionHeading_tbUL"><span class="admonitionIcon_kALy"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_S0QG"><p>Notice that <code>shutdown</code> is a no-op, since we don&#x27;t have any cleanup to do when the app closes.</p></div></div><h2 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="the-card-presenter">The Card Presenter<a class="hash-link" href="#the-card-presenter" title="Direct link to heading">​</a></h2><p>This app has a single Carousel that contains almost all of the UI elements. And that Carousel is driven by a custom <code>Presenter</code> that manages the layout and animation of the cards within it.</p><p>The cards in the Carousel can be in 3 key positions. The first position is that of the selected card, which fills the Carousel and has larger text displayed to the left. The first small card is in the second important position. And the cards to the right of the first card a all in the last key position.</p><p>The second position is treated as special because it has to support the transition from small to large card. Therefore the <code>CardPresenter</code> needs to track it directly.</p><code theme="darcula" mode="kotlin" data-highlight-only="true">package io.nacular.doodle.examples
+
+import io.nacular.doodle.controls.carousel.Carousel
+import io.nacular.doodle.controls.carousel.CarouselBehavior
+import io.nacular.doodle.core.View
+import io.nacular.doodle.geometry.Point
+import io.nacular.doodle.geometry.Rectangle
+import io.nacular.doodle.geometry.Size
+import io.nacular.doodle.geometry.Vector2D
+import io.nacular.doodle.geometry.lerp
+import io.nacular.doodle.layout.Insets
+import kotlin.math.abs
+import kotlin.math.min
+
+/**
+ * Presenter responsible for displaying the contents of the Carousel
+ */
+//sampleStart
+class CardPresenter&lt;T&gt;(private val spacing: Double = 20.0, private val itemSize: (Size) -&gt; Size): CarouselBehavior.Presenter&lt;T&gt;() {
+    /**
+     * Determines what is shown in the Carousel
+     */
+    override fun present(
+        carousel         : Carousel&lt;T, *&gt;,
+        position         : Position,
+        progressToNext   : Float,
+        supplementalViews: List&lt;View&gt;,
+        items            : (at: Position) -&gt; Carousel.PresentedItem?
+    ): Presentation {
+        var zOrder          = 0
+        val results         = mutableListOf&lt;Carousel.PresentedItem&gt;()
+        val itemSize        = itemSize(carousel.size)
+        var currentBounds   = null as Rectangle?
+        var currentPosition = position as Position?
+        val mainBounds      = Rectangle(carousel.size).inset(-10.0)
+
+        // Add selected card
+        currentPosition?.let(items)?.let {
+            // Image is outset by 10, and grows as we progress to the next frame
+            it.bounds       = mainBounds.inset(Insets(-progressToNext * itemSize.width * 0.5))
+            it.zOrder       = zOrder++
+            currentPosition = currentPosition?.next
+
+            results += it
+        }
+
+        // Add the first small card
+        currentPosition?.let(items)?.let { item -&gt;
+            // bounds when exactly at frame
+            val bounds = Rectangle(
+                Point(
+                    (carousel.width - itemSize.width) / 2,
+                    (carousel.height - itemSize.height - CONTROLS_HEIGHT)
+                ),
+                itemSize
+            )
+
+            // bounds gradually grows toward main bounds
+            item.bounds = lerp(bounds, mainBounds, min(1f, progressToNext * 2))
+
+            // increase item zOrder so they sort properly
+            item.zOrder = zOrder++
+
+            // next item is shifted over towards this slot as progress increases
+            currentBounds   = bounds.run { at(x - progressToNext * (width + spacing)) }
+            currentPosition = currentPosition?.next
+
+            results += item
+        }
+
+        // add the remaining cards to the right of the first small one
+        do {
+            currentPosition?.let(items)?.let { item -&gt;
+                // each item is offset to the right of the second, with a spacing that varies w/ progress
+                currentBounds = currentBounds?.run {
+                    at(right + spacing + -abs(progressToNext - 0.5f) * 3 * spacing + 3 * spacing / 2)
+                }
+
+                currentBounds?.let { item.bounds = it }
+
+                // increase item zOrder so they sort properly
+                item.zOrder = zOrder++
+
+                results += item
+            } ?: break
+        } while (
+            // continue until there are no more items to show
+            (currentBounds?.right ?: 0.0) + spacing &lt; carousel.size.width &amp;&amp;
+            currentPosition?.next?.also { currentPosition = it } != null
+        )
+
+        return Presentation(items = results)
+    }
+
+    override fun distanceToNext(
+        carousel: Carousel&lt;T, *&gt;,
+        position: Position,
+        offset  : Vector2D,
+        items   : (Position) -&gt; Carousel.PresentedItem?
+    ): Distance = Distance(Vector2D(x = 1), carousel.width)
+}
+//sampleEnd</code><p>This presenter is all it takes to handle all the positioning for the Carousel&#x27;s contents.</p><h2 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="transitioner">Transitioner<a class="hash-link" href="#transitioner" title="Direct link to heading">​</a></h2><p>Carousel&#x27;s also expose a way to manage their automatic movement between frames. This includes changing frames or when a manual move is completed and the Carousel needs to move to a valid frame.</p><p>This app uses the <code>DampedTransitioner</code> with an animation for auto frame selection. This Transitioner provides a critically damped spring behavior to smoothly complete manual movement (which happens after a swipe for example). And the animation provided by our app is used during frame jumps.</p><code theme="darcula" mode="kotlin" data-highlight-only="true">
+behavior = object: CarouselBehavior&lt;CardData&gt; {
+    override val presenter = CardPresenter&lt;CardData&gt; { itemSize(it) }
+
+
+    override val transitioner = dampedTransitioner&lt;CardData&gt;(timer, scheduler) { _,_,_, update -&gt;
+        animate(0f to 1f, using = tweenFloat(easeInOutCubic, duration = 1.25 * seconds)) {
+            update(it)
+        }
+    }
+}
+</code><h2 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="carousel-interactions">Carousel Interactions<a class="hash-link" href="#carousel-interactions" title="Direct link to heading">​</a></h2><p>The app uses a floating View with controls to interact with the Carousel and monitor its progress. The two buttons trigger <code>Carousel.previous()</code> and <code>Carousel.next()</code> to switch back and forth between frames. While the progress bar and frame text listen for <code>Carousel.progressChanged</code> and update accordingly.</p><p><strong>Button Controls</strong></p><code theme="darcula" mode="kotlin" data-highlight-only="true">package io.nacular.doodle.examples
+
+import io.nacular.doodle.controls.buttons.Button
+import io.nacular.doodle.controls.buttons.PushButton
+import io.nacular.doodle.controls.carousel.Carousel
+import io.nacular.doodle.controls.theme.CommonButtonBehavior
+import io.nacular.doodle.core.View
+import io.nacular.doodle.core.view
+import io.nacular.doodle.drawing.AffineTransform
+import io.nacular.doodle.drawing.Canvas
+import io.nacular.doodle.drawing.Color
+import io.nacular.doodle.drawing.Color.Companion.White
+import io.nacular.doodle.drawing.Stroke
+import io.nacular.doodle.drawing.TextMetrics
+import io.nacular.doodle.drawing.opacity
+import io.nacular.doodle.drawing.paint
+import io.nacular.doodle.geometry.Circle
+import io.nacular.doodle.geometry.Point
+import io.nacular.doodle.geometry.Rectangle
+import io.nacular.doodle.geometry.inscribed
+import io.nacular.doodle.geometry.inset
+import io.nacular.doodle.layout.constraints.constrain
+import io.nacular.doodle.system.Cursor.Companion.Pointer
+import io.nacular.measured.units.Angle
+import io.nacular.measured.units.times
+import kotlin.math.min
+
+class ButtonControls(carousel: Carousel&lt;*, *&gt;, textMetrics: TextMetrics, private val fonts: Fonts): View() {
+
+    private val stroke = Stroke(White opacity 0.75f, 0.5)
+
+    // Let pointer pass through everywhere else
+    override fun contains(point: Point) = (point - position).let { localPoint -&gt; children.any { it.contains(localPoint) } }
+
+    init {
+        //sampleStart
+        children += leftButton  { carousel.previous() } // Skip to the previous frame
+        children += rightButton { carousel.next    () } // Skip to the next frame
+
+        // Progress Bar
+        children += view {
+            contains = { false }
+            render   = {
+                val progress = (carousel.nearestItem + carousel.progressToNextItem) / carousel.numItems
+
+                rect(bounds.atOrigin,                     fill = stroke.fill           )
+                rect(Rectangle(progress * width, height), fill = Color(0xE8B950u).paint)
+            }
+
+            carousel.progressChanged += { rerender() }
+        }
+
+        // Frame Number
+        children += view {
+            font     = fonts.mediumBoldFont
+            contains = { false }
+            render   = {
+                val currentIndex = &quot;0${(carousel.nearestItem    ) % carousel.numItems + 1}&quot;
+                val nextIndex    = &quot;0${(carousel.nearestItem + 1) % carousel.numItems + 1}&quot;
+                val size1        = textMetrics.size(currentIndex, font)
+                val size2        = textMetrics.size(nextIndex,    font)
+
+                val x1 = (width  - size1.width ) / 2 - carousel.progressToNextItem * width
+                val y1 = (height - size1.height) / 2
+                val x2 = (width  - size2.width ) / 2 - carousel.progressToNextItem * width + width
+                val y2 = (height - size2.height) / 2
+
+                text(currentIndex, at = Point(x1, y1), font = font, fill = White.paint)
+                text(nextIndex,    at = Point(x2, y2), font = font, fill = White.paint)
+            }
+
+            carousel.progressChanged += { rerender() }
+        }
+//sampleEnd
+
+        layout = constrain(children[0], children[1], children[2], children[3]) { left, right, progress, text -&gt;
+            left.left    eq 0
+            left.width   eq left.height
+            left.height  eq 45
+            left.centerY eq parent.centerY
+
+            right.left    eq left.right + 10
+            right.width   eq left.width
+            right.height  eq left.height
+            right.centerY eq left.centerY
+
+            progress.left    eq right.right   + 20
+            progress.right   eq text.left - 20
+            progress.height  eq 1.5
+            progress.centerY eq right.centerY
+
+            text.top    eq 0
+            text.width  eq 40
+            text.right  eq parent.right - 20
+            text.height eq parent.height
+        }
+    }
+
+    private fun leftButton (onFired: (Button) -&gt; Unit) = skipButton(isRightButton = false, onFired)
+    private fun rightButton(onFired: (Button) -&gt; Unit) = skipButton(isRightButton = true,  onFired)
+
+    private fun skipButton(isRightButton: Boolean, onFired: (Button) -&gt; Unit) = PushButton().apply {
+        font          = fonts.smallRegularFont
+        fired        += onFired
+        cursor        = Pointer
+        behavior      = buttonRenderer(right = isRightButton)
+        acceptsThemes = false
+
+        return this
+    }
+
+    private fun buttonRenderer(right: Boolean = true) = object: CommonButtonBehavior&lt;Button&gt;(null) {
+        override fun contains(view: Button, point: Point): Boolean =
+            point in Circle(view.bounds.center, min(view.width, view.height) / 2)
+
+        override fun render(view: Button, canvas: Canvas) {
+            val circle   = Circle(view.bounds.atOrigin.center, min(view.width, view.height) / 2)
+            val triangle = AffineTransform.Identity.scale(around = circle.center, x = 0.7)(circle.inset(circle.radius * 0.75).inscribed(
+                3,
+                if (right) 90 * Angle.degrees else 270 * Angle.degrees
+            )!!)
+
+            val points = listOf(triangle.points[2], triangle.points[0], triangle.points[1])
+
+            canvas.circle(circle.inset(stroke.thickness / 2), stroke = stroke)
+            canvas.path  (points, Stroke(stroke.fill, 4 * stroke.thickness))
+        }
+    }
+}
+</code><h2 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="cards">Cards<a class="hash-link" href="#cards" title="Direct link to heading">​</a></h2><p>The cards shown in the Carousel are very dynamic and change what they show when moving from their small to large size.</p><code theme="darcula" mode="kotlin" data-highlight-only="true">package io.nacular.doodle.examples
+
+import io.nacular.doodle.accessibility.ImageRole
+import io.nacular.doodle.controls.carousel.CarouselItem
+import io.nacular.doodle.controls.text.Label
+import io.nacular.doodle.core.View
+import io.nacular.doodle.core.container
+import io.nacular.doodle.core.then
+import io.nacular.doodle.core.view
+import io.nacular.doodle.drawing.Canvas
+import io.nacular.doodle.drawing.Color
+import io.nacular.doodle.drawing.Color.Companion.Black
+import io.nacular.doodle.drawing.Font
+import io.nacular.doodle.drawing.opacity
+import io.nacular.doodle.drawing.paint
+import io.nacular.doodle.geometry.Rectangle
+import io.nacular.doodle.geometry.Size
+import io.nacular.doodle.geometry.lerp
+import io.nacular.doodle.image.Image
+import io.nacular.doodle.image.width
+import io.nacular.doodle.layout.constraints.constrain
+import io.nacular.doodle.utils.Dimension
+import io.nacular.doodle.utils.TextAlignment
+import io.nacular.doodle.utils.observable
+import kotlin.math.min
+
+/**
+ * Data objects that are stored in the Carousel&#x27;s model. These are converted to [Card]s.
+ */
+data class CardData(val image: Image, val header: String, val title: String, val clip: Rectangle) {
+    val width get() = image.width
+}
+
+/**
+ * Represents each item in the Carousel. These are created by the [ItemVisualizer][io.nacular.doodle.controls.ItemVisualizer]
+ * passed to the Carousel.
+ */
+//sampleStart
+class Card(
+    private var data           : CardData,
+    private var context        : CarouselItem,
+    private val fonts          : Fonts,
+    private val itemDefaultSize: Size,
+): View(accessibilityRole = ImageRole()) {
+
+    private val smallHeader = header(data.header, fonts.smallBoldFont      )
+    private val smallTitle  = title(data.title,   fonts.smallBoldFont, -0.8)
+    private val largeText   = container {
+        +view { render = { rect(bounds.atOrigin, fill = Color.White.paint) } }
+        +header(data.header, fonts.largeRegularFont   )
+        +title (data.title,  fonts.largeBoldFont, -1.0)
+
+        layout = constrain(children[0], children[1], children[2]) { block, header, title -&gt;
+            block.edges eq Rectangle(15, 3)
+
+            header.top  eq block.bottom + 8
+            header.left eq block.left
+            header.width.preserve
+            header.height.preserve
+
+            title.top   eq header.bottom + 7
+            title.left  eq 0
+            title.right eq parent.right
+            title.height.preserve
+        }.then {
+            this.height = children.last().bounds.bottom
+        }
+
+        opacity = 0f
+    }
+
+    private var progress by observable(0f) { _, new -&gt;
+        largeText.opacity = when {
+            new &gt;= 0.5f -&gt; (new - 0.5f) * 2
+            else -&gt; 0f
+        }
+
+        relayout()
+        rerender()
+    }
+
+    init {
+        size               = data.image.size
+        enabled            = false
+        clipCanvasToBounds = false
+
+        children += container {
+            +view { render = { rect(bounds.atOrigin, fill = Color.White.paint) } }
+            +smallHeader
+            +smallTitle
+
+            layout = constrain(children[0], smallHeader, smallTitle) { bar, header, title -&gt;
+                bar.edges eq Rectangle(7.0, 1.5)
+
+                header.top  eq bar.bottom + 6
+                header.left eq bar.left
+                header.width.preserve
+                header.height.preserve
+
+                title.top   eq header.bottom + 7
+                title.left  eq 0
+                title.right eq parent.right
+                title.height.preserve
+            }.then {
+                this.height = smallTitle.bounds.bottom
+            }
+        }
+        children += largeText
+
+        layout = constrain(children[0], children[1]) { smallText, largeText -&gt;
+            smallText.left   eq parent.centerX - itemDefaultSize.width / 2 + 10
+            smallText.right  eq parent.right  - 10
+            smallText.bottom eq parent.bottom - 20 + progress * 800
+            smallText.height.preserve
+
+            val largeTextOffset = when {
+                progress &gt;= 0.5f -&gt; 20 * (1 - (progress - 0.5f) * 2)
+                else             -&gt; 0f
+            }
+
+            largeText.left  eq  50
+            largeText.width eq 500
+            largeText.centerY eq parent.centerY + 5 + largeTextOffset
+            largeText.height.preserve
+        }
+
+        updateProgress()
+    }
+
+    /**
+     * Called when a Card needs to be recycled to display a new [CardData] or [CarouselItem].
+     */
+    fun update(data: CardData, context: CarouselItem) {
+        this.data    = data
+        this.context = context
+
+        updateProgress()
+    }
+
+    override fun render(canvas: Canvas) {
+        val clip   = lerp(data.clip, Rectangle(data.width, data.width * MAIN_ASPECT_RATIO), min(1f, progress * 2f))
+        val radius = 10.0 * (1 - progress * 1.5)
+
+        canvas.outerShadow(blurRadius = 10.0, vertical = 10.0, horizontal = 10.0, color = Black opacity 0.5f) {
+            val w = height * clip.width/clip.height
+
+            image(
+                image       = data.image,
+                source      = clip,
+                radius      = radius,
+                destination = Rectangle((width - w) / 2, 0.0, w, height)
+            )
+        }
+    }
+
+    private fun updateProgress() {
+        progress = when (context.index) {
+            context.nearestItem -&gt; 1f
+            (context.nearestItem + 1) % context.numItems -&gt; context.progressToNextItem
+            else -&gt; 0f
+        }
+    }
+
+    private fun header(text: String, font: Font) = Label(text).apply {
+        this.font     = font
+        letterSpacing = 0.0
+    }
+
+    private fun title(text: String, font: Font, letterSpacing: Double) = Label(text).apply {
+        this.font          = font
+        this.letterSpacing = letterSpacing
+        wrapsWords         = true
+        textAlignment      = TextAlignment.Start
+        lineSpacing        = 1.1f
+        fitText            = setOf(Dimension.Height)
+    }
+}
+//sampleEnd</code></div></article><nav class="pagination-nav docusaurus-mt-lg" aria-label="Docs pages navigation"><a class="pagination-nav__link pagination-nav__link--prev" href="/doodle-tutorials/docs/introduction"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Introduction</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/doodle-tutorials/docs/tabstrip"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Animating Tab Strip</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#project-setup" class="table-of-contents__link toc-highlight">Project Setup</a></li><li><a href="#launching-on-web-and-desktop" class="table-of-contents__link toc-highlight">Launching on Web and Desktop</a></li><li><a href="#defining-our-application" class="table-of-contents__link toc-highlight">Defining Our Application</a></li><li><a href="#the-card-presenter" class="table-of-contents__link toc-highlight">The Card Presenter</a></li><li><a href="#transitioner" class="table-of-contents__link toc-highlight">Transitioner</a></li><li><a href="#carousel-interactions" class="table-of-contents__link toc-highlight">Carousel Interactions</a></li><li><a href="#cards" class="table-of-contents__link toc-highlight">Cards</a></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container container-fluid"></div></footer></div>
+<script src="/doodle-tutorials/assets/js/runtime~main.91d6943e.js"></script>
+<script src="/doodle-tutorials/assets/js/main.1f062b3e.js"></script>
+</body>
+</html>

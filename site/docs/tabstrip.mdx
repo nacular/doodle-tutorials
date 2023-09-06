@@ -4,13 +4,12 @@ hide_title: true
 ---
 import Tabs      from '@theme/Tabs'
 import TabItem   from '@theme/TabItem'
-import CodeBlock from '@theme/CodeBlock';
 
-import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
-import Gradle            from '!!raw-loader!../../TabStrip/build.gradle.kts';
-import RunnerGradle      from '!!raw-loader!../../TabStripRunner/build.gradle.kts';
-import TabStripApp       from '!!raw-loader!../../TabStrip/src/commonMain/kotlin/io/nacular/doodle/examples/TabStripApp.kt';
-import WebMain           from '!!raw-loader!../../TabStripRunner/src/jsMain/kotlin/main.kt';
+import Gradle        from '!!raw-loader!../../TabStrip/build.gradle.kts';
+import RunnerGradle  from '!!raw-loader!../../TabStripRunner/build.gradle.kts';
+import TabStripApp   from '!!raw-loader!../../TabStrip/src/commonMain/kotlin/io/nacular/doodle/examples/TabStripApp.kt';
+import WebMain       from '!!raw-loader!../../TabStripRunner/src/jsMain/kotlin/main.kt';
+import {KPlayground} from '../src/components/KotlinPlayground'
 
 
 # [TabStrip](https://github.com/nacular/doodle-tutorials/tree/master/TabStrip) Tutorial
@@ -19,7 +18,7 @@ We will build a simple app that hosts animating tab selection component in this 
 
 The main focus will be utilizing [Doodle's powerful animation APIs](https://nacular.github.io/doodle/docs/animations) to create smooth transitions with precise timings.
 
-<DoodleCodeBlock functionName="tabStrip" height="300" />
+<DoodleKPlayground functionName="tabStrip" height="300" />
 
 You can also see the full-screen app [here](https://nacular.github.io/doodle-tutorials/tabstrip).
 
@@ -50,14 +49,14 @@ like below. Therefore, we need a pure library for the app. This is why there is 
 
 [**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/TabStrip/build.gradle.kts)
 
-<CodeBlock language="kotlin">{Gradle}</CodeBlock>
+<KPlayground>{Gradle}</KPlayground>
 
 </TabItem>
 <TabItem value="TabStripRunner">
 
 [**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/TabStripRunner/build.gradle.kts)
 
-<CodeBlock language="kotlin">{RunnerGradle}</CodeBlock>
+<KPlayground>{RunnerGradle}</KPlayground>
 
 </TabItem>
 </Tabs>
@@ -68,12 +67,11 @@ like below. Therefore, we need a pure library for the app. This is why there is 
 
 All Doodle apps must implement the [`Application`](https://nacular.github.io/doodle/docs/applications) interface. The framework will then initialize our app via the constructor. Our app will be fairly simple: just create an instance of our calculator and add it to the display.
 
-Doodle apps can be defined in `commonMain`, since they do not require any platform-specific dependencies. Therefore, we will do
-the same and place ours in `commonMain/kotlin/io/nacular/doodle/examples`.
+Doodle apps can be defined in `commonMain`, since they do not require any platform-specific dependencies. Therefore, we will do the same and place ours in `commonMain/kotlin/io/nacular/doodle/examples`.
 
 [**TabStripApp.kt**](https://github.com/nacular/doodle-tutorials/blob/master/TabStrip/src/commonMain/kotlin/io/nacular/doodle/examples/TabStripApp.kt#L11)
 
-<CodeBlock language="kotlin">{TabStripApp}</CodeBlock>
+<KPlayground>{TabStripApp}</KPlayground>
 
 :::tip
 Notice that `shutdown` is a no-op, since we don't have any cleanup to do when the app closes.
@@ -86,7 +84,9 @@ Notice that `shutdown` is a no-op, since we don't have any cleanup to do when th
 Doodle apps can be [launched](https://nacular.github.io/doodle/docs/applications) in a few different ways on Web and Desktop. We defined our app logic
 in a multi-platform `TabStrip` library (no `main` functions), so it can be used on both platforms. Notice that we are only using a library here because we also want to run the TabStrip in our documentation app. That app will run it as an embedded Web app, which becomes easier if it is a library. Otherwise, we could have defined our platform `main` functions directly in the `TabStrip` module. Instead, we created a separate `TabStripRunner` module that contains our `main` functions.
 
-<CodeBlock language="kotlin" title="main.kt">{WebMain}</CodeBlock>
+**main.kt**
+
+<KPlayground>{WebMain}</KPlayground>
 
 ---
 
@@ -104,41 +104,41 @@ The `TabStrip` is composed of a rounded rectangle background (with a drop-shadow
 
 All parts of the view are rendered in `TabStrip.render`, which is how all Views draw themselves.
 
-```kotlin
+<KPlayground>{`
 override fun render(canvas: Canvas) {
     val foreGround = (foregroundColor ?: Black).paint
     val backGround = (backgroundColor ?: White).paint
-
+\n
     // draw shadow
     canvas.outerShadow(color = Black opacity 0.1f, blurRadius = 20.0) {
         // draw background rounded rect
         canvas.rect(bounds.atOrigin, radius = cornerRadius, fill = backGround)
     }
-
+\n
     // draw items
     items.forEach { item ->
         val itemScale = 1 - itemScaleChange * item.moveProgress
-
+\n
         // position and scale the item
         canvas.transform(Identity.
             translate(Point(item.x, item.y + itemDipOffset * item.moveProgress)).
             scale(around = Point(item.width / 2, item.height / 2), itemScale, itemScale)) {
-
+\n
             when (item.selectionProgress) {
                 1f   -> path(item.selected, fill = foreGround) // fully selected
                 else -> {
                     path(item.deselected, fill = foreGround)
-
+\n
                     if (item.selectionProgress > 0f) {
                         // overlay transition if partially selected
                         val dropletCircle = Circle(
                             center = Point(item.width / 2, item.height - dropLetRadius),
                             radius = dropLetRadius + (max(item.width, item.height) - dropLetRadius) * item.selectionProgress
                         )
-
+\n
                         // overlay background fill so it seeps through holes in item
                         circle(dropletCircle, fill = backGround)
-
+\n
                         // draw selected item clip to droplet
                         clip(dropletCircle) {
                             path(item.selected, fill = foreGround)
@@ -148,11 +148,11 @@ override fun render(canvas: Canvas) {
             }
         }
     }
-
+\n
     canvas.translate(indicatorCenter) {
         // draw indicator
         path(indicatorPath, fill = foreGround)
-
+\n
         if (dropletYAboveIndicator != 0.0) {
             // draw droplet so that it's top is at the indicator top when dropletYAboveIndicator == 0
             circle(Circle(
@@ -162,7 +162,7 @@ override fun render(canvas: Canvas) {
         }
     }
 }
-```
+`}</KPlayground>
 
 Notice that the icons and indicator are all drawn after the canvas has been transformed. That is because paths are fixed in space (in our case they are all anchored at `0,0`) and moving them around on a Canvas requires a transform.
 
@@ -178,13 +178,11 @@ This component has a complex set of animation that will trigger in a specific se
 
 The first thing we'll do is track the `selectedItem` as an `observable` property so we can trigger animations when it changes:
 
-```kotlin
-private var selectedItem by observable(items.first()) { _,selected -> ... }
-```
+<KPlayground>{`private var selectedItem by observable(items.first()) { _,selected -> ... }`}</KPlayground>
 
 This item will be initialized to the first item in our list. That list will simply be hard-coded for this tutorial. It tracks data for each item in a simple data object.
 
-```kotlin
+<KPlayground>{`
 private inner class ItemState(val selected: Path, val deselected: Path, var selectionProgress: Float = 0f) {
     val x          get() = position.x
     val y          get() = position.y
@@ -193,18 +191,18 @@ private inner class ItemState(val selected: Path, val deselected: Path, var sele
     val centerX    get() = x + width / 2
     val size             = pathMetrics.size(selected)
     val atDefaults get() = selectionProgress == 0f && moveProgress == 0f
-
+\n
     lateinit var position     : Point
              var moveProgress = 0f
 }
-```
+`}</KPlayground>
 
 The user is able to change `selectedItem` by clicking on it with the Pointer. We track this by listening to click events on the view directly and deciding which item is selected. We also listen for pointer move events to handle the dynamic cursor, which shows a Pointer when hovering over a non-selected item.
 
-```kotlin
+<KPlayground>{`
 init {
     // ...
-
+\n
     // Listen for item clicks
     pointerChanged += clicked { event ->
         getItem(at = event.location)?.let {
@@ -212,7 +210,7 @@ init {
             cursor       = Default
         }
     }
-
+\n
     // Update cursor as pointer moves
     pointerMotionChanged += moved { event ->
         cursor = when (getItem(event.location)) {
@@ -221,7 +219,7 @@ init {
         }
     }
 }
-```
+`}</KPlayground>
 
 The result is that clicking on an item other than `selectedItem` will trigger our observable callback, which is where we do our animation handling.
 
@@ -233,9 +231,7 @@ This is what the full animation timeline looks like. The diagram shows the seque
 
 There are a few important things to note about our approach. First is that we are using an animation block and tracking several top-level animations that will run concurrently via `animations`. This allows us to auto-cancel them whenever a new animation starts. We accomplish this by defining `animations` as an `autoCanceling` property
 
-```kotlin
-private var animation: Animation<*>? by autoCanceling()
-```
+<KPlayground>{`private var animation: Animation<*>? by autoCanceling()`}</KPlayground>
 
 :::tip
 Use the `autoCanceling` delegate to get free animation cleanup whenever a new value is assigned to an old one.
@@ -248,20 +244,22 @@ Secondly, our approach initiates a lot of follow-on animations at the completion
 Doodle's animation block captures any animations created while the block is being executed and groups them all under a single animation returned from the block. In the following example, all the animations will be tied to `animations`, so canceling it cancels everything.
 
 
-```kotlin title="All animations rolled into the result"
+**All animations rolled into the result**
+<KPlayground>{`
 val animations = animate {
     0f to 1f using tweenFloat(...).invoke {}
     a  to b  using tweenColor(...).invoke {}
-
+\n
     subAnimation = animate {
         ...
     }
 }
-```
+`}</KPlayground>
 
 Doing the following **will not** track the animation created in the `completed` callback.
 
-```kotlin title="Some animations not tracked"
+**Some animations not tracked**
+<KPlayground>{`
 val animations = animate {
     (0f to 1f using tweenFloat(...).invoke {}).apply {
         completed += {
@@ -270,8 +268,7 @@ val animations = animate {
         }
     }
 }
-
-```
+`}</KPlayground>
 :::
 
 We use the second pattern to chain animations together, which means our `animations` property is only tracking a subset. Of course, we could have made this work by tracking start/end times and using delays for all subsequent animations. But that is a bit more tedious.
@@ -284,14 +281,14 @@ A future version of Doodle could provide ways to offset animations in a block re
 
 The following code has all of the logic to setup the timeline, track secondary animations and cancel anything that is ongoing when it fires.
 
-```kotlin
+<KPlayground>{`
 private var selectedItem by observable(items.first()) { _,selected ->
-
+\n
     // cancel any ongoing secondary animations and hide droplet
     dropletYAboveIndicator = 0.0
     secondaryAnimations.forEach { it.cancel() }
     secondaryAnimations.clear()
-
+\n
     // Animation blocks roll all top-level animations (those created while in the block) into a common
     // parent animation. Canceling that animation cancels all the children.
     // However, our code creates additional animations that are created when top-level ones are completed.
@@ -304,31 +301,31 @@ private var selectedItem by observable(items.first()) { _,selected ->
             deselected.moveProgress      to 0f using (tweenFloat(linear, itemMoveUpDuration)) { deselected.moveProgress      = it }
             deselected.selectionProgress to 0f using (tweenFloat(linear, itemFillDuration  )) { deselected.selectionProgress = it }
         }
-
+\n
         // Indicator moves to selected item
         (indicatorCenter.x to selected.centerX using (tweenDouble(easeInOutCubic, slideDuration)) { indicatorCenter = Point(it, height) }).onCompleted {
             // Selected item moves down
             (selected.moveProgress to 1f using (tweenFloat(linear, itemMoveDownDuration)) { selected.moveProgress = it }).also { secondaryAnimations += it }
         }
-
+\n
         // Indicator primes as it travels to selected item
         (indicatorHeight to minIndicatorHeight using (tweenDouble(linear, primeDuration)) { indicatorHeight = it }).onCompleted {
             // NOTE: All these are secondary animations that won't be attached to the outer animation, since it would have been
             // completed at this point. So they need to be tracked using our secondaryAnimation set.
-
+\n
             // Indicator fires at selected item
             (indicatorHeight to maxIndicatorHeight using (tweenDouble(linear, fireDuration)) { indicatorHeight = it }).onCompleted {
                 // Indicator height returns to normal
                 (indicatorHeight to defaultIndicatorHeight using (tweenDouble(linear, recoilDuration)) { indicatorHeight = it }).also { secondaryAnimations += it }
-
+\n
                 // Droplet moves up to item
                 (dropletYAboveIndicator to dropletMaxY using (tweenDouble(linear, dropletTravelDuration)) { dropletYAboveIndicator = it }).onCompleted {
                     // Hide droplet
                     dropletYAboveIndicator = 0.0
-
+\n
                     // Selected item moves up
                     (selected.moveProgress to 0f using (tweenFloat(linear, itemMoveUpDuration)) { selected.moveProgress = it }).also { secondaryAnimations += it }
-
+\n
                     // Item animates droplet within it
                     (selected.selectionProgress to 1f using (tweenFloat(linear, itemFillDuration)) { selected.selectionProgress = it }).also { secondaryAnimations += it }
                 }.also { secondaryAnimations += it }
@@ -336,7 +333,7 @@ private var selectedItem by observable(items.first()) { _,selected ->
         }.also { secondaryAnimations += it }
     }
 }
-```
+`}</KPlayground>
 
 ### Rendering On Animation
 
@@ -344,20 +341,20 @@ Our animations change many internal variables as they update. These variables al
 
 So we take a different approach. The `Animator` interface lets you listen to changes to active animations. These events are fired in bulk whenever any animations change, complete, or are canceled. This is a great way to take action at low cost. The code for this is as follows:
 
-```kotlin
+<KPlayground>{`
 init {
     // ...
-
+\n
     // Rerender on animation updates
     animate.listeners += object: Listener {
         override fun changed(animator: Animator, animations: Set<Animation<*>>) {
             rerenderNow() // only called once per animation tick
         }
     }
-
+\n
     // ...
 }
-```
+`}</KPlayground>
 
 With this, our component will render itself and listen to pointer events so it can trigger animations.
 

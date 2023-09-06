@@ -4,11 +4,12 @@ hide_title: true
 ---
 import Tabs      from '@theme/Tabs'
 import TabItem   from '@theme/TabItem'
-import CodeBlock from '@theme/CodeBlock';
 
-import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
-import Gradle            from '!!raw-loader!../../Todo/build.gradle.kts';
-import RunnerGradle      from '!!raw-loader!../../TodoRunner/build.gradle.kts';
+import Gradle        from '!!raw-loader!../../Todo/build.gradle.kts';
+import RunnerGradle  from '!!raw-loader!../../TodoRunner/build.gradle.kts';
+import {KPlayground} from '../src/components/KotlinPlayground'
+import TodoApp       from '!!raw-loader!../../Todo/src/commonMain/kotlin/io/nacular/doodle/examples/TodoApp.kt';
+import WebMain       from '!!raw-loader!../../TodoRunner/src/jsMain/kotlin/main.kt';
 
 # [Todo](https://github.com/nacular/doodle-tutorials/tree/master/Todo) Tutorial
 
@@ -42,14 +43,14 @@ We will use a multi-platform library setup for this app, with a multiplatform la
 
 [**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/Todo/build.gradle.kts)
 
-<CodeBlock language="kotlin">{Gradle}</CodeBlock>
+<KPlayground>{Gradle}</KPlayground>
 
 </TabItem>
 <TabItem value="TodoRunner">
 
 [**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/TodoRunner/build.gradle.kts)
 
-<CodeBlock language="kotlin">{RunnerGradle}</CodeBlock>
+<KPlayground>{RunnerGradle}</KPlayground>
 
 </TabItem>
 </Tabs>
@@ -64,29 +65,7 @@ Doodle apps can be defined in `commonMain`, since they do not require any platfo
 
 [**TodoApp.kt**](https://github.com/nacular/doodle-tutorials/blob/master/Todo/src/commonMain/kotlin/io/nacular/doodle/examples/TodoApp.kt#L11)
 
-```kotlin
-class TodoApp(display: Display, /*...*/): Application {
-    init {
-        // Launch coroutine to fetch fonts/images
-        GlobalScope.launch {
-            val titleFont  = fonts            { family = "Helvetica Neue"; size = 100; weight = 100 }
-            val listFont   = fonts(titleFont) {                            size =  24               }
-            val footerFont = fonts(titleFont) {                            size =  10               }
-
-            // install theme
-            themes.selected = theme
-
-            display += TodoView(/*...*/)
-
-            display.layout = constrain(display.children[0]) { fill(it) }
-
-            display.fill(config.appBackground.paint)
-        }
-    }
-
-    override fun shutdown() { /* no-op */ }
-}
-```
+<KPlayground>{TodoApp}</KPlayground>
 
 :::tip
 Notice that `shutdown` is a no-op, since we don't have any cleanup to do when the app closes.
@@ -98,30 +77,10 @@ Notice that `shutdown` is a no-op, since we don't have any cleanup to do when th
 
 Doodle apps can be [launched](https://nacular.github.io/doodle/docs/applications) in a few different ways. We create a helper to launch the app in [full screen](https://nacular.github.io/doodle/docs/applications#top-level-apps).
 
-[**FullScreen.kt**](https://github.com/nacular/doodle-tutorials/blob/master/Todo/src/jsMain/kotlin/io/nacular/doodle/examples/FullScreen.kt#L12)
+[**main.kt**](https://github.com/nacular/doodle-tutorials/blob/master/TodoRunner/src/jsMain/kotlin/main.kt#L21)
 
-```kotlin
-package io.nacular.doodle.examples
+<KPlayground>{WebMain}</KPlayground>
 
-//...
-
-fun fullScreen() {
-    application(modules = listOf(FontModule, PointerModule, KeyboardModule, basicLabelBehavior(),
-        nativeTextFieldBehavior(), nativeHyperLinkBehavior(), nativeScrollPanelBehavior(smoothScrolling = true),
-        Module(name = "AppModule") {
-            bind<ImageLoader>         () with singleton { ImageLoaderImpl         (instance(), instance()            ) }
-            bind<PersistentStore>     () with singleton { LocalStorePersistence   (                                  ) }
-            bind<NativeLinkStyler>    () with singleton { NativeLinkStylerImpl    (instance()                        ) }
-            bind<DataStore>           () with singleton { DataStore               (instance()                        ) }
-            bind<Router>              () with singleton { TrivialRouter           (window                            ) }
-            bind<FilterButtonProvider>() with singleton { LinkFilterButtonProvider(instance(), instance(), instance()) }
-        }
-    )) {
-        // load app
-        TodoApp(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance())
-    }
-}
-```
 :::tip
 Normally this would just be your `main` function. But `main` would prevent the app from being used as a library. Which is what happens to allow both an embedded (in the docs) and full-screen version.
 :::
@@ -142,13 +101,13 @@ App launching is the only part of our code that is platform-specific; since it i
 
 These docs actually launch the app using a custom `main` with a slightly different set of inputs. The big difference is in `FilterButtonProvider` used. The docs inject a provider that creates `PushButton`s instead of `HyperLink`s for the filter controls. The app itself treats these the same. The end result is that the docs version does not use routing.
 
-```kotlin
+<KPlayground>{`
 // Notice the element is provided for embedded version
 application(root = element, modules = listOf(FontModule, PointerModule, KeyboardModule, basicLabelBehavior(),
         nativeTextFieldBehavior(), nativeHyperLinkBehavior(), nativeScrollPanelBehavior(smoothScrolling = true),
         Module(name = "AppModule") {
             // ...
-
+\n
             // Different behavior for docs version
             bind<FilterButtonProvider>() with singleton { EmbeddedFilterButtonProvider(instance()) }
         }
@@ -156,4 +115,4 @@ application(root = element, modules = listOf(FontModule, PointerModule, Keyboard
     // load app just like full-screen
     TodoApp(instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance())
 }
-```
+`}</KPlayground>

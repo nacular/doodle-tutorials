@@ -23,7 +23,8 @@ const config = {
       ({
         docs: {
           sidebarPath  : require.resolve('./sidebars.js'),
-          remarkPlugins: [require('mdx-mermaid')]
+          remarkPlugins: [require('mdx-mermaid')],
+          breadcrumbs  : false,
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -40,6 +41,12 @@ const config = {
     mermaid: true,
   },
   themes: ['@docusaurus/theme-mermaid'],
+
+  scripts: [
+    {
+      src: 'https://unpkg.com/kotlin-playground@1',
+    }
+  ],
 
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */

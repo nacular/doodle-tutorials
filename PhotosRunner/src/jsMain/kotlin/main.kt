@@ -17,6 +17,7 @@ import org.kodein.di.instance
 /**
  * Creates a [PhotosApp]
  */
+//sampleStart
 fun main() {
     application(modules = listOf(
         FocusModule,
@@ -32,6 +33,14 @@ fun main() {
         }
     )) {
         // load app
-        PhotosApp(instance(), instance(), instance(), instance(), instance(), instance())
+        PhotosApp(
+            theme        = instance(),
+            images       = instance(),
+            display      = instance(),
+            animate      = instance(),
+            themeManager = instance(),
+            focusManager = instance()
+        )
     }
 }
+//sampleEnd

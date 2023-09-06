@@ -4,11 +4,11 @@ hide_title: true
 ---
 import Tabs      from '@theme/Tabs'
 import TabItem   from '@theme/TabItem'
-import CodeBlock from '@theme/CodeBlock';
 
-import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
-import Gradle            from '!!raw-loader!../../Photos/build.gradle.kts';
-import RunnerGradle      from '!!raw-loader!../../PhotosRunner/build.gradle.kts';
+import Gradle        from '!!raw-loader!../../Photos/build.gradle.kts';
+import RunnerGradle  from '!!raw-loader!../../PhotosRunner/build.gradle.kts';
+import {KPlayground} from '../src/components/KotlinPlayground'
+import WebMain       from '!!raw-loader!../../PhotosRunner/src/jsMain/kotlin/main.kt';
 
 # [Photos](https://github.com/nacular/doodle-tutorials/tree/master/Photos) Tutorial
 
@@ -42,14 +42,14 @@ We will use a multi-platform library setup for this app, with a multiplatform la
 
 [**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/Photos/build.gradle.kts)
 
-<CodeBlock language="kotlin">{Gradle}</CodeBlock>
+<KPlayground>{Gradle}</KPlayground>
 
 </TabItem>
 <TabItem value="runner" label="PhotosRunner">
 
 [**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/PhotosRunner/build.gradle.kts)
 
-<CodeBlock language="kotlin">{RunnerGradle}</CodeBlock>
+<KPlayground>{RunnerGradle}</KPlayground>
 
 </TabItem>
 </Tabs>
@@ -64,35 +64,35 @@ The app's structure is fairly simple. It has a main Container that holds the ima
 
 [**PhotosApp.kt**](https://github.com/nacular/doodle-tutorials/blob/master/Photos/src/commonMain/kotlin/io/nacular/doodle/examples/PhotosApp.kt#L11)
 
-```kotlin
+<KPlayground>{`
 class PhotosApp(/*...*/): Application {
     init {
         // ...
-
+\n
         val panelToggle                 // Button used to show/hide the panel
         val panel                       // Has controls for manipulating images
         val mainContainer = container { // container that holds images
             // ...
-
+\n
             dropReceiver = object: DropReceiver {
                 // support drag-drop importing
             }
-
+\n
             GlobalScope.launch {
                 listOf("tetons.jpg", "earth.jpg").forEachIndexed { index, file ->
                     // load default images
                 }
             }
         }
-
+\n
         display += listOf(mainContainer, panel, panelToggle)
-
+\n
         // ...
     }
-
+\n
     override fun shutdown() {}
 }
-```
+`}</KPlayground>
 
 :::tip
 Notice that `shutdown` is a no-op, since we don't have any cleanup to do when the app closes.
@@ -106,30 +106,7 @@ Doodle apps can be [launched](https://nacular.github.io/doodle/docs/applications
 
 [**FullScreen.kt**](https://github.com/nacular/doodle-tutorials/blob/master/Photos/src/main/kotlin/io/nacular/doodle/examples/FullScreen.kt#L22)
 
-```kotlin
-package io.nacular.doodle.examples
-
-//...
-
-fun fullscreen() {
-    application(modules = listOf(
-        FocusModule,
-        KeyboardModule,
-        DragDropModule,
-        basicLabelBehavior(),
-        nativeTextFieldBehavior(spellCheck = false),
-        basicMutableSpinnerBehavior(),
-        basicCircularProgressIndicatorBehavior(thickness = 18.0),
-        Module(name = "AppModule") {
-            bindSingleton<Animator>    { AnimatorImpl   (instance(), instance()) }
-            bindSingleton<ImageLoader> { ImageLoaderImpl(instance(), instance()) }
-        }
-    )) {
-        // load app
-        PhotosApp(instance(), instance(), instance(), instance(), instance(), instance())
-    }
-}
-```
+<KPlayground>{WebMain}</KPlayground>
 
 :::tip
 Normally this would just be your `main` function. But `main` would prevent the app from being used as a library. Which is what happens to allow both an embedded (in the docs) and full-screen version.
@@ -153,13 +130,13 @@ App launching is the only part of our code that is platform-specific; since it i
 
 Drag-drop support requires the [`DragDropModule`](https://nacular.github.io/doodle/docs/dragdrop) to work. It then requires setting up drag/drop recognizers on the source/target Views. We created the `mainContainer` for this. You can see that the `dropReceiver` property is set to a `DropReceiver` that controls how the `mainContainer` handles drop events.
 
-```kotlin
+<KPlayground>{`
 class PhotosApp(/*...*/ private val images: ImageLoader /*...*/): Application {
     init {
         // ...
         val mainContainer = container {
             // ...
-
+\n
             dropReceiver = object: DropReceiver {
                 private  val allowedFileTypes                    = Files(ImageType("jpg"), ImageType("jpeg"), ImageType("png"))
                 override val active                              = true
@@ -169,7 +146,7 @@ class PhotosApp(/*...*/ private val images: ImageLoader /*...*/): Application {
                 override fun dropActionChanged(event: DropEvent) = allowed(event)
                 override fun drop             (event: DropEvent) = event.bundle[allowedFileTypes]?.let { files ->
                     val photos = files.map { GlobalScope.async { images.load(it)?.let { FixedAspectPhoto(it) } } }
-
+\n
                     GlobalScope.launch {
                         photos.mapNotNull { it.await() }.forEach { photo ->
                             import(photo, event.location)
@@ -180,10 +157,10 @@ class PhotosApp(/*...*/ private val images: ImageLoader /*...*/): Application {
             }
         }
     }
-
+\n
     // ...
 }
-```
+`}</KPlayground>
 
 Our `DropReceiver` specifies the supported file-types (jpg, jpeg, and png). It then checks that any drop event contains valid files before accepting it. The `drop(event: DropEvent)` method is called when the user attempts the final drop. Here, the receiver fetches all the allowed files in the bundle, and tries to load and import each one. Notice that the receiver converts raw Image returned by `ImageLoader` into a `FixedAspectPhoto`.
 
@@ -191,15 +168,15 @@ Our `DropReceiver` specifies the supported file-types (jpg, jpeg, and png). It t
 
 We import images using a local `import` function inside the `mainContainer` creation block. This simplifies access to local state. The `import` function takes a photo, which is a `View`, and a location to place it.
 
-```kotlin
+<KPlayground>{`
 val import = { photo: View, location: Point ->
-
+\n
 }
-```
+`}</KPlayground>
 
 Import resizes and centers the photo at the given point. It is center-rotates it between -15° and 15°. Finally, a listener is added to the `pressed` pointer event. This moves the photo to the foreground and updates the panel.
 
-```kotlin
+<KPlayground>{`
 photo.width           = 400.0
 photo.position        = location - Point(photo.width / 2, photo.height / 2)
 photo.transform       = Identity.rotate(location, (Random.nextFloat() * 30 - 15) * degrees)
@@ -207,34 +184,34 @@ photo.pointerChanged += pressed {
     children.move(photo, to = children.size - 1)
     panel.setPhoto(photo)
 }
-```
+`}</KPlayground>
 
 ## Using Gestures
 
 Import also registers a custom gesture listener to support multi-touch scaling and rotations.
 
-```kotlin
+<KPlayground>{`
 GestureRecognizer(photo).changed += object: GestureListener<GestureEvent> {
     // ...
-
+\n
     override fun started(event: GestureEvent) {
         // capture initial state
         event.consume()
     }
-
+\n
     override fun changed(event: GestureEvent) {
         // 1) calculate rotation angle
         // 2) update photo transform to include rotation
         // 3) update photo bounds based on scaling
         event.consume()
     }
-
+\n
     override fun ended(event: GestureEvent) {
         // simply consume event
         event.consume()
     }
 }
-```
+`}</KPlayground>
 
 `GestureRecognizer` takes a `View` and emits events whenever it detects motion from 2 or more pointers in that `View`. It also calculates a scale value by comparing the distance between the selected pointers over time.
 
@@ -244,41 +221,41 @@ We register a listener that uses the events to update the photo's `transform` an
 
 We record the state of our photo, and the pointers provided by the `GestureRecognizer` on the `started` event. Notice that `GestureRecognizer` provides locations in the photo's local coordinate. This makes sense for a general-purpose utility and matches the way Doodle reports pointer events. We use these values to modify the photo's bounds though, which is defined in its parent's coordinates. So we map the points into the parent before our calculations.
 
-```kotlin
+<KPlayground>{`
 override fun started(event: GestureEvent) {
-    // Capture initial state to apply deltas with in `changed`
+    // Capture initial state to apply deltas with in \`changed\`
     originalSize     = photo.size
     originalCenter   = this@container.toLocal(event.center, photo)
     originalVector   = event.initial[1].inParent(photo) - event.initial[0].inParent(photo)
     originalPosition = photo.position
     initialTransform = photo.transform
-
+\n
     event.consume() // ensure event is consumed from Resizer
 }
-```
+`}</KPlayground>
 
 ### Handling Gesture Updates
 
 The values recorded in `started` are used--along with the new state--in the `changed` event to update the selected photo.
 
-```kotlin
+<KPlayground>{`
 override fun changed(event: GestureEvent) {
     val currentVector = event.current[1].inParent(photo) - event.current[0].inParent(photo)
-
+\n
     // Angle between initial set of points and their current locations
     val transformAngle = atan2(
         originalVector.x * currentVector.y - originalVector.y * currentVector.x,
         originalVector.x * currentVector.x + originalVector.y * currentVector.y
     )
-
+\n
     // Use transform for rotation
     photo.transform = initialTransform.rotate(around = originalCenter, by = transformAngle)
-
+\n
     // Update bounds instead of scale transformation
     photo.bounds = Rectangle(
             originalPosition - ((originalPosition - originalCenter) * (1 - event.scale)),
             originalSize * event.scale)
-
+\n
     event.consume() // ensure event is consumed from Resizer
 }
-```
+`}</KPlayground>
