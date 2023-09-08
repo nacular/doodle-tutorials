@@ -21,7 +21,6 @@ import io.nacular.doodle.event.PointerListener.Companion.on
 import io.nacular.doodle.event.PointerMotionListener.Companion.dragged
 import io.nacular.doodle.focus.FocusManager
 import io.nacular.doodle.geometry.Point.Companion.Origin
-import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.image.ImageLoader
 import io.nacular.doodle.layout.constraints.Strength.Companion.Strong
 import io.nacular.doodle.layout.constraints.constrain
@@ -53,10 +52,10 @@ class TimedCardsApp(
                 uiDispatcher: CoroutineDispatcher,
 ): Application {
 
-    private val appScope        = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    private val itemDefaultSize = Size(CARD_MAX_WIDTH, CARD_MAX_WIDTH * SMALL_CARD_ASPECT)
+    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     private lateinit var appFonts: Fonts
+    private lateinit var carousel: Carousel<CardData, *>
 
     init {
         appScope.launch(uiDispatcher) {
@@ -65,12 +64,12 @@ class TimedCardsApp(
             appFonts = loadFonts(fonts)
 
             // Carousel containing all the content
-            val carousel = Carousel(
+            carousel = Carousel(
                 createModel(images),
                 itemVisualizer { item, previous, context ->
                     when (previous) {
                         is Card -> previous.apply { update(item, context) }
-                        else    -> Card(item, context, appFonts, itemDefaultSize)
+                        else    -> Card(item, context, appFonts) { itemSize(carousel.size) }
                     }
                 }
             ).apply {

@@ -40,7 +40,7 @@ class Card(
     private var data           : CardData,
     private var context        : CarouselItem,
     private val fonts          : Fonts,
-    private val itemDefaultSize: Size,
+    private val itemInitialSize: () -> Size,
 ): View(accessibilityRole = ImageRole()) {
 
     private val smallHeader = header(data.header, fonts.smallBoldFont      )
@@ -108,7 +108,7 @@ class Card(
         children += largeText
 
         layout = constrain(children[0], children[1]) { smallText, largeText ->
-            smallText.left   eq parent.centerX - itemDefaultSize.width / 2 + 10
+            smallText.left   eq parent.centerX - itemInitialSize().width / 2 + 10
             smallText.right  eq parent.right  - 10
             smallText.bottom eq parent.bottom - 20 + progress * 800
             smallText.height.preserve
