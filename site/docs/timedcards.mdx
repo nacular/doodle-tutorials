@@ -2,11 +2,11 @@
 title: Timed Cards
 hide_title: true
 ---
+
 import Tabs      from '@theme/Tabs'
 import TabItem   from '@theme/TabItem'
 import CodeBlock from '@theme/CodeBlock';
 
-import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
 import Gradle            from '!!raw-loader!../../TimedCards/build.gradle.kts';
 import RunnerGradle      from '!!raw-loader!../../TimedCardsRunner/build.gradle.kts';
 import TimedCardsApp     from '!!raw-loader!../../TimedCards/src/commonMain/kotlin/io/nacular/doodle/examples/TimedCardsApp.kt';
@@ -15,6 +15,7 @@ import ButtonControls    from '!!raw-loader!../../TimedCards/src/commonMain/kotl
 import Card              from '!!raw-loader!../../TimedCards/src/commonMain/kotlin/io/nacular/doodle/examples/Card.kt';
 import WebMain           from '!!raw-loader!../../TimedCardsRunner/src/jsMain/kotlin/main.kt';
 import {KPlayground}     from '../src/components/KotlinPlayground'
+import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
 
 # [TimedCards](https://github.com/nacular/doodle-tutorials/tree/master/TimedCards) Tutorial
 
@@ -22,13 +23,11 @@ This is a simple app that shows the flexibility of Doodle Carousels. It is inspi
 
 The entire app rests on [Doodle's powerful Carousel APIs](https://nacular.github.io/doodle/docs/ui_components/overview#carousel) to create the layout and smooth, perfectly-timed transitions.
 
-<DoodleCodeBlock functionName="timedCards" height="538.875" />
+<DoodleCodeBlock function="timedCards" height="538.875" />
 
 :::tip
 You can also see the full-screen app [here](https://nacular.github.io/doodle-tutorials/timedcards).
 :::
-
----
 
 ## Project Setup
 
@@ -67,7 +66,9 @@ like below. Therefore, we need a pure library for the app. This is why there is 
 </TabItem>
 </Tabs>
 
----
+:::info
+Build uses [libs.versions.toml](https://github.com/nacular/doodle-tutorials/blob/master/gradle/libs.versions.toml) file.
+:::
 
 ## Launching on Web and Desktop
 
@@ -76,8 +77,6 @@ Doodle apps can be [launched](https://nacular.github.io/doodle/docs/applications
 **main.kt**
 
 <KPlayground>{WebMain}</KPlayground>
-
----
 
 ## Defining Our Application
 

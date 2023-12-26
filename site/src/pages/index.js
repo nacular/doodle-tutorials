@@ -20,7 +20,7 @@ function HomepageHeader() {
                 <h1 className="hero__title">{siteConfig.tagline}</h1>
                 <div className={styles.buttons}>
                     <Link className="button button--secondary button--lg" to="/docs/introduction">
-                        Tutorials&nbsp;&nbsp;→
+                        Tutorials
                     </Link>
                 </div>
             </div>

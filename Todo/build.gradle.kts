@@ -1,48 +1,30 @@
 plugins {
-    kotlin("multiplatform"       )
-    kotlin("plugin.serialization")
+    kotlin("multiplatform"          )
+    alias(libs.plugins.serialization)
 }
 
 kotlin {
-    jsTargets (BOTH)
-    jvmTargets()
-
-    val mockkVersion        : String by project
-    val doodleVersion       : String by project
-    val coroutinesVersion   : String by project
-    val serializationVersion: String by project
+    // Defined in buildSrc/src/main/kotlin/Common.kt
+    jsTargets    ()
+    wasmJsTargets()
+    jvmTargets   ()
 
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(kotlin("stdlib-common"))
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-                api("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
+        commonMain.dependencies {
+            api(libs.coroutines.core   )
+            api(libs.serialization.json)
 
-                api("io.nacular.doodle:core:$doodleVersion"    )
-                api("io.nacular.doodle:themes:$doodleVersion"  )
-                api("io.nacular.doodle:controls:$doodleVersion")
-            }
+            api(libs.doodle.themes     )
+            api(libs.doodle.controls   )
         }
 
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test-common"))
-                implementation(kotlin("test-annotations-common"))
-            }
+        jsTest.dependencies {
+            implementation(kotlin("test-js"))
         }
 
-        jvm().compilations["test"].defaultSourceSet {
-            dependencies {
-                implementation(kotlin("test-junit"))
-                implementation("io.mockk:mockk:$mockkVersion")
-            }
-        }
-
-        js().compilations["test"].defaultSourceSet {
-            dependencies {
-                implementation(kotlin("test-js"))
-            }
+        jvmTest.dependencies {
+            implementation(kotlin("test-junit"))
+            implementation(libs.bundles.test.libs)
         }
     }
 }

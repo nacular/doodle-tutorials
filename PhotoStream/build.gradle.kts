@@ -1,25 +1,24 @@
 plugins {
-    kotlin("js"                  )
-    kotlin("plugin.serialization")
+    kotlin("multiplatform"          )
+    alias(libs.plugins.serialization)
 }
 
 kotlin {
-    jsTargets(BOTH)
+    // Defined in buildSrc/src/main/kotlin/Common.kt
+    jsTargets    (executable = true)
+    wasmJsTargets(executable = true)
 
-    val ktorVersion         : String by project
-    val doodleVersion       : String by project
-    val coroutinesVersion   : String by project
-    val serializationVersion: String by project
+    sourceSets {
+        jsMain {
+            dependencies {
+                implementation(libs.bundles.ktor.client)
+                implementation(libs.coroutines.core    )
+                implementation(libs.serialization.json )
 
-    dependencies {
-        implementation("io.ktor:ktor-client-core:$ktorVersion"                                 )
-        implementation("io.ktor:ktor-client-serialization:$ktorVersion"                        )
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:$coroutinesVersion"   )
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
-
-        api("io.nacular.doodle:core:$doodleVersion"     )
-        api("io.nacular.doodle:browser:$doodleVersion"  )
-        api("io.nacular.doodle:controls:$doodleVersion" )
-        api("io.nacular.doodle:themes:$doodleVersion"   )
+                api(libs.doodle.browser )
+                api(libs.doodle.controls)
+                api(libs.doodle.themes  )
+            }
+        }
     }
 }

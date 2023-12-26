@@ -4,36 +4,34 @@ import styles from './HomepageFeatures.module.css';
 
 const FeatureList = [
     {
-        title: 'Expressive',
+        title: 'One Language',
         description: (
             <>
-                Complex UIs are easy with powerful, vector-oriented rendering, fully customizable layouts and simple pointer and keyboard handling.
+                Write your app once, entirely in <a href='https://kotlinlang.org'>Kotlin</a> and forget about the underlying platform.
             </>
         ),
     },
     {
-        title: 'Single Language',
+        title: 'Many Platforms',
         description: (
             <>
-                Doodle apps are written entirely in <a href='https://kotlinlang.org'>Kotlin</a>. This means no CSS or Javascript libraries.
+                Deploy the same app to the Web (via JavaScript or WASM) or Desktop (via the JVM).
             </>
         ),
     },
     {
-        title: 'Multi-platform',
+        title: 'Your Creativity',
         description: (
             <>
-                Target both JS (Browser) and JVM (alpha) using common widgets and business logic.
+                Build beautiful, modern apps with pixel perfect UIs, fully customizable layouts and simple user input.
             </>
         ),
     },
 ];
-function Feature({Svg, title, description}) {
+
+function Feature({title, description}) {
     return (
         <div className={clsx('col col--4')}>
-            <div className="text--center">
-                {/*<Svg className={styles.featureSvg} alt={title} />*/}
-            </div>
             <div className="text--center padding-horiz--md">
                 <h1>{title}</h1>
                 <p>{description}</p>

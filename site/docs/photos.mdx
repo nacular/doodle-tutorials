@@ -2,13 +2,15 @@
 title: Photos
 hide_title: true
 ---
+
 import Tabs      from '@theme/Tabs'
 import TabItem   from '@theme/TabItem'
 
-import Gradle        from '!!raw-loader!../../Photos/build.gradle.kts';
-import RunnerGradle  from '!!raw-loader!../../PhotosRunner/build.gradle.kts';
-import {KPlayground} from '../src/components/KotlinPlayground'
-import WebMain       from '!!raw-loader!../../PhotosRunner/src/jsMain/kotlin/main.kt';
+import Gradle            from '!!raw-loader!../../Photos/build.gradle.kts';
+import RunnerGradle      from '!!raw-loader!../../PhotosRunner/build.gradle.kts';
+import {KPlayground}     from '../src/components/KotlinPlayground'
+import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
+import WebMain           from '!!raw-loader!../../PhotosRunner/src/jsMain/kotlin/main.kt';
 
 # [Photos](https://github.com/nacular/doodle-tutorials/tree/master/Photos) Tutorial
 
@@ -16,13 +18,11 @@ We will build a simple photo app that lets you view and manipulate images using 
 
 Here is the end result.
 
-<DoodleCodeBlock functionName="photos" height="700" />
+<DoodleCodeBlock function="photos" height="700" />
 
 :::tip
 You can also see the full-screen app [here](https://nacular.github.io/doodle-tutorials/photos).
 :::
-
----
 
 ## Project Setup
 
@@ -54,7 +54,9 @@ We will use a multi-platform library setup for this app, with a multiplatform la
 </TabItem>
 </Tabs>
 
----
+:::info
+Build uses [libs.versions.toml](https://github.com/nacular/doodle-tutorials/blob/master/gradle/libs.versions.toml) file.
+:::
 
 ## The Application
 
@@ -97,8 +99,6 @@ class PhotosApp(/*...*/): Application {
 :::tip
 Notice that `shutdown` is a no-op, since we don't have any cleanup to do when the app closes.
 :::
-
----
 
 ## Creating A Full Screen App
 

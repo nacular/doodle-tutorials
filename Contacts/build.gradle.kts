@@ -1,29 +1,24 @@
 plugins {
-    kotlin("multiplatform"       )
-    kotlin("plugin.serialization")
+    kotlin("multiplatform"          )
+    alias(libs.plugins.serialization)
 }
 
 kotlin {
-    jsTargets (BOTH)
-    jvmTargets()
-
-    val kodeinVersion       : String by project
-    val doodleVersion       : String by project
-    val coroutinesVersion   : String by project
-    val serializationVersion: String by project
+    // Defined in buildSrc/src/main/kotlin/Common.kt
+    jsTargets    ()
+    jvmTargets   ()
+    wasmJsTargets()
 
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
-                implementation(kotlin("stdlib-common"))
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-                api("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
-                api("org.kodein.di:kodein-di:$kodeinVersion")
+                api(libs.coroutines.core   )
+                api(libs.serialization.json)
+                api(libs.kodein.di         )
 
-                api("io.nacular.doodle:core:$doodleVersion"    )
-                api("io.nacular.doodle:controls:$doodleVersion")
-                api("io.nacular.doodle:themes:$doodleVersion")
-                api("io.nacular.doodle:animation:$doodleVersion")
+                api(libs.doodle.controls )
+                api(libs.doodle.themes   )
+                api(libs.doodle.animation)
             }
         }
     }

@@ -3,18 +3,15 @@ plugins {
 }
 
 kotlin {
-    jsTargets (BOTH)
-    jvmTargets()
-
-    val doodleVersion: String by project
+    // Defined in buildSrc/src/main/kotlin/Common.kt
+    jsTargets    ()
+    jvmTargets   ()
+    wasmJsTargets()
 
     sourceSets {
         commonMain {
             dependencies {
-                implementation(kotlin("stdlib-common"))
-                api("io.nacular.doodle:core:$doodleVersion"     )
-                api("io.nacular.doodle:controls:$doodleVersion" )
-                api("io.nacular.doodle:animation:$doodleVersion")
+                api(libs.doodle.animation)
             }
         }
     }

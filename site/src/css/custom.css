@@ -4,9 +4,13 @@
  * work well for content-centric websites.
  */
 
+@import "codemirror.css";
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #25c2a0;
+  --ifm-color-primary: #0094C6;
   --ifm-color-primary-dark: rgb(33, 175, 144);
   --ifm-color-primary-darker: rgb(31, 165, 136);
   --ifm-color-primary-darkest: rgb(26, 136, 112);
@@ -14,18 +18,89 @@
   --ifm-color-primary-lighter: rgb(102, 212, 189);
   --ifm-color-primary-lightest: rgb(146, 224, 208);
   --ifm-code-font-size: 95%;
-  --ifm-code-border-radius: 0px;
+  --ifm-code-border-radius: 2px;
+  --ifm-code-padding-horizontal: 4px;
   --ifm-table-stripe-background: none;
+  --ifm-pre-border-radius: 10px;
+  --docusaurus-highlighted-code-line-bg: rgb(72, 77, 91);
+  --ifm-font-family-base: 'Roboto',-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;
+  --ifm-alert-shadow: none;
+  --ifm-alert-border-left-width: 0px;
+  --ifm-alert-border-radius: 0.75em;
+
+  --rich-content-margin-bottom: 2em;
+  --ifm-color-secondary: #ffffff;
+  --ifm-line-height-base: 1.85;
+  --ifm-font-size-base: 110%;
+  --ifm-menu-color-background-hover: none;
+  --ifm-menu-color-background-active: none;
+  --ifm-footer-padding-vertical: 1rem;
+  --ifm-footer-background-color: black;
+}
+
+@media screen and (min-width: 997px) {
+  :root {
+    --ifm-navbar-padding-horizontal: 3rem;
+  }
+}
+
+.table-of-contents__left-border {
+  border-left: none;
+}
+
+.menu__link:hover {
+  color: var(--ifm-color-primary);
+}
+
+.menu__link--sublist-caret::after {
+  background: var(--ifm-menu-link-sublist-icon) 50% / 1.5rem 1.5rem;
+}
+
+.navbar--fixed-top {
+  box-shadow: 0 0 0.2rem #0000001a, 0 0.2rem 0.4rem #0003;
+}
+
+.executable-fragment-wrapper {
+  margin-top: var(--rich-content-margin-bottom);
+  margin-bottom: var(--rich-content-margin-bottom);
+}
+
+.padding-top--md {
+  padding-top: 1.5rem !important;
+}
+
+.menu {
+  padding-top: 1.5rem !important;
+}
+
+.menu__list {
+  padding-left: 2rem;
+}
+
+.menu__list-item {
+  font-size: 0.85rem;
+}
+
+h2 {
+  color: rgba(0, 0, 0, 0.54);
+}
+
+html[data-theme='dark'] h2 {
+  color: white;
 }
 
 hr {
-  border-top: none;
-  border-left: none;
+  border-top  : none;
+  border-left : none;
   border-right: none;
 }
 
 code {
   border: none;
+}
+
+.theme-doc-sidebar-container {
+  border: none !important;
 }
 
 .docusaurus-highlight-code-line {
@@ -83,4 +158,22 @@ html[data-theme='dark'] .header-slack-link:before {
 
 .CodeMirror {
   font-size: var(--ifm-code-font-size);
+}
+
+.markdown > h2 {
+  --ifm-h2-font-size: 2rem;
+}
+
+.markdown {
+  --ifm-heading-vertical-rhythm-bottom: 1.5
+}
+
+.footer__copyright {
+  font-size: 85%;
+  color: #ffffffb3;
+}
+
+header .container {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
 }

@@ -3,7 +3,13 @@ package io.nacular.doodle.examples.contacts
 import io.nacular.doodle.animation.Animator
 import io.nacular.doodle.animation.AnimatorImpl
 import io.nacular.doodle.application.Application
-import io.nacular.doodle.application.Modules
+import io.nacular.doodle.application.Modules.Companion.FocusModule
+import io.nacular.doodle.application.Modules.Companion.FontModule
+import io.nacular.doodle.application.Modules.Companion.ImageModule
+import io.nacular.doodle.application.Modules.Companion.KeyboardModule
+import io.nacular.doodle.application.Modules.Companion.ModalModule
+import io.nacular.doodle.application.Modules.Companion.PathModule
+import io.nacular.doodle.application.Modules.Companion.PointerModule
 import io.nacular.doodle.core.Container
 import io.nacular.doodle.core.Display
 import io.nacular.doodle.core.Layout
@@ -18,11 +24,9 @@ import io.nacular.doodle.drawing.Color.Companion.White
 import io.nacular.doodle.drawing.opacity
 import io.nacular.doodle.drawing.rect
 import io.nacular.doodle.examples.contacts.ContactsModel.EditContext
-import io.nacular.doodle.geometry.PathMetrics
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Rectangle
 import io.nacular.doodle.geometry.Size
-import io.nacular.doodle.geometry.impl.PathMetricsImpl
 import io.nacular.doodle.layout.Insets
 import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.layout.constraints.fill
@@ -71,23 +75,23 @@ object NoOpContacts: ContactsModel {
 
 // Modules used in showcase apps
 val showcaseModules = listOf(
-    Modules.FontModule,
-    Modules.ImageModule,
-    Modules.ModalModule,
-    Modules.FocusModule,
-    Modules.PointerModule,
-    Modules.KeyboardModule,
+    PathModule,
+    FontModule,
+    ImageModule,
+    ModalModule,
+    FocusModule,
+    PointerModule,
+    KeyboardModule,
     BasicTheme.basicLabelBehavior(),
     NativeTheme.nativeTextFieldBehavior(spellCheck = false),
     NativeTheme.nativeHyperLinkBehavior(),
     NativeTheme.nativeScrollPanelBehavior(),
     Module(name = "DummyModule") {
-        bindSingleton<PathMetrics> { PathMetricsImpl(instance()) }
-        bindInstance<Router>       { EmbeddedRouter (          ) }
-        bindSingleton<Animator>    { AnimatorImpl   (instance(), instance())             }
-        bindInstance <Navigator>   { NoOpNavigator                                       }
-        bindSingleton<AppButtons>  { AppButtonsImpl (instance(), instance(), instance()) }
-        bindSingleton<Modals>      { ModalsImpl     (instance(), instance(), instance()) }
+        bindInstance<Router>      { EmbeddedRouter(                                  ) }
+        bindSingleton<Animator>   { AnimatorImpl  (instance(), instance()            ) }
+        bindInstance <Navigator>  { NoOpNavigator                                      }
+        bindSingleton<AppButtons> { AppButtonsImpl(instance(), instance(), instance()) }
+        bindSingleton<Modals>     { ModalsImpl    (instance(), instance(), instance()) }
     }
 )
 

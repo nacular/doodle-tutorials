@@ -11,7 +11,7 @@ export class DoodleCodeBlock extends React.Component {
     }
 
     this.height       = props.height
-    this.functionName = props.functionName
+    this.functionName = props.function
     this.ref = React.createRef()
   }
 

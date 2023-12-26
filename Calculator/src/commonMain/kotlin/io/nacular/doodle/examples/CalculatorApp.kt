@@ -31,8 +31,8 @@ class CalculatorApp(
         }
 
         display.layout = constrain(display.children[0]) {
-            it.width  eq (display.children[0].idealSize?.width  ?: 0.0) // set width to ideal width or 0 if no ideal size set
-            it.height eq (display.children[0].idealSize?.height ?: 0.0) // set height to ideal height or 0 if no ideal size set
+            it.width  eq (display.children.firstOrNull()?.idealSize?.width  ?: 0.0) // set width to ideal width or 0 if no ideal size set
+            it.height eq (display.children.firstOrNull()?.idealSize?.height ?: 0.0) // set height to ideal height or 0 if no ideal size set
             it.center eq parent.center
         }
     }

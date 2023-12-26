@@ -2,7 +2,7 @@ package io.nacular.doodle.examples.contacts
 
 import io.nacular.doodle.controls.MutableListModel
 import io.nacular.doodle.controls.SingleItemSelectionModel
-import io.nacular.doodle.controls.TextVisualizer
+import io.nacular.doodle.controls.StringVisualizer
 import io.nacular.doodle.controls.table.CellInfo
 import io.nacular.doodle.controls.table.CellVisualizer
 import io.nacular.doodle.controls.table.ColumnSizePolicy
@@ -90,7 +90,7 @@ class ContactList(
     }
 
     column(Label("Name"        ), { name        }, nameVisualizer   ) { cellAlignment = alignment; headerAlignment = alignment                        }
-    column(Label("Phone Number"), { phoneNumber }, TextVisualizer() ) { cellAlignment = alignment; headerAlignment = alignment                        }
+    column(Label("Phone Number"), { phoneNumber }, StringVisualizer() ) { cellAlignment = alignment; headerAlignment = alignment                        }
     column(null,                                   toolsVisualizer  ) { cellAlignment = fill(Insets(top = 20.0, bottom = 20.0, right = 20.0), Strong) }
 }) {
     init {

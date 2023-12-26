@@ -2,12 +2,14 @@
 title: Contacts
 hide_title: true
 ---
+
 import Tabs      from '@theme/Tabs'
 import TabItem   from '@theme/TabItem'
 
-import Gradle              from '!!raw-loader!../../Contacts/build.gradle.kts';
-import RunnerGradle        from '!!raw-loader!../../ContactsRunner/build.gradle.kts';
-import {KPlayground}       from '../src/components/KotlinPlayground'
+import Gradle            from '!!raw-loader!../../Contacts/build.gradle.kts';
+import RunnerGradle      from '!!raw-loader!../../ContactsRunner/build.gradle.kts';
+import {KPlayground}     from '../src/components/KotlinPlayground'
+import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
 
 # [Contacts](https://github.com/nacular/doodle-tutorials/tree/master/Contacts) Tutorial
 
@@ -18,13 +20,11 @@ For example, the one embedded in these docs does not support deep linking, as th
 The full screen, Web version does support deep links though. This works seamlessly, as the app itself is unaware of the implementation
 details of its dependencies.
 
-<DoodleCodeBlock functionName="contacts" height="700" />
+<DoodleCodeBlock function="contacts" height="700" />
 
 :::tip
 You can also see the full-screen app [here](https://nacular.github.io/doodle-tutorials/contacts).
 :::
-
----
 
 ## Project Setup
 
@@ -67,7 +67,9 @@ The desktop application uses placeholder icons in some cases to work-around a kn
 </TabItem>
 </Tabs>
 
----
+:::info
+Build uses [libs.versions.toml](https://github.com/nacular/doodle-tutorials/blob/master/gradle/libs.versions.toml) file.
+:::
 
 ## The Application
 
@@ -323,15 +325,13 @@ Notice that the Create Button is a floating View. It is aligned to the right of 
 The Create Button needs to be above all other Views, so the app ensures it is added to the `Display` last.
 :::
 
----
-
 ## Main Views
 
 ### [Header](https://github.com/nacular/doodle-tutorials/blob/master/Contacts/src/commonMain/kotlin/io/nacular/doodle/examples/contacts/Header.kt#L35)
 
 The app's header (which is always visible) provides a way to [filter](#filterbox) the [Contact List](#contact-list) and navigate back to it whenever the logo area is clicked. It also positions its contents in a way that allows the floating create button to sit along side them as though it is a child.
 
-<DoodleCodeBlock functionName="contactsHeader" height="200" />
+<DoodleCodeBlock function="contactsHeader" height="200" />
 
 **Header.kt**
 <KPlayground>{`
@@ -492,7 +492,7 @@ private inner class FilterBox: View() {
 
 This is the main view within the app. It displays the contacts in a [Table](https://nacular.github.io/doodle/docs/ui_components/overview#table) with three columns: _Name_, _Phone Number_, and an untitled one to hold the edit/delete tool buttons. This View extends Doodle's [`DynamicTable`](https://nacular.github.io/doodle/docs/ui_components/overview#table), which means it responds automatically to change in its underlying model. This is precisely what we need since Contacts will be added, edited, and deleted.
 
-<DoodleCodeBlock functionName="contactList" height="550" />
+<DoodleCodeBlock function="contactList" height="550" />
 
 **ContactList.kt**
 <KPlayground>{`
@@ -619,7 +619,7 @@ Highlighting on pointer hover is handled by each cell in the Table. [`ContactCel
 
 This View allows the user to create a new contact. It shows a preview of the avatar that will be used and takes text input for both the `name` and `phoneNumber`. This View uses child Views for these components, including a [Form](https://nacular.github.io/doodle/docs/ui_components/form) for the input fields.
 
-<DoodleCodeBlock functionName="contactCreation" height="550" />
+<DoodleCodeBlock function="contactCreation" height="550" />
 
 **CreateContactView.kt**
 <KPlayground>{`
@@ -695,7 +695,7 @@ class CreateContactView(
 
 This View shows the details of a contact. It allows the user to edit or delete the contact. Editing jumps to the [Contact Editing](#contact-editing) screen.
 
-<DoodleCodeBlock functionName="contactView" height="550" />
+<DoodleCodeBlock function="contactView" height="550" />
 
 **ContactView.kt**
 <KPlayground>{`
@@ -770,7 +770,7 @@ This view uses a customized HyperLink that contains an icon. HyperLinks are Butt
 
 Contacts are edited using this View. It is fairly similar to the CreateContactView, in that it displays the contact's avatar, `name`, `phoneNumber`, and presents a form to modify them. It also has a delete button to remove the Contact. This View shares a lot of structure with `ContactView` that is placed in the `ContactCommon` base class.
 
-<DoodleCodeBlock functionName="contactEditing" height="620" />
+<DoodleCodeBlock function="contactEditing" height="620" />
 
 **EditContactView.kt**
 <KPlayground>{`

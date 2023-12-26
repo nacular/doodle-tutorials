@@ -1,8 +1,7 @@
 package io.nacular.doodle.examples
 
 import io.ktor.client.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
+import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.nacular.doodle.controls.DynamicListModel
 import io.nacular.doodle.controls.ModelObserver
@@ -25,7 +24,7 @@ import kotlin.properties.Delegates
 //sampleStart
 class UnSplashDataModel(
     private val scope      : CoroutineScope,
-    httpClient             : HttpClient,
+    private val client     : HttpClient,
     private val imageLoader: ImageLoader,
     private val accessToken: String = "YOUR_ACCESS_TOKEN"
 ): DynamicListModel<Image> {
@@ -34,13 +33,6 @@ class UnSplashDataModel(
 
     @Serializable
     data class UnsplashPhoto(val id: String, val urls: Urls)
-
-    // HTTP client configured to read JSON  returned from unsplash
-    private val client = httpClient.config {
-        install(JsonFeature) {
-            serializer = KotlinxSerializer(kotlinx.serialization.json.Json { ignoreUnknownKeys = true })
-        }
-    }
 
     // Tracks current HTTP request
     private var httpRequestJob: Job? by Delegates.observable(null) { _, old, _ ->
@@ -54,7 +46,7 @@ class UnSplashDataModel(
     private var currentPage: Int by observable(-1) { _, _ ->
         fetchActive = true
         httpRequestJob = scope.launch {
-            val results = client.get<List<UnsplashPhoto>>(unsplashLocation)
+            val results = client.get(unsplashLocation).body<List<UnsplashPhoto>>()
 
             loadedImages.addAll(results.mapNotNull { imageLoader.load(it.urls.small) })
 

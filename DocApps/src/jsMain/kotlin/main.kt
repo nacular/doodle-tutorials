@@ -1,7 +1,6 @@
 @file:Suppress("unused")
 @file:OptIn(ExperimentalJsExport::class)
 
-import io.nacular.doodle.HTMLElement
 import io.nacular.doodle.animation.Animator
 import io.nacular.doodle.animation.AnimatorImpl
 import io.nacular.doodle.application.Modules.Companion.DragDropModule
@@ -10,6 +9,7 @@ import io.nacular.doodle.application.Modules.Companion.FontModule
 import io.nacular.doodle.application.Modules.Companion.ImageModule
 import io.nacular.doodle.application.Modules.Companion.KeyboardModule
 import io.nacular.doodle.application.Modules.Companion.ModalModule
+import io.nacular.doodle.application.Modules.Companion.PathModule
 import io.nacular.doodle.application.Modules.Companion.PointerModule
 import io.nacular.doodle.application.application
 import io.nacular.doodle.controls.buttons.Button
@@ -28,6 +28,7 @@ import io.nacular.doodle.examples.Router
 import io.nacular.doodle.examples.TabStripApp
 import io.nacular.doodle.examples.TimedCardsApp
 import io.nacular.doodle.examples.TodoApp
+import io.nacular.doodle.examples.TrivialRouter
 import io.nacular.doodle.examples.contacts.AppConfig
 import io.nacular.doodle.examples.contacts.AppConfigImpl
 import io.nacular.doodle.examples.contacts.Contact
@@ -44,8 +45,6 @@ import io.nacular.doodle.examples.contacts.SimpleContactsModel
 import io.nacular.doodle.examples.contacts.appModule
 import io.nacular.doodle.examples.contacts.showcase
 import io.nacular.doodle.examples.contacts.showcaseModules
-import io.nacular.doodle.geometry.PathMetrics
-import io.nacular.doodle.geometry.impl.PathMetricsImpl
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicCircularProgressIndicatorBehavior
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicLabelBehavior
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicMutableSpinnerBehavior
@@ -61,6 +60,7 @@ import org.kodein.di.bindInstance
 import org.kodein.di.bindSingleton
 import org.kodein.di.factory
 import org.kodein.di.instance
+import org.w3c.dom.HTMLElement
 
 @JsExport
 fun calculator(element: HTMLElement) {
@@ -87,7 +87,7 @@ fun todo(element: HTMLElement) {
             Module(name = "AppModule") {
                 bindSingleton<PersistentStore>      { LocalStorePersistence                   (          ) }
                 bindSingleton                       { DataStore                               (instance()) }
-                bindSingleton<Router>               { io.nacular.doodle.examples.TrivialRouter(window    ) }
+                bindSingleton<Router>               { TrivialRouter(window    ) }
                 bindSingleton<FilterButtonProvider> { EmbeddedFilterButtonProvider            (instance()) }
 
             }
@@ -124,6 +124,7 @@ fun contacts(element: HTMLElement) {
 
     application (root = element, modules = listOf(
         FontModule,
+        PathModule,
         ImageModule,
         ModalModule,
         FocusModule,
@@ -136,8 +137,7 @@ fun contacts(element: HTMLElement) {
         appModule(appScope = appScope, contacts = contacts, uiDispatcher = Dispatchers.UI),
         Module   (name = "PlatformModule") {
             // Platform-specific bindings
-            bindSingleton<PathMetrics>                               { PathMetricsImpl(instance()) }
-            bindInstance<io.nacular.doodle.examples.contacts.Router> { EmbeddedRouter (          ) }
+            bindInstance<io.nacular.doodle.examples.contacts.Router> { EmbeddedRouter () }
         }
     )) {
         // load app
@@ -318,9 +318,8 @@ fun contactsHeader(element: HTMLElement) {
 
 @JsExport
 fun tabStrip(element: HTMLElement) {
-    application(root = element, modules = listOf(PointerModule, Module(name = "AppModule") {
-        bindSingleton<Animator>    { AnimatorImpl   (instance(), instance()) }
-        bindSingleton<PathMetrics> { PathMetricsImpl(instance()            ) }
+    application(root = element, modules = listOf(PointerModule, PathModule, Module(name = "AppModule") {
+        bindSingleton<Animator> { AnimatorImpl(instance(), instance()) }
     })) {
         // load app
         TabStripApp(instance(), instance(), instance())

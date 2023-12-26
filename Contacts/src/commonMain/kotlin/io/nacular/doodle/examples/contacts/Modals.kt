@@ -70,7 +70,8 @@ class ModalsImpl(
 
         Modal(
             object: View() {
-                private val clipPath get() = object: ClipPath(bounds.atOrigin.toPath(10.0)) {
+                private val clipPath get() = object: ClipPath() {
+                    override val path = bounds.atOrigin.toPath(10.0)
                     override fun contains(point: Point) = point in bounds.atOrigin
                 }
 

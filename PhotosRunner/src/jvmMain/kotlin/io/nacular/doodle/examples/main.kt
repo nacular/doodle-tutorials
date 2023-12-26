@@ -22,7 +22,7 @@ fun main() {
             KeyboardModule,
             DragDropModule,
             basicLabelBehavior(),
-            nativeTextFieldBehavior(spellCheck = false),
+            nativeTextFieldBehavior(),
             basicMutableSpinnerBehavior(),
             basicCircularProgressIndicatorBehavior(thickness = 18.0),
             Module(name = "AppModule") {

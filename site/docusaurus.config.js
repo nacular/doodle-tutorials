@@ -1,7 +1,7 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const darkCodeTheme  = require('prism-react-renderer/themes/dracula');
+import {themes as prismThemes} from 'prism-react-renderer';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -56,18 +56,11 @@ const config = {
         respectPrefersColorScheme: true,
       },
       navbar: {
-        hideOnScroll: true,
         logo: {
           alt: 'Doodle Logo',
           src: 'img/doodle.svg',
         },
         items: [
-          {
-            type    : 'doc',
-            docId   : 'introduction',
-            position: 'left',
-            label   : 'Guide',
-          },
           {
             href: 'https://github.com/nacular/doodle-tutorials',
             position: 'right',
@@ -82,17 +75,12 @@ const config = {
           },
         ],
       },
-      docs: {
-        sidebar: {
-          hideable: true,
-        }
-      },
       footer: {
-        style: 'dark',
+        copyright: `Copyright © ${new Date().getFullYear()} Nacular`,
       },
       prism: {
-        theme              : require('prism-react-renderer/themes/dracula'),
-        darkTheme          : darkCodeTheme,
+        theme              : prismThemes.github,
+        darkTheme          : prismThemes.dracula,
         additionalLanguages: ['kotlin', 'groovy'],
       },
       mermaid: {

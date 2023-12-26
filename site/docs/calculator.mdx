@@ -2,14 +2,16 @@
 title: Calculator
 hide_title: true
 ---
+
 import Tabs      from '@theme/Tabs'
 import TabItem   from '@theme/TabItem'
 import CodeBlock from '@theme/CodeBlock';
 
-import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
 import Gradle            from '!!raw-loader!../../Calculator/build.gradle.kts';
 import RunnerGradle      from '!!raw-loader!../../CalculatorRunner/build.gradle.kts';
+import Toml              from '!!raw-loader!../../gradle/libs.versions.toml';
 import {KPlayground}     from '../src/components/KotlinPlayground'
+import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
 
 # [Calculator](https://github.com/nacular/doodle-tutorials/tree/master/Calculator) Tutorial
 
@@ -21,11 +23,11 @@ However, it does not have more advanced features, like parentheses, or other mat
 the implementation is simpler, and we can focus on the way Doodle is used instead of the complexity of the
 app itself. Play around with the calculator to get a feel for it.
 
-<DoodleCodeBlock functionName="calculator" height="500" />
+<DoodleCodeBlock function="calculator" height="500" />
 
+:::tip
 You can also see the full-screen app [here](https://nacular.github.io/doodle-tutorials/calculator).
-
----
+:::
 
 ## Project Setup
 
@@ -60,7 +62,9 @@ like below. Therefore, we need a pure library for each app. This is why there is
 </TabItem>
 </Tabs>
 
----
+:::info
+Build uses [libs.versions.toml](https://github.com/nacular/doodle-tutorials/blob/master/gradle/libs.versions.toml) file.
+:::
 
 ## Defining Our Application
 
@@ -88,8 +92,6 @@ class CalculatorApp(display: Display): Application {
 :::tip
 Notice that `shutdown` is a no-op, since we don't have any cleanup to do when the app closes.
 :::
-
----
 
 ## Launching on Web and Desktop
 

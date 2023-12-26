@@ -2,15 +2,17 @@
 title: Animating Tab Strip
 hide_title: true
 ---
+
 import Tabs      from '@theme/Tabs'
 import TabItem   from '@theme/TabItem'
+import CodeBlock from '@theme/CodeBlock';
 
-import Gradle        from '!!raw-loader!../../TabStrip/build.gradle.kts';
-import RunnerGradle  from '!!raw-loader!../../TabStripRunner/build.gradle.kts';
-import TabStripApp   from '!!raw-loader!../../TabStrip/src/commonMain/kotlin/io/nacular/doodle/examples/TabStripApp.kt';
-import WebMain       from '!!raw-loader!../../TabStripRunner/src/jsMain/kotlin/main.kt';
-import {KPlayground} from '../src/components/KotlinPlayground'
-
+import Gradle            from '!!raw-loader!../../TabStrip/build.gradle.kts';
+import RunnerGradle      from '!!raw-loader!../../TabStripRunner/build.gradle.kts';
+import TabStripApp       from '!!raw-loader!../../TabStrip/src/commonMain/kotlin/io/nacular/doodle/examples/TabStripApp.kt';
+import WebMain           from '!!raw-loader!../../TabStripRunner/src/jsMain/kotlin/main.kt';
+import {KPlayground}     from '../src/components/KotlinPlayground'
+import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
 
 # [TabStrip](https://github.com/nacular/doodle-tutorials/tree/master/TabStrip) Tutorial
 
@@ -18,11 +20,11 @@ We will build a simple app that hosts animating tab selection component in this 
 
 The main focus will be utilizing [Doodle's powerful animation APIs](https://nacular.github.io/doodle/docs/animations) to create smooth transitions with precise timings.
 
-<DoodleKPlayground functionName="tabStrip" height="300" />
+<DoodleCodeBlock function="tabStrip" height="300" />
 
+:::tip
 You can also see the full-screen app [here](https://nacular.github.io/doodle-tutorials/tabstrip).
-
----
+:::
 
 ## Project Setup
 
@@ -61,7 +63,9 @@ like below. Therefore, we need a pure library for the app. This is why there is 
 </TabItem>
 </Tabs>
 
----
+:::info
+Build uses [libs.versions.toml](https://github.com/nacular/doodle-tutorials/blob/master/gradle/libs.versions.toml) file.
+:::
 
 ## Defining Our Application
 
@@ -77,8 +81,6 @@ Doodle apps can be defined in `commonMain`, since they do not require any platfo
 Notice that `shutdown` is a no-op, since we don't have any cleanup to do when the app closes.
 :::
 
----
-
 ## Launching on Web and Desktop
 
 Doodle apps can be [launched](https://nacular.github.io/doodle/docs/applications) in a few different ways on Web and Desktop. We defined our app logic
@@ -87,8 +89,6 @@ in a multi-platform `TabStrip` library (no `main` functions), so it can be used 
 **main.kt**
 
 <KPlayground>{WebMain}</KPlayground>
-
----
 
 ## The TabStrip View
 

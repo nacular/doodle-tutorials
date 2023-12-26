@@ -1,11 +1,11 @@
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 
 plugins {
-    kotlin("js")
+    kotlin("multiplatform")
 }
 
 kotlin {
-    js(IR) {
+    js {
         browser {
             testTask {
                 enabled = false
@@ -15,16 +15,18 @@ kotlin {
         binaries.executable()
     }
 
-    val doodleVersion: String by project
-
-    dependencies {
-        implementation(project(":Calculator"))
-        implementation(project(":Todo"      ))
-        implementation(project(":Photos"    ))
-        implementation(project(":Contacts"  ))
-        implementation(project(":TabStrip"  ))
-        implementation(project(":TimedCards"))
-        implementation("io.nacular.doodle:browser:$doodleVersion")
+    sourceSets {
+        jsMain {
+            dependencies {
+                implementation(project(":Calculator"))
+                implementation(project(":Todo"      ))
+                implementation(project(":Photos"    ))
+                implementation(project(":Contacts"  ))
+                implementation(project(":TabStrip"  ))
+                implementation(project(":TimedCards"))
+                implementation(libs.doodle.browser)
+            }
+        }
     }
 }
 
@@ -33,12 +35,12 @@ setupDocInstall("Production" )
 
 fun setupDocInstall(suffix: String) {
     tasks.register<Copy>("installDocApps$suffix") {
-        val webPack = project.tasks.getByName("browser${suffix}Webpack", KotlinWebpack::class)
+        val webPack = project.tasks.getByName("jsBrowser${suffix}Webpack", KotlinWebpack::class)
 
         dependsOn(webPack)
 
-        val outputFile   = webPack.outputFile
-        val dirToArchive = "$buildDir/../../site/src/components" //"$buildDir/../../docs"
+        val outputFile   = webPack.mainOutputFile
+        val dirToArchive = "$buildDir/../../site/src/components"
 
         from(outputFile  )
         into(dirToArchive)

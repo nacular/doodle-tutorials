@@ -2,61 +2,117 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
 import org.gradle.kotlin.dsl.getByName
 import org.gradle.kotlin.dsl.register
-import org.jetbrains.kotlin.gradle.dsl.KotlinJsProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinTargetContainerWithJsPresetFunctions
 import org.jetbrains.kotlin.gradle.dsl.KotlinTargetContainerWithPresetFunctions
-import org.jetbrains.kotlin.gradle.plugin.KotlinJsCompilerType
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
+import java.util.*
 
-private fun KotlinJsTargetDsl.configure(vararg additoinalFlags: String) {
-    compilations.all {
+private fun KotlinJsTargetDsl.configure(executable: Boolean) {
+    compilations.configureEach {
         kotlinOptions {
-            moduleKind = "umd"
+            moduleKind            = "umd"
             sourceMapEmbedSources = "always"
-            freeCompilerArgs = listOf("-Xuse-experimental=kotlin.ExperimentalUnsignedTypes") + additoinalFlags
         }
     }
     browser {
         testTask {
             enabled = false
         }
+
+        if (executable) {
+            binaries.executable()
+        }
     }
 }
 
-fun KotlinJsProjectExtension.jsTargets(compiler: KotlinJsCompilerType = defaultJsCompilerType, vararg additoinalFlags: String) {
-    js(compiler).configure(*additoinalFlags)
+fun KotlinMultiplatformExtension.jsTargets(executable: Boolean = false) {
+    js().configure(executable)
 }
 
-fun KotlinTargetContainerWithJsPresetFunctions.jsTargets(compiler: KotlinJsCompilerType = defaultJsCompilerType, vararg additoinalFlags: String) {
-    js(compiler).configure(*additoinalFlags)
-}
-
-fun KotlinTargetContainerWithPresetFunctions.jvmTargets(vararg additoinalFlags: String) {
-    jvm {
+@OptIn(ExperimentalWasmDsl::class)
+fun KotlinMultiplatformExtension.wasmJsTargets(executable: Boolean = false) {
+    wasmJs {
         compilations.all {
             kotlinOptions {
-                jvmTarget        = "1.8"
-                freeCompilerArgs = listOf("-Xuse-experimental=kotlin.ExperimentalUnsignedTypes") + additoinalFlags
+                moduleKind            = "umd"
+                sourceMapEmbedSources = "always"
+            }
+        }
+        browser {
+            testTask { enabled = false }
+        }
+        if (executable) {
+            binaries.executable()
+
+            if (project.gradle.startParameter.taskNames.find { it.contains("wasmJsBrowserProductionWebpack") } != null) {
+                applyBinaryen {
+                    binaryenArgs = mutableListOf(
+                        "--enable-nontrapping-float-to-int",
+                        "--enable-gc",
+                        "--enable-reference-types",
+                        "--enable-exception-handling",
+                        "--enable-bulk-memory",
+                        "--inline-functions-with-loops",
+                        "--traps-never-happen",
+                        "--fast-math",
+                        "--closed-world",
+                        "--metrics",
+                        "-O3", "--gufa", "--metrics",
+                        "-O3", "--gufa", "--metrics",
+                        "-O3", "--gufa", "--metrics",
+                    )
+                }
+            }
+
+        }
+    }
+}
+
+fun KotlinTargetContainerWithPresetFunctions.jvmTargets(jvmTargetOverrid: String = "11", vararg additoinalFlags: String) {
+    jvm {
+        withJava()
+        compilations.all {
+            kotlinOptions {
+                jvmTarget        = jvmTargetOverrid
+                freeCompilerArgs = additoinalFlags.toList()
             }
         }
     }
 }
 
+fun osTarget(): String {
+    val osName = System.getProperty("os.name")
+    val targetOs = when {
+        osName == "Mac OS X"       -> "macos"
+        osName.startsWith("Win"  ) -> "windows"
+        osName.startsWith("Linux") -> "linux"
+        else                       -> error("Unsupported OS: $osName")
+    }
+
+    val targetArch = when (val osArch = System.getProperty("os.arch")) {
+        "x86_64", "amd64" -> "x64"
+        "aarch64"         -> "arm64"
+        else              -> error("Unsupported arch: $osArch")
+    }
+
+    return "${targetOs}-${targetArch}"
+}
+
 fun Project.installFullScreenDemo(suffix: String) {
     try {
-        val webPack = project.tasks.getByName("jsBrowser${suffix}Webpack", org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack::class)
+        val jsWebPack = project.tasks.getByName("jsBrowser${suffix}Webpack", org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack::class)
 
         tasks.register<Copy>("installFullScreenDemo$suffix") {
-            dependsOn(webPack)
+            dependsOn(jsWebPack)
 
             val kotlinExtension = project.extensions.getByName("kotlin") as KotlinMultiplatformExtension
             val kotlinSourceSets = kotlinExtension.sourceSets
 
-            val jsFile          = webPack.outputFile
+            val jsFile          = jsWebPack.mainOutputFile
             val commonResources = kotlinSourceSets.getByName("commonMain").resources
             val jsResources     = kotlinSourceSets.getByName("jsMain"    ).resources
-            val docDirectory    = "$buildDir/../../docs/${project.name.toLowerCase().removeSuffix("runner")}"
+            val docDirectory    = "$buildDir/../../docs/${project.name.lowercase(Locale.getDefault()).removeSuffix("runner")}"
 
             from(commonResources, jsResources, jsFile)
             into(docDirectory)

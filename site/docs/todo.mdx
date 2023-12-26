@@ -2,14 +2,16 @@
 title: Todo
 hide_title: true
 ---
+
 import Tabs      from '@theme/Tabs'
 import TabItem   from '@theme/TabItem'
 
-import Gradle        from '!!raw-loader!../../Todo/build.gradle.kts';
-import RunnerGradle  from '!!raw-loader!../../TodoRunner/build.gradle.kts';
-import {KPlayground} from '../src/components/KotlinPlayground'
-import TodoApp       from '!!raw-loader!../../Todo/src/commonMain/kotlin/io/nacular/doodle/examples/TodoApp.kt';
-import WebMain       from '!!raw-loader!../../TodoRunner/src/jsMain/kotlin/main.kt';
+import Gradle            from '!!raw-loader!../../Todo/build.gradle.kts';
+import RunnerGradle      from '!!raw-loader!../../TodoRunner/build.gradle.kts';
+import TodoApp           from '!!raw-loader!../../Todo/src/commonMain/kotlin/io/nacular/doodle/examples/TodoApp.kt';
+import WebMain           from '!!raw-loader!../../TodoRunner/src/jsMain/kotlin/main.kt';
+import {KPlayground}     from '../src/components/KotlinPlayground'
+import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
 
 # [Todo](https://github.com/nacular/doodle-tutorials/tree/master/Todo) Tutorial
 
@@ -17,13 +19,11 @@ This tutorial shows how you might build the [TodoMVC](http://todomvc.com) app us
 
 This version is also designed to work well as an embedded app. The version below (unlike the full-screen version) does not use routing for the filters. This means there is no way to deep-link to a filter, like the full-screen version has. The launch code decides this by injecting a different strategy for creating the filter buttons, while the app itself is unaware of this difference.
 
-<DoodleCodeBlock functionName="todo" height="700" />
+<DoodleCodeBlock function="todo" height="700" />
 
 :::tip
 You can also see the full-screen app [here](https://nacular.github.io/doodle-tutorials/todo).
 :::
-
----
 
 ## Project Setup
 
@@ -55,7 +55,9 @@ We will use a multi-platform library setup for this app, with a multiplatform la
 </TabItem>
 </Tabs>
 
----
+:::info
+Build uses [libs.versions.toml](https://github.com/nacular/doodle-tutorials/blob/master/gradle/libs.versions.toml) file.
+:::
 
 ## Defining Our Application
 
@@ -70,8 +72,6 @@ Doodle apps can be defined in `commonMain`, since they do not require any platfo
 :::tip
 Notice that `shutdown` is a no-op, since we don't have any cleanup to do when the app closes.
 :::
-
----
 
 ## Creating A Fullscreen App
 

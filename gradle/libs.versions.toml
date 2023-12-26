@@ -1,0 +1,41 @@
+[versions]
+kotlinVersion                    = { strictly = "1.9.22" }
+coroutinesVersion                = { strictly = "1.8.0"  }
+kodeinVersion                    = { strictly = "7.21.1" }
+doodleVersion                    = { strictly = "0.10.1-SNAPSHOT" }
+slf4jVersion                     = { strictly = "2.0.9"  }
+mockkVersion                     = { strictly = "1.13.7" }
+jupiterVersion                   = { strictly = "5.10.0" }
+logbackVersion                   = { strictly = "1.4.11" }
+ktorVersion                      = { strictly = "2.3.8"  }
+serializationVersion             = { strictly = "1.6.3"  }
+
+[libraries]
+mockk                            = { module = "io.mockk:mockk",                                   version.ref = "mockkVersion"         }
+slf4j-api                        = { module = "org.slf4j:slf4j-api",                              version.ref = "slf4jVersion"         }
+kodein-di                        = { module = "org.kodein.di:kodein-di",                          version.ref = "kodeinVersion"        }
+junit-jupiter                    = { module = "org.junit.jupiter:junit-jupiter",                  version.ref = "jupiterVersion"       }
+doodle-themes                    = { module = "io.nacular.doodle:themes",                         version.ref = "doodleVersion"        }
+doodle-browser                   = { module = "io.nacular.doodle:browser",                        version.ref = "doodleVersion"        }
+doodle-controls                  = { module = "io.nacular.doodle:controls",                       version.ref = "doodleVersion"        }
+doodle-animation                 = { module = "io.nacular.doodle:animation",                      version.ref = "doodleVersion"        }
+doodle-desktop-jvm-macos-x64     = { module = "io.nacular.doodle:desktop-jvm-macos-x64",          version.ref = "doodleVersion"        }
+doodle-desktop-jvm-macos-arm64   = { module = "io.nacular.doodle:desktop-jvm-macos-arm64",        version.ref = "doodleVersion"        }
+doodle-desktop-jvm-linux-x64     = { module = "io.nacular.doodle:desktop-jvm-linux-x64",          version.ref = "doodleVersion"        }
+doodle-desktop-jvm-linux-arm64   = { module = "io.nacular.doodle:desktop-jvm-linux-arm64",        version.ref = "doodleVersion"        }
+doodle-desktop-jvm-windows-x64   = { module = "io.nacular.doodle:desktop-jvm-windows-x64",        version.ref = "doodleVersion"        }
+doodle-desktop-jvm-windows-arm64 = { module = "io.nacular.doodle:desktop-jvm-windows-arm64",      version.ref = "doodleVersion"        }
+ktor-client-core                 = { module = "io.ktor:ktor-client-core",                         version.ref = "ktorVersion"          }
+ktor-client-content              = { module = "io.ktor:ktor-client-content-negotiation",          version.ref = "ktorVersion"          }
+ktor-serialization-json          = { module = "io.ktor:ktor-serialization-kotlinx-json",          version.ref = "ktorVersion"          }
+logback-classic                  = { module = "ch.qos.logback:logback-classic",                   version.ref = "logbackVersion"       }
+ktor-serialization               = { module = "io.ktor:ktor-client-serialization",                version.ref = "ktorVersion"          }
+serialization-json               = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serializationVersion" }
+coroutines-core                  = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core",    version.ref = "coroutinesVersion"    }
+
+[bundles]
+ktor-client                      = ["ktor-client-core", "ktor-client-content", "ktor-serialization-json"]
+test-libs                        = ["mockk", "slf4j-api", "junit-jupiter", "logback-classic"]
+
+[plugins]
+serialization                    = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinVersion"  }

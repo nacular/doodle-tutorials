@@ -1,21 +1,4 @@
-buildscript {
-    val kotlinVersion: String by System.getProperties()
-
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath(kotlin("gradle-plugin", version = kotlinVersion))
-        classpath(kotlin("serialization", version = kotlinVersion))
-    }
-}
-
-plugins {
-    kotlin("multiplatform") apply false
-}
-
-allprojects {
+subprojects {
     repositories {
         mavenLocal  ()
         mavenCentral()
@@ -32,8 +15,5 @@ rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJ
     rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().download                    = false
     rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion                 = "16.0.0"
     rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().versions.webpackCli.version = "4.10.0"
-}
-
-rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin> {
-    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension>().disableGranularWorkspaces()
+    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().versions.webpack.version    = "5.74.0"
 }
