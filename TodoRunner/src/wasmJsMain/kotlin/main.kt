@@ -24,7 +24,6 @@ import org.kodein.di.instance
 /**
  * Creates a [TodoApp]
  */
-//sampleStart
 fun main() {
     application(modules = listOf(
         FontModule,
@@ -58,4 +57,3 @@ fun main() {
         )
     }
 }
-//sampleEnd

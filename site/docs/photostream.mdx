@@ -37,14 +37,11 @@ We also need Kotlin's Coroutines library to load images asynchronously.
 
 ## The Application
 
-Our application will be fairly simple. It will create a [`DynamicList`](https://nacular.github.io/doodle/docs/ui_components/overview#list)
-with a data model bound to Unsplash's APIs. This list will be within a [`ScrollPanel`](https://nacular.github.io/doodle-api/core/io.nacular.doodle.controls.panels/-scroll-panel)
-that fits the [`Display`](https://nacular.github.io/doodle/docs/display/overview) height.
+Our application will be fairly simple. It will create a [`DynamicList`](https://nacular.github.io/doodle/docs/ui_components/overview#list) with a data model bound to Unsplash's APIs. This list will be within a [`ScrollPanel`](https://nacular.github.io/doodle-api/core/io.nacular.doodle.controls.panels/-scroll-panel) that fits the [`Display`](https://nacular.github.io/doodle/docs/display/overview) height.
 
 <KPlayground>{PhotoStreamApp}</KPlayground>
 
-DynamicList monitors its model for changes and updates whenever items are added, removed, or moved. This means we can simply change the underlying
-model to get a list that grows.
+DynamicList monitors its model for changes and updates whenever items are added, removed, or moved. This means we can simply change the underlying model to get a list that grows.
 
 :::tip
 `DynamicList`, like [`List`](https://nacular.github.io/doodle-api/controls/io.nacular.doodle.controls.list/-list) and [`MutableList`](https://nacular.github.io/doodle-api/controls/io.nacular.doodle.controls.list/-mutable-list) recycle their contents to avoid rendering items that are not displayed. The `scrollCache` constructor parameter controls the amount of items in the buffer. Passing nothing means we get a default of 10 items cached beyond what is visible.
@@ -58,8 +55,7 @@ DynamicList requires a [`DynamicListModel`](https://nacular.github.io/doodle-api
 
 Our model will cache a local [`ObservableList`](https://nacular.github.io/doodle-api/core/io.nacular.doodle.utils/-observable-list) of images via `loadedImages`. This list will provide the model state our list uses to render. The model will then fetch paginated images from Unsplash and load the resulting urls asynchronously into this list.
 
-We track the `currentPage` and `pageSize` to fetch a growing list of pages from Unsplash. We fetch a new page whenever the `currentPage` is
-updated.
+We track the `currentPage` and `pageSize` to fetch a growing list of pages from Unsplash. We fetch a new page whenever the `currentPage` is updated.
 
 <KPlayground>{`
 class UnSplashDataModel(private val scope: CoroutineScope, /*...*/): DynamicListModel<Image> {
@@ -89,9 +85,7 @@ class UnSplashDataModel(private val scope: CoroutineScope, /*...*/): DynamicList
 }
 `}</KPlayground>
 
-Fetches are performed using Ktor's HttpClient configured to read JSON data. These reads are done via Kotlin Serialization into the `UnsplashPhoto`
-data class. We only use the `small` value in the `urls` property from the JSON response, so our data classes are much simpler than the full
-Unsplash API.
+Fetches are performed using Ktor's HttpClient configured to read JSON data. These reads are done via Kotlin Serialization into the `UnsplashPhoto` data class. We only use the `small` value in the `urls` property from the JSON response, so our data classes are much simpler than the full Unsplash API.
 
 <KPlayground>{`
 class UnSplashDataModel(httpClient: HttpClient, /*...*/): DynamicListModel<Image> {
@@ -114,8 +108,7 @@ class UnSplashDataModel(httpClient: HttpClient, /*...*/): DynamicListModel<Image
 }
 `}</KPlayground>
 
-Our `loadedImages` list triggers an event whenever we add a new set of images to it. We use this fact to notify of changes to the model, which get
-reflected by the `DynamicList`.
+Our `loadedImages` list triggers an event whenever we add a new set of images to it. We use this fact to notify of changes to the model, which get reflected by the `DynamicList`.
 
 <KPlayground>{`
 class UnSplashDataModel(/*...*/): DynamicListModel<Image> {
@@ -137,8 +130,7 @@ class UnSplashDataModel(/*...*/): DynamicListModel<Image> {
 }
 `}</KPlayground>
 
-Finally, we need to decide when to fetch more images. We do this whenever `get` is called on the last image of the model. This happens when
-the `DynamicList` needs to present that image, and is a good indication that it has reached the end.
+Finally, we need to decide when to fetch more images. We do this whenever `get` is called on the last image of the model. This happens when the `DynamicList` needs to present that image, and is a good indication that it has reached the end.
 
 <KPlayground>{`
 class UnSplashDataModel(/*...*/): DynamicListModel<Image> {
@@ -188,12 +180,9 @@ class PhotoStreamApp(/*...*/): Application {
 `}</KPlayground>
 
 :::tip
-`ItemVisualizer` is designed to support recycling. Each invocation may provide a recycled View that might be reusable for the new item. This lets
-us reuse the `CenterCroppedPhoto` instances as the list scrolls.
+`ItemVisualizer` is designed to support recycling. Each invocation may provide a recycled View that might be reusable for the new item. This lets us reuse the `CenterCroppedPhoto` instances as the list scrolls.
 :::
 
-We will render each image as with a center-crop using `CenterCroppedPhoto`. This class holds an image that it renders with a centered square crop. The
-crop square's length is equal to the image's width or height (whichever is smaller). That center region is then scaled to fit the cropped photo View's
-bounds.
+We will render each image as with a center-crop using `CenterCroppedPhoto`. This class holds an image that it renders with a centered square crop. The crop square's length is equal to the image's width or height (whichever is smaller). That center region is then scaled to fit the cropped photo View's bounds.
 
 <KPlayground>{CenterCroppedPhoto}</KPlayground>

@@ -23,15 +23,12 @@ The main focus will be utilizing [Doodle's powerful animation APIs](https://nacu
 <DoodleCodeBlock function="tabStrip" height="300" />
 
 :::tip
-You can also see the full-screen app [here](https://nacular.github.io/doodle-tutorials/tabstrip).
+You can also see the full-screen app here: [JavaScript](https://nacular.github.io/doodle-tutorials/tabstrip), [WebAssembly](https://nacular.github.io/doodle-tutorials/tabstrip_wasm).
 :::
 
 ## Project Setup
 
-This app (like the others in this tutorial) is created as a multi-platform library, with a multiplatform launcher that depends on it.
-This is not necessary to use Doodle. You could create a single multiplatform build with the common parts of your app
-in `commonMain` etc.. This setup is used here because the app are also launched by an app within `DocApps` when embedding it
-like below. Therefore, we need a pure library for the app. This is why there is an app and a runner.
+This app (like the others in this tutorial) is created as a multi-platform library, with a multiplatform launcher that depends on it. This is not necessary to use Doodle. You could create a single multiplatform build with the common parts of your app in `commonMain` etc.. This setup is used here because the app are also launched by an app within `DocApps` when embedding it like below. Therefore, we need a pure library for the app. This is why there is an app and a runner.
 
 ```mermaid
  classDiagram
@@ -83,8 +80,7 @@ Notice that `shutdown` is a no-op, since we don't have any cleanup to do when th
 
 ## Launching on Web and Desktop
 
-Doodle apps can be [launched](https://nacular.github.io/doodle/docs/applications) in a few different ways on Web and Desktop. We defined our app logic
-in a multi-platform `TabStrip` library (no `main` functions), so it can be used on both platforms. Notice that we are only using a library here because we also want to run the TabStrip in our documentation app. That app will run it as an embedded Web app, which becomes easier if it is a library. Otherwise, we could have defined our platform `main` functions directly in the `TabStrip` module. Instead, we created a separate `TabStripRunner` module that contains our `main` functions.
+Doodle apps can be [launched](https://nacular.github.io/doodle/docs/applications) in a few different ways on Web and Desktop. We defined our app logic in a multi-platform `TabStrip` library (no `main` functions), so it can be used on both platforms. Notice that we are only using a library here because we also want to run the TabStrip in our documentation app. That app will run it as an embedded Web app, which becomes easier if it is a library. Otherwise, we could have defined our platform `main` functions directly in the `TabStrip` module. Instead, we created a separate `TabStripRunner` module that contains our `main` functions.
 
 **main.kt**
 

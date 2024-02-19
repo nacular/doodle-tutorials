@@ -26,15 +26,12 @@ The entire app rests on [Doodle's powerful Carousel APIs](https://nacular.github
 <DoodleCodeBlock function="timedCards" height="538.875" />
 
 :::tip
-You can also see the full-screen app [here](https://nacular.github.io/doodle-tutorials/timedcards).
+You can also see the full-screen app here: [JavaScript](https://nacular.github.io/doodle-tutorials/timedcards), [WebAssembly](https://nacular.github.io/doodle-tutorials/timedcards_wasm).
 :::
 
 ## Project Setup
 
-This app (like the others in this tutorial) is created as a multi-platform library, with a multiplatform launcher that depends on it.
-This is not necessary to use Doodle. You could create a single multiplatform build with the common parts of your app
-in `commonMain` etc.. This setup is used here because the app are also launched by an app within `DocApps` when embedding it
-like below. Therefore, we need a pure library for the app. This is why there is an app and a runner.
+This app (like the others in this tutorial) is created as a multi-platform library, with a multiplatform launcher that depends on it. This is not necessary to use Doodle. You could create a single multiplatform build with the common parts of your app in `commonMain` etc.. This setup is used here because the app are also launched by an app within `DocApps` when embedding it like below. Therefore, we need a pure library for the app. This is why there is an app and a runner.
 
 ```mermaid
  classDiagram

@@ -12,13 +12,13 @@ actual interface NumberFormatter {
 
 external class NumberFormat
 
-@JsFun("new Intl.NumberFormat('en-US', {maximumFractionDigits: 10})")
+@JsFun("() => ( new Intl.NumberFormat('en-US', {maximumFractionDigits: 10}) )")
 external fun numberFormat(): NumberFormat
 
-@JsFun("obj.format(value)") private external fun format(obj: NumberFormat, value: Int   ): String
-@JsFun("obj.format(value)") private external fun format(obj: NumberFormat, value: Long  ): String
-@JsFun("obj.format(value)") private external fun format(obj: NumberFormat, value: Float ): String
-@JsFun("obj.format(value)") private external fun format(obj: NumberFormat, value: Double): String
+@JsFun("(obj, value) => ( obj.format(value) )") private external fun format(obj: NumberFormat, value: Int   ): String
+@JsFun("(obj, value) => ( obj.format(value) )") private external fun format(obj: NumberFormat, value: Long  ): String
+@JsFun("(obj, value) => ( obj.format(value) )") private external fun format(obj: NumberFormat, value: Float ): String
+@JsFun("(obj, value) => ( obj.format(value) )") private external fun format(obj: NumberFormat, value: Double): String
 
 /**
  * NumberFormatter based on native JS impl.

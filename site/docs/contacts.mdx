@@ -15,23 +15,18 @@ import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
 
 This tutorial shows how you might build a simple app to track a list of contacts, each with a name and phone number. It is inspired by [phonebook-pi.vercel.app](https://phonebook-pi.vercel.app/), which was built using React.
 
-The app is multiplatform and is initialized with different dependencies based on the hosting situation.
-For example, the one embedded in these docs does not support deep linking, as the router used is a memory only implementation.
-The full screen, Web version does support deep links though. This works seamlessly, as the app itself is unaware of the implementation
-details of its dependencies.
+The app is multiplatform and is initialized with different dependencies based on the hosting situation. For example, the one embedded in these docs does not support deep linking, as the router used is a memory only implementation. The full screen, Web version does support deep links though. This works seamlessly, as the app itself is unaware of the implementation details of its dependencies.
 
 <DoodleCodeBlock function="contacts" height="700" />
 
 :::tip
-You can also see the full-screen app [here](https://nacular.github.io/doodle-tutorials/contacts).
+
+You can also see the full-screen apps here: [JavaScript](https://nacular.github.io/doodle-tutorials/contacts), [WebAssembly](https://nacular.github.io/doodle-tutorials/contacts_wasm).
 :::
 
 ## Project Setup
 
-This app (like the others in this tutorial) is created as a multi-platform library, with a multiplatform launcher that depends on it.
-This is not necessary to use Doodle. You could create a single multiplatform build with the common parts of your app
-in `commonMain` etc.. This setup is used here because the app are also launched by an app within `DocApps` when embedding it
-like below. Therefore, we need a pure library for the app. This is why there is an app and a runner.
+This app (like the others in this tutorial) is created as a multi-platform library, with a multiplatform launcher that depends on it. This is not necessary to use Doodle. You could create a single multiplatform build with the common parts of your app in `commonMain` etc.. This setup is used here because the app are also launched by an app within `DocApps` when embedding it like below. Therefore, we need a pure library for the app. This is why there is an app and a runner.
 
 ```mermaid
 classDiagram

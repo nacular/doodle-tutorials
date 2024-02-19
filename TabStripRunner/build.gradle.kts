@@ -9,13 +9,15 @@ kotlin {
     jvmTargets   (                 )
 
     sourceSets {
-        commonMain {
-            dependencies {
-                implementation(project(":TabStrip"))
-            }
+        commonMain.dependencies {
+            implementation(project(":TabStrip"))
         }
 
-        jsMain {
+        jsMain.dependencies {
+            implementation(libs.doodle.browser)
+        }
+
+        val wasmJsMain by getting {
             dependencies {
                 implementation(libs.doodle.browser)
             }

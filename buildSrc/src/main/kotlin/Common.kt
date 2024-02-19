@@ -64,7 +64,6 @@ fun KotlinMultiplatformExtension.wasmJsTargets(executable: Boolean = false) {
                     )
                 }
             }
-
         }
     }
 }
@@ -101,21 +100,28 @@ fun osTarget(): String {
 
 fun Project.installFullScreenDemo(suffix: String) {
     try {
-        val jsWebPack = project.tasks.getByName("jsBrowser${suffix}Webpack", org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack::class)
+        val jsWebPack   = project.tasks.getByName("jsBrowser${suffix}Webpack",     org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack::class)
+        val wasmWebPack = project.tasks.getByName("wasmJsBrowser${suffix}Webpack", org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack::class)
 
-        tasks.register<Copy>("installFullScreenDemo$suffix") {
+        val jsDocDirectory = "$buildDir/../../docs/${project.name.lowercase(Locale.getDefault()).removeSuffix("runner")}"
+
+        val jsInstall = tasks.register<Copy>("jsInstallFullScreenDemo$suffix") {
             dependsOn(jsWebPack)
 
-            val kotlinExtension = project.extensions.getByName("kotlin") as KotlinMultiplatformExtension
-            val kotlinSourceSets = kotlinExtension.sourceSets
+            from(jsWebPack.outputDirectory.asFileTree.files)
+            into(jsDocDirectory)
+        }
 
-            val jsFile          = jsWebPack.mainOutputFile
-            val commonResources = kotlinSourceSets.getByName("commonMain").resources
-            val jsResources     = kotlinSourceSets.getByName("jsMain"    ).resources
-            val docDirectory    = "$buildDir/../../docs/${project.name.lowercase(Locale.getDefault()).removeSuffix("runner")}"
+        val wasmInstall = tasks.register<Copy>("wasmInstallFullScreenDemo$suffix") {
+            dependsOn(wasmWebPack)
 
-            from(commonResources, jsResources, jsFile)
-            into(docDirectory)
+            from(wasmWebPack.outputDirectory.asFileTree.files)
+            into("${jsDocDirectory}_wasm")
+        }
+
+        tasks.register("installFullScreenDemo$suffix") {
+            dependsOn(jsInstall  )
+            dependsOn(wasmInstall)
         }
     } catch (ignored: Exception) {}
 }

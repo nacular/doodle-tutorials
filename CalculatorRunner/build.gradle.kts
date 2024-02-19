@@ -9,15 +9,17 @@ kotlin {
     jvmTargets   (                 )
 
     sourceSets {
-        commonMain {
-            dependencies {
-                implementation(project(":Calculator")) // app library
-            }
+        commonMain.dependencies {
+            implementation(project(":Calculator"))
         }
 
-        jsMain {
+        jsMain.dependencies {
+            implementation(libs.doodle.browser)
+        }
+
+        val wasmJsMain by getting {
             dependencies {
-                implementation(libs.doodle.browser) // required for Web app
+                implementation(libs.doodle.browser)
             }
         }
 
