@@ -108,14 +108,14 @@ fun Project.installFullScreenDemo(suffix: String) {
         val jsInstall = tasks.register<Copy>("jsInstallFullScreenDemo$suffix") {
             dependsOn(jsWebPack)
 
-            from(jsWebPack.outputDirectory.asFileTree.files)
+            from(jsWebPack.outputDirectory.asFileTree.files.filter { !it.name.endsWith(".map") })
             into(jsDocDirectory)
         }
 
         val wasmInstall = tasks.register<Copy>("wasmInstallFullScreenDemo$suffix") {
             dependsOn(wasmWebPack)
 
-            from(wasmWebPack.outputDirectory.asFileTree.files)
+            from(wasmWebPack.outputDirectory.asFileTree.files.filter { !it.name.endsWith(".map") })
             into("${jsDocDirectory}_wasm")
         }
 
