@@ -2,9 +2,10 @@
 
 ---
 
-A collection of live apps and tutorials to help you learn [Doodle](https://nacular.github.io/doodle). Play with the apps and check out their 
-walkthroughs and source code.
+A collection of live apps and tutorials to help you learn [Doodle](https://nacular.github.io/doodle). Play with the apps and check out the walkthrough and source code for each.
 
+- [Timed Cards](https://nacular.github.io/doodle-tutorials/docs/timedcards)
+- [Animating Tab Strip](https://nacular.github.io/doodle-tutorials/docs/tabstrip)
 - [Contacts](https://nacular.github.io/doodle-tutorials/docs/contacts)
 - [Calculator](https://nacular.github.io/doodle-tutorials/docs/calculator)
 - [TodoMVC](https://nacular.github.io/doodle-tutorials/docs/todo)
