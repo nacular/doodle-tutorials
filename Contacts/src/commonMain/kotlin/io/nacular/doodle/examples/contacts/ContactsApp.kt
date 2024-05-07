@@ -129,8 +129,8 @@ class ContactsApp(
 
                 mainView.top    eq header_.height
                 mainView.left   eq INSET
-                mainView.width  eq max(0.0, header_.width - 2 * INSET)
-                mainView.height eq max(0.0, parent.height - header_.height)
+                mainView.width  eq header_.width - 2 * INSET
+                mainView.height eq parent.height - header_.height
 
                 lateinit var buttonSize: Size
 

@@ -92,7 +92,7 @@ abstract class ContactCommon(
             }
         }
 
-        spacer.bounds  = Rectangle(back.x, delete.bounds.bottom, max(0.0, width - 2 * INSET), spacer.height)
+        spacer.bounds  = Rectangle(back.x, delete.bounds.bottom, width - 2 * INSET, spacer.height)
         details.bounds = Rectangle(spacer.x, spacer.bounds.bottom, min(520.0, spacer.width), 98.0)
     }
 }

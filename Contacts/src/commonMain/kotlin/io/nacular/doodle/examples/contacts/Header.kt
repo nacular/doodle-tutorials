@@ -170,7 +170,7 @@ class Header(
                 else                                     -> Rectangle(logo.x, logo.bounds.bottom + INSET, max(filter.minimumSize.width, container.width - 4 * INSET), filter.height)
             }
         }.then {
-            minimumSize = Size(width, max(0.0, filterBox.bounds.bottom + 8))
+            minimumSize = Size(width, filterBox.bounds.bottom + 8)
             idealSize   = minimumSize
         }
 

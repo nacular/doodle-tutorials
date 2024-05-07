@@ -108,7 +108,7 @@ class CreateContactView(
 
             form.top   eq spacer.bottom
             form.left  eq back.left
-            form.width eq max(0.0, min(parent.width - 2 * INSET, 520.0))
+            form.width eq min(parent.width - 2 * INSET, 520.0)
 
             button.top  eq form.bottom + 2 * INSET
             button.left eq back.left

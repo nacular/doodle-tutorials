@@ -116,8 +116,8 @@ fun showcase(
 
                 display += object: Container() {
                     init {
-                        size = Size(max(0.0, display.width - 2 * inset), max(0.0, display.height - 2 * inset))
-                        position = display.center - Point(width / 2, height / 2)
+                        size               = Size(display.width - 2 * inset, display.height - 2 * inset)
+                        position           = display.center - Point(width / 2, height / 2)
                         clipCanvasToBounds = false
 
                         Resizer(this).apply { movable = false }
@@ -143,8 +143,8 @@ fun showcase(
                         bounds = Rectangle(
                             x,
                             y,
-                            min(max(0.0, display.width  - inset - x), width),
-                            min(max(0.0, display.height - inset - y), height)
+                            min(display.width  - inset - x, width),
+                            min(display.height - inset - y, height)
                         )
                     }
                 }
