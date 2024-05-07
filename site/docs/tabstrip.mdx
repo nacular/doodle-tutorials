@@ -94,7 +94,7 @@ This tutorial will implement the `TabStrip` as a single [`View`](https://nacular
 A production version of this control would be more flexible if it let you pass in the items in the tab and configure what each does when clicked.
 :::
 
-The `TabStrip` is composed of a rounded rectangle background (with a drop-shadow), a row of items rendered using paths an indicator that looks like a wave, and a droplet that appears during a new tab selection. All of these elements are rendered directly onto the `TabStrip`'s canvas, so there are no child `View`s involved for this approach.
+The `TabStrip` is composed of a rounded rectangle background (with a drop-shadow), a row of items rendered using paths, an indicator that looks like a wave, and a droplet that appears during a new tab selection. All of these elements are rendered directly onto the `TabStrip`'s canvas, so there are no child `View`s involved for this approach.
 
 ### Render Logic
 
@@ -165,12 +165,12 @@ Notice that the icons and indicator are all drawn after the canvas has been tran
 You can also see that each icon can be in 1 of 3 states: *deselected*, *partially selected*, *fully selected*. In the first and last case, only the respective path is drawn. But in the transitional state, both paths are drawn, with the selected path being clipped to the droplet circle. We also need to change the background color that leaks through the holes of the path. So a filler circle is drawn before the selected path with the current background fill.
 
 :::info
-Many of the parameters used in `render` are ones we will animate (i.e. `icon.moveProgress`, `icon.selectionProgress`, ``indicatorCenter`, `dropletYAboveIndicator`, etc.). Therefore, animation can simply trigger renders to ensure the `TabStrip` always reflects the changes on every tick.
+Many of the parameters used in `render` are ones we will animate (i.e. `icon.moveProgress`, `icon.selectionProgress`, `indicatorCenter`, `dropletYAboveIndicator`, etc.). Therefore, animation can simply trigger renders to ensure the `TabStrip` always reflects the changes on every tick.
 :::
 
 ### Triggering The Animation
 
-This component has a complex set of animation that will trigger in a specific sequence to achieve the final look. We will use an injected `Animator` names `animate` to perform all animations. And we will tie animations to click events that select a new item.
+This component has a complex set of animations that will trigger in a specific sequence to achieve the final look. We will use an injected `Animator` names `animate` to perform all animations. And we will tie animations to click events that select a new item.
 
 The first thing we'll do is track the `selectedItem` as an `observable` property so we can trigger animations when it changes:
 
