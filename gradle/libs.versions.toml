@@ -2,7 +2,7 @@
 kotlinVersion                    = { strictly = "1.9.22" }
 coroutinesVersion                = { strictly = "1.8.0"  }
 kodeinVersion                    = { strictly = "7.21.1" }
-doodleVersion                    = { strictly = "0.10.0" }
+doodleVersion                    = { strictly = "0.10.1" }
 slf4jVersion                     = { strictly = "2.0.9"  }
 mockkVersion                     = { strictly = "1.13.7" }
 jupiterVersion                   = { strictly = "5.10.0" }
@@ -32,6 +32,7 @@ logback-classic                  = { module = "ch.qos.logback:logback-classic", 
 ktor-serialization               = { module = "io.ktor:ktor-client-serialization",                version.ref = "ktorVersion"          }
 serialization-json               = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serializationVersion" }
 coroutines-core                  = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core",    version.ref = "coroutinesVersion"    }
+date-time                        = { module = "org.jetbrains.kotlinx:kotlinx-datetime",           version.ref = "dateTimeVersion"      }
 
 [bundles]
 ktor-client                      = ["ktor-client-core", "ktor-client-content", "ktor-serialization-json"]
