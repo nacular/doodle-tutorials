@@ -102,6 +102,7 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
                 else     -> Label("$item$suffix").apply {
                     font            = previous?.font
                     cursor          = Text
+                    fitText         = emptySet()
                     foregroundColor = previous?.foregroundColor
                     backgroundColor = previous?.backgroundColor ?: Transparent
 
@@ -116,9 +117,13 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
         }
 
         private val spinner = MutableSpinner(
-                MutableIntSpinnerModel(Int.MIN_VALUE..Int.MAX_VALUE, property.get().toInt()),
-                spinnerVisualizer(suffix)
+            MutableIntSpinnerModel(Int.MIN_VALUE..Int.MAX_VALUE, property.get().toInt()),
+            spinnerVisualizer(suffix)
         ).apply {
+            cellAlignment = {
+                it.edges eq parent.edges
+            }
+
             // Make the spinner editable
             editor = spinnerEditor { spinner, value, current ->
                 object: SpinnerTextEditOperation<Int>(focusManager, ToStringIntEncoder, spinner, value, current) {
