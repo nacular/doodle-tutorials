@@ -111,7 +111,7 @@ This app uses the `DampedTransitioner` with an animation for auto frame selectio
 <KPlayground>{`
 behavior = object: CarouselBehavior<CardData> {
     override val presenter = CardPresenter<CardData> { itemSize(it) }
-\n
+
     override val transitioner = dampedTransitioner<CardData>(timer, scheduler) { _,_,_, update ->
         animate(0f to 1f, using = tweenFloat(easeInOutCubic, duration = 1.25 * seconds)) {
             update(it)

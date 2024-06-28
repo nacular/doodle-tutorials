@@ -77,43 +77,43 @@ Build uses [libs.versions.toml](https://github.com/nacular/doodle-tutorials/blob
 
 <KPlayground>{`
 class ContactsApp(/*...*/): Application {
-\n
+
     // ...
-\n
+
     init {
         // Coroutine used to load assets
         appScope.launch(uiDispatcher) {
             val appAssets = assets()
-\n
+
             themeManager.selected = theme // Install theme
-\n
+
             header      = Header     (appAssets)
             contactList = ContactList(appAssets)
-\n
+
             // Register handlers for different routes
             router[""                      ] = { _,_        -> /* Contact List     */ }
             router["/add"                  ] = { _,_        -> /* Contact Creation */ }
             router["/contact/([0-9]+)"     ] = { _, matches -> /* Contact          */ }
             router["/contact/([0-9]+)/edit"] = { _, matches -> /* Contact Editing  */ }
-\n
+
             display += header
-\n
+
             // Happens after header is added to ensure view goes below create button
             router.fireAction()
-\n
+
             display += CreateButton(appAssets)
-\n
+
             // Setup layout that manages how Header, CreateButton, and current View are positioned
             display.layout = simpleLayout { container ->
                 // ...
             }
-\n
+
             display.fill(appAssets.background.paint)
         }
     }
-\n
+
     // ...
-\n
+
     override fun shutdown() { /* no-op */ }
 }
 `}</KPlayground>
@@ -143,7 +143,7 @@ class ContactsApp(
             // ...
         }
     }
-\n
+
     // ...
 }
 `}</KPlayground>
@@ -156,7 +156,7 @@ Our launcher creates the `appScope` ahead of app creation and injects it, along 
 fun main() {
     // ...
     val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
-\n
+
     application (modules = listOf(
         // ...
     )) {
@@ -182,7 +182,7 @@ In this case, we use the following behaviors by installing [Modules](https://nac
 <KPlayground>{`
 fun main() {
     // ...
-\n
+
     application (modules = listOf(
         // ...
         basicLabelBehavior       (),
@@ -225,7 +225,7 @@ class ContactsApp(
             // ...
         }
     }
-\n
+
     // ...
 }
 `}</KPlayground>
@@ -245,17 +245,17 @@ class ContactsApp(
     init {
         appScope.launch(uiDispatcher) {
             // ...
-\n
+
             // Register handlers for different routes
             router[""                      ] = { _,_        -> /* Contact List     */ }
             router["/add"                  ] = { _,_        -> /* Contact Creation */ }
             router["/contact/([0-9]+)"     ] = { _, matches -> /* Contact          */ }
             router["/contact/([0-9]+)/edit"] = { _, matches -> /* Contact Editing  */ }
-\n
+
             // ...
         }
     }
-\n
+
     // ...
 }
 `}</KPlayground>
@@ -280,7 +280,7 @@ class ContactsApp(
     init {
         appScope.launch(uiDispatcher) {
             // ...
-\n
+
             display.layout = object: Layout {
                 // Header needs to be sized based on its minimumSize, so this layout should respond to any changes to it.
                 override fun requiresLayout(
@@ -289,25 +289,25 @@ class ContactsApp(
                     old  : View.SizePreferences,
                     new  : View.SizePreferences
                 ) = new.minimumSize != old.minimumSize
-\n
+
                 override fun layout(container: PositionableContainer) {
                     val mainView = container.children[1]
                     val button   = container.children[2]
-\n
+
                     header.size     = Size(container.width, header.minimumSize.height)
                     mainView.bounds = Rectangle(INSET, header.height, max(0.0, header.width - 2 * INSET), max(0.0, container.height - header.height))
-\n
+
                     button.bounds = when {
                         container.width > header.filterCenterAboveWidth -> Rectangle(container.width - appAssets.createButtonLargeSize.width - 20, (header.naturalHeight - appAssets.createButtonLargeSize.height) / 2, appAssets.createButtonLargeSize.width, appAssets.createButtonLargeSize.height)
                         else                                            -> Rectangle(container.width - appAssets.createButtonSmallSize.width - 20, container.height - appAssets.createButtonSmallSize.height - 40,      appAssets.createButtonSmallSize.width, appAssets.createButtonSmallSize.height)
                     }
                 }
             }
-\n
+
             // ...
         }
     }
-\n
+
     // ...
 }
 `}</KPlayground>
@@ -331,23 +331,23 @@ The app's header (which is always visible) provides a way to [filter](#filterbox
 **Header.kt**
 <KPlayground>{`
 class Header(/*...*/): View() {
-\n
+
     /** Search box that filters which contacts are shown */
     private inner class FilterBox: View() {
         // ...
     }
-\n
+
             val naturalHeight          =  64.0
     private val filterRightAboveWidth  = 672.0
     private val filterCenterAboveWidth = 800.0
     private val filterBox: FilterBox
-\n
+
     val filterCentered: Boolean get() = width > filterCenterAboveWidth
-\n
+
     var searchEnabled by observable(true) { _,new ->
         filterBox.enabled = new
     }
-\n
+
     init {
         children += Photo(assets.logo).apply { size = Size(40) }
         children += Label("Phonebook").apply {
@@ -357,17 +357,17 @@ class Header(/*...*/): View() {
             foregroundColor = assets.header
         }
         children += FilterBox().apply { size = Size(300, 45); font = assets.medium }.also { filterBox = it }
-\n
+
         val filterNaturalWidth = 300.0
-\n
+
         layout = Layout.simpleLayout { container ->
             val logo   = container.children[0]
             val label  = container.children[1]
             val filter = container.children[2]
-\n
+
             logo.position  = Point(2 * INSET, (naturalHeight - logo.height) / 2)
             label.position = Point(logo.bounds.right + 10, logo.bounds.center.y - label.height / 2)
-\n
+
             filter.bounds = when {
                 container.width > filterCenterAboveWidth -> Rectangle((container.width - filterNaturalWidth) / 2,        logo.bounds.center.y - filter.height / 2, filterNaturalWidth, filter.height)
                 container.width > filterRightAboveWidth  -> Rectangle( container.width - filterNaturalWidth - 2 * INSET, logo.bounds.center.y - filter.height / 2, filterNaturalWidth, filter.height)
@@ -377,7 +377,7 @@ class Header(/*...*/): View() {
             minimumSize = Size(width, max(0.0, filterBox.bounds.bottom + 8))
             idealSize   = minimumSize
         }
-\n
+
         // Custom cursor when pointer in the "clickable" region
         pointerMotionChanged += moved {
             cursor = when {
@@ -385,7 +385,7 @@ class Header(/*...*/): View() {
                 else         -> null
             }
         }
-\n
+
         // Show Contact list when "clickable" region clicked
         pointerChanged += clicked {
             if (it.inHotspot) {
@@ -393,7 +393,7 @@ class Header(/*...*/): View() {
             }
         }
     }
-\n
+
     private val PointerEvent.inHotspot get() = this@Header.toLocal(location, target).x < 220
 }
 `}</KPlayground>
@@ -408,13 +408,13 @@ The FilterBox is a simple wrapper around a [TextField](https://nacular.github.io
 
 <KPlayground>{`
 private inner class FilterBox: View() {
-\n
+
     private var progress              by renderProperty(0f  )
     private var animation: Animation? by observable    (null) { old,_ -> old?.cancel() }
-\n
+
     private val searchIcon     = PathIcon<View>(path(assets.searchIcon), fill = assets.search, pathMetrics = pathMetrics)
     private val searchIconSize = searchIcon.size(this)
-\n
+
     val textField = TextField().apply {
         placeHolder      = "Search"
         borderVisible    = false
@@ -427,11 +427,11 @@ private inner class FilterBox: View() {
             }
         }
     }
-\n
+
     init {
         cursor             = Text
         clipCanvasToBounds = false
-\n
+
         val clearButton = PathIconButton(pathData = assets.deleteIcon, pathMetrics = pathMetrics).apply {
             size            = Size(22, 44)
             cursor          = Pointer
@@ -441,19 +441,19 @@ private inner class FilterBox: View() {
                 textField.text = ""
             }
         }
-\n
+
         textField.textChanged += { _,_,new ->
             when {
                 new.isBlank() -> contacts.filter = null
                 else          -> contacts.filter = { it.name.contains(new, ignoreCase = true) }
             }
-\n
+
             clearButton.visible = new.isNotBlank()
         }
-\n
+
         children += textField
         children += clearButton
-\n
+
         layout = constrain(children[0], children[1]) { textField, clear ->
             textField.left    = parent.left + searchIconSize.width + 2 * 20
             textField.height  = parent.height
@@ -462,12 +462,12 @@ private inner class FilterBox: View() {
             clear.right       = parent.right - 20
             clear.centerY     = parent.centerY
         }
-\n
+
         pointerChanged += clicked {
             focusManager.requestFocus(textField)
         }
     }
-\n
+
     override fun render(canvas: Canvas) {
         when {
             // draw shadow when animating (progress > 0)
@@ -477,7 +477,7 @@ private inner class FilterBox: View() {
             }
             else          -> canvas.rect(bounds.atOrigin, radius = 8.0, color = assets.searchSelected)
         }
-\n
+
         searchIcon.render(this, canvas, at = Point(20.0, (height - searchIconSize.height) / 2))
     }
 }
@@ -497,34 +497,34 @@ class ContactList(
     val alignment      : Constraints.() -> Unit          = // ...
     val nameVisualizer : CellVisualizer<Contact, String> = // ...
     val toolsVisualizer: CellVisualizer<Contact, Unit>   = // ...
-\n
+
     column(Label("Name"        ), { name        }, nameVisualizer   ) { cellAlignment = alignment; headerAlignment = alignment                }
     column(Label("Phone Number"), { phoneNumber }, TextVisualizer() ) { cellAlignment = alignment; headerAlignment = alignment                }
     column(null,                                   toolsVisualizer  ) { cellAlignment = fill(Insets(top = 20.0, bottom = 20.0, right = 20.0)) }
 }) {
     init {
         // ...
-\n
+
         // Controls how the table's columns resize
         columnSizePolicy = object: ColumnSizePolicy {
             override fun layout(width: Double, columns: List<Column>, startIndex: Int): Double {
                 columns[2].width = if (width > 672.0 - 2 * INSET) 100.0 else 0.0 // FIXME: factor out hard-coded width
                 columns[0].width = width / 2
                 columns[1].width = width - columns[0].width - columns[2].width
-\n
+
                 return width
             }
-\n
+
             override fun widthChanged(width: Double, columns: List<Column>, index: Int, to: Double) {
                 // no-op
             }
         }
-\n
+
         behavior      = ContactListBehavior(assets, navigator)
         acceptsThemes = false
     }
 }
-\n
+
 // ...
 `}</KPlayground>
 
@@ -549,33 +549,33 @@ class ContactListBehavior(private val assets: AppConfig, private val navigator: 
         // Navigates to ContactView on pointer press
         // Adds/removes row selection (for highlighting) on pointer enter/exit
     }
-\n
+
     private val selectionChanged: SetObserver<Table<Contact, *>, Int> = { table,_,_ ->
         // Repaint the Table to show selected rows
         table.bodyDirty()
     }
-\n
+
     override fun install(view: Table<Contact, *>) {
         view.selectionChanged += selectionChanged
     }
-\n
+
     override fun uninstall(view: Table<Contact, *>) {
         view.selectionChanged -= selectionChanged
     }
-\n
+
     override val headerCellGenerator = object: AbstractTableBehavior.HeaderCellGenerator<Table<Contact, *>> {
         override fun <A> invoke(table: Table<Contact, *>, column: Column<A>) = container {
             // Column header cell with underline
         }
     }
-\n
+
     override val headerPositioner = object: AbstractTableBehavior.HeaderPositioner<Table<Contact, *>> {
         override fun invoke(table: Table<Contact, *>) = HeaderGeometry(0.0, TABLE_HEADER_HEIGHT)
     }
-\n
+
     // No overflow column will be in the Table
     override val overflowColumnConfig: Nothing? = null
-\n
+
     @Suppress("UNCHECKED_CAST")
     override val cellGenerator: CellGenerator<Contact> = object: CellGenerator<Contact> {
         override fun <A> invoke(table: Table<Contact, *>, column: Column<A>, cell: A, row: Int, itemGenerator: ItemVisualizer<A, IndexedItem>, current: View?): View = when (current) {
@@ -583,19 +583,19 @@ class ContactListBehavior(private val assets: AppConfig, private val navigator: 
             else              -> ContactCell(table, column, cell, row, itemGenerator)
         }
     }
-\n
+
     override val rowPositioner: RowPositioner<Contact> = object: RowPositioner<Contact> {
         // Position rows like a vertical list
         private val delegate = VerticalListPositioner(ROW_HEIGHT)
-\n
+
         override fun rowBounds  (of: Table<Contact, *>, row: Contact, index: Int) = delegate.itemBounds (of.size,     of.insets, index)
         override fun row        (of: Table<Contact, *>, at: Point               ) = delegate.itemFor    (of.size,     of.insets,  at  )
         override fun minimumSize(of: Table<Contact, *>                          ) = delegate.minimumSize(of.numItems, of.insets       )
     }
-\n
+
     override fun renderBody(table: Table<Contact, *>, canvas: Canvas) {
         canvas.rect(table.bounds.atOrigin, color = assets.background)
-\n
+
         // Highlight selected rows
         table.selection.map { it to table[it] }.forEach { (index, row) ->
             row.onSuccess {
@@ -631,17 +631,17 @@ class CreateContactView(
             }
         }
     }
-\n
+
     init {
         lateinit var name       : String
         lateinit var phoneNumber: String
-\n
+
         val label = Label("Create Contact").apply {
             font    = assets.medium
             height  = 28.0
             fitText = setOf(Width)
         }
-\n
+
         val back   = buttons.back  (assets.backIcon)
         val avatar = DynamicAvatar (assets.blankAvatar).apply { size = Size(176); font = assets.medium }
         val button = buttons.create(assets.buttonBackground, assets.buttonForeground).apply {
@@ -652,14 +652,14 @@ class CreateContactView(
                 navigator.showContactList()
             }
         }
-\n
+
         val spacer = view {
             height = 64.0
             render = {
                 line(Point(0.0, height / 2), Point(width, height / 2), stroke = Stroke(assets.outline))
             }
         }
-\n
+
         val form = editForm(
             assets          = assets,
             button          = button,
@@ -671,16 +671,16 @@ class CreateContactView(
             phoneNumber    = phone_
             button.enabled = true
         }
-\n
+
         children += listOf(label, back, avatar, spacer, form, button)
-\n
+
         layout = constrain(label, back, avatar, spacer, form, button) { (label, back, avatar, spacer, form, button) ->
             // ...
         }.then {
             idealSize = Size(spacer.width + 2 * INSET, button.bounds.bottom + INSET)
         }
     }
-\n
+
     // Helper to use constrain with 6 items
     private operator fun <T> List<T>.component6() = this[5]
 }
@@ -702,7 +702,7 @@ class ContactView(/*...*/): ContactCommon(/*...*/) {
                 navigator.showContactEdit(super.contact)
             }
         }
-\n
+
         val details = container {
             this += Label("Contact Details").apply {
                 font    = assets.small
@@ -722,24 +722,24 @@ class ContactView(/*...*/): ContactCommon(/*...*/) {
                         super.install(view)
                         val textSize = textMetrics.size(text, font)
                         val iconSize = icon!!.size(view)
-\n
+
                         // Ensure link's size includes icon and text
                         size = Size(textPosition(view).x + textSize.width, max(iconSize.height, textSize.height))
                     }
-\n
+
                     override fun render(view: HyperLink, canvas: Canvas) {
                         icon!!.render(view, canvas, at = iconPosition(view, icon = icon!!))
-\n
+
                         // Styled text with phoneNumberLink color and link's font
                         canvas.text(assets.phoneNumberLink.invoke { view.font(view.text) }, at = textPosition(view))
                     }
                 }) as Behavior<Button>
             }
-\n
+
             render = {
                 rect(bounds.atOrigin.inset(0.5), radius = 12.0, stroke = Stroke(assets.outline))
             }
-\n
+
             layout = constrain(children[0], children[1]) { label, link ->
                 label.top  = parent.top   + INSET
                 label.left = parent.left  + INSET
@@ -747,9 +747,9 @@ class ContactView(/*...*/): ContactCommon(/*...*/) {
                 link.left  = label.left
             }
         }
-\n
+
         setDetail(details)
-\n
+
         layout = simpleLayout { layoutCommonItems() }.then {
             idealSize = Size(spacer.width + 2 * INSET, details.bounds.bottom + INSET)
         }
@@ -777,7 +777,7 @@ class EditContactView(
     init {
         lateinit var newName       : String
         lateinit var newPhoneNumber: String
-\n
+
         edit.apply {
             enabled = false
             fired += {
@@ -788,23 +788,23 @@ class EditContactView(
                 }.onSuccess {
                     super.contact = it // updates its contact to the newly edited one
                 }
-\n
+
                 enabled = false
             }
         }
-\n
+
         val form = editForm(super.contact.name, super.contact.phoneNumber, assets, textFieldStyler, pathMetrics, edit) { name, phone ->
             // called whenever the Form becomes valid
             newName        = name
             newPhoneNumber = phone
             edit.enabled   = name != super.contact.name || phone != super.contact.phoneNumber
         }
-\n
+
         setDetail(form) // super class utility for specifying details view
-\n
+
         layout = simpleLayout {
             layoutCommonItems() // super class utility
-\n
+
             edit.position = Point(form.x, form.bounds.bottom + 2 * INSET)
         }.then {
             idealSize = Size(spacer.width + 2 * INSET, edit.bounds.bottom + INSET)

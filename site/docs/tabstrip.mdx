@@ -104,37 +104,37 @@ All parts of the view are rendered in `TabStrip.render`, which is how all Views 
 override fun render(canvas: Canvas) {
     val foreGround = (foregroundColor ?: Black).paint
     val backGround = (backgroundColor ?: White).paint
-\n
+
     // draw shadow
     canvas.outerShadow(color = Black opacity 0.1f, blurRadius = 20.0) {
         // draw background rounded rect
         canvas.rect(bounds.atOrigin, radius = cornerRadius, fill = backGround)
     }
-\n
+
     // draw items
     items.forEach { item ->
         val itemScale = 1 - itemScaleChange * item.moveProgress
-\n
+
         // position and scale the item
         canvas.transform(Identity.
             translate(Point(item.x, item.y + itemDipOffset * item.moveProgress)).
             scale(around = Point(item.width / 2, item.height / 2), itemScale, itemScale)) {
-\n
+
             when (item.selectionProgress) {
                 1f   -> path(item.selected, fill = foreGround) // fully selected
                 else -> {
                     path(item.deselected, fill = foreGround)
-\n
+
                     if (item.selectionProgress > 0f) {
                         // overlay transition if partially selected
                         val dropletCircle = Circle(
                             center = Point(item.width / 2, item.height - dropLetRadius),
                             radius = dropLetRadius + (max(item.width, item.height) - dropLetRadius) * item.selectionProgress
                         )
-\n
+
                         // overlay background fill so it seeps through holes in item
                         circle(dropletCircle, fill = backGround)
-\n
+
                         // draw selected item clip to droplet
                         clip(dropletCircle) {
                             path(item.selected, fill = foreGround)
@@ -144,11 +144,11 @@ override fun render(canvas: Canvas) {
             }
         }
     }
-\n
+
     canvas.translate(indicatorCenter) {
         // draw indicator
         path(indicatorPath, fill = foreGround)
-\n
+
         if (dropletYAboveIndicator != 0.0) {
             // draw droplet so that it's top is at the indicator top when dropletYAboveIndicator == 0
             circle(Circle(
@@ -187,7 +187,7 @@ private inner class ItemState(val selected: Path, val deselected: Path, var sele
     val centerX    get() = x + width / 2
     val size             = pathMetrics.size(selected)
     val atDefaults get() = selectionProgress == 0f && moveProgress == 0f
-\n
+
     lateinit var position     : Point
              var moveProgress = 0f
 }
@@ -198,7 +198,7 @@ The user is able to change `selectedItem` by clicking on it with the Pointer. We
 <KPlayground>{`
 init {
     // ...
-\n
+
     // Listen for item clicks
     pointerChanged += clicked { event ->
         getItem(at = event.location)?.let {
@@ -206,7 +206,7 @@ init {
             cursor       = Default
         }
     }
-\n
+
     // Update cursor as pointer moves
     pointerMotionChanged += moved { event ->
         cursor = when (getItem(event.location)) {
@@ -233,9 +233,9 @@ There are a few important things to note about our approach. First is that we ar
 Use the `autoCanceling` delegate to get free animation cleanup whenever a new value is assigned to an old one.
 :::
 
-Secondly, our approach initiates a lot of follow-on animations at the completion of previous animations (denoted with the dotted lines). Unfortunately, these will not be tracked by our top-level animation block, since blocks only track animations created when the block is executed (see below). So we will need to track all of these to cancel them if tab changes happen during an ongoing animation. These are all lumped into a `secondaryAnimations` set.
+Secondly, our approach initiates a lot of follow-on animations at the completion of previous animations (bubbles that come after others). These are triggered using the `then` method on the animation they follow. This allows them to be tracked by our top-level animation block and they are only created when the previous animation completes.
 
-:::info
+:::warning
 
 Doodle's animation block captures any animations created while the block is being executed and groups them all under a single animation returned from the block. In the following example, all the animations will be tied to `animations`, so canceling it cancels everything.
 
@@ -243,16 +243,18 @@ Doodle's animation block captures any animations created while the block is bein
 **All animations rolled into the result**
 <KPlayground>{`
 val animations = animate {
-    0f to 1f using tweenFloat(...).invoke {}
-    a  to b  using tweenColor(...).invoke {}
-\n
+    0f to 1f (using tweenFloat(...)) {}
+    a  to b  (using tweenColor(...)) {} then {
+        ...
+    }
+
     subAnimation = animate {
         ...
     }
 }
 `}</KPlayground>
 
-Doing the following **will not** track the animation created in the `completed` callback.
+NOTE that you must use `then` if you'd like to create subsequent animations at the completions of others. Doing the following **will not** track the animation created in the `completed` callback.
 
 **Some animations not tracked**
 <KPlayground>{`
@@ -267,66 +269,50 @@ val animations = animate {
 `}</KPlayground>
 :::
 
-We use the second pattern to chain animations together, which means our `animations` property is only tracking a subset. Of course, we could have made this work by tracking start/end times and using delays for all subsequent animations. But that is a bit more tedious.
-
-:::tip
-A future version of Doodle could provide ways to offset animations in a block relative to those already defined, which would better serve this use case.
-:::
-
 ### Animation Logic
 
-The following code has all of the logic to setup the timeline, track secondary animations and cancel anything that is ongoing when it fires.
+The following code has all of the logic to cancel anything that is ongoing when it fires and setup the timeline.
 
 <KPlayground>{`
 private var selectedItem by observable(items.first()) { _,selected ->
-\n
-    // cancel any ongoing secondary animations and hide droplet
+    // hide droplet
     dropletYAboveIndicator = 0.0
-    secondaryAnimations.forEach { it.cancel() }
-    secondaryAnimations.clear()
-\n
+
     // Animation blocks roll all top-level animations (those created while in the block) into a common
     // parent animation. Canceling that animation cancels all the children.
-    // However, our code creates additional animations that are created when top-level ones are completed.
-    // These animations are NOT tracked as part of the returned animation group. So they need to be tracked
-    // separately, so we can cancel them if anything changes mid-flight.
-    // We do that using the secondaryAnimations set.
     animation = animate {
-        // Animate all deselected items back to normal
+        // All deselected items move back to normal
         items.filter { it != selected && !it.atDefaults }.forEach { deselected ->
             deselected.moveProgress      to 0f using (tweenFloat(linear, itemMoveUpDuration)) { deselected.moveProgress      = it }
             deselected.selectionProgress to 0f using (tweenFloat(linear, itemFillDuration  )) { deselected.selectionProgress = it }
         }
-\n
+
         // Indicator moves to selected item
-        (indicatorCenter.x to selected.centerX using (tweenDouble(easeInOutCubic, slideDuration)) { indicatorCenter = Point(it, height) }).onCompleted {
+        indicatorCenter.x to selected.centerX using (tweenDouble(easeInOutCubic, slideDuration)) { indicatorCenter = Point(it, height) } then {
             // Selected item moves down
-            (selected.moveProgress to 1f using (tweenFloat(linear, itemMoveDownDuration)) { selected.moveProgress = it }).also { secondaryAnimations += it }
+            selected.moveProgress to 1f using (tweenFloat(linear, itemMoveDownDuration)) { selected.moveProgress = it }
         }
-\n
+
         // Indicator primes as it travels to selected item
-        (indicatorHeight to minIndicatorHeight using (tweenDouble(linear, primeDuration)) { indicatorHeight = it }).onCompleted {
-            // NOTE: All these are secondary animations that won't be attached to the outer animation, since it would have been
-            // completed at this point. So they need to be tracked using our secondaryAnimation set.
-\n
+        indicatorHeight to minIndicatorHeight using (tweenDouble(linear, primeDuration)) { indicatorHeight = it } then {
             // Indicator fires at selected item
-            (indicatorHeight to maxIndicatorHeight using (tweenDouble(linear, fireDuration)) { indicatorHeight = it }).onCompleted {
+            indicatorHeight to maxIndicatorHeight using (tweenDouble(linear, fireDuration)) { indicatorHeight = it } then {
                 // Indicator height returns to normal
-                (indicatorHeight to defaultIndicatorHeight using (tweenDouble(linear, recoilDuration)) { indicatorHeight = it }).also { secondaryAnimations += it }
-\n
+                indicatorHeight to defaultIndicatorHeight using (tweenDouble(linear, recoilDuration)) { indicatorHeight = it }
+
                 // Droplet moves up to item
-                (dropletYAboveIndicator to dropletMaxY using (tweenDouble(linear, dropletTravelDuration)) { dropletYAboveIndicator = it }).onCompleted {
-                    // Hide droplet
+                dropletYAboveIndicator to dropletMaxY using (tweenDouble(linear, dropletTravelDuration)) { dropletYAboveIndicator = it } then {
+                    // Droplet is instantly hidden
                     dropletYAboveIndicator = 0.0
-\n
+
                     // Selected item moves up
-                    (selected.moveProgress to 0f using (tweenFloat(linear, itemMoveUpDuration)) { selected.moveProgress = it }).also { secondaryAnimations += it }
-\n
-                    // Item animates droplet within it
-                    (selected.selectionProgress to 1f using (tweenFloat(linear, itemFillDuration)) { selected.selectionProgress = it }).also { secondaryAnimations += it }
-                }.also { secondaryAnimations += it }
-            }.also { secondaryAnimations += it }
-        }.also { secondaryAnimations += it }
+                    selected.moveProgress to 0f using (tweenFloat(linear, itemMoveUpDuration)) { selected.moveProgress = it }
+
+                    // Selected item animates droplet within it
+                    selected.selectionProgress to 1f using (tweenFloat(linear, itemFillDuration)) { selected.selectionProgress = it }
+                }
+            }
+        }
     }
 }
 `}</KPlayground>
@@ -340,14 +326,14 @@ So we take a different approach. The `Animator` interface lets you listen to cha
 <KPlayground>{`
 init {
     // ...
-\n
+
     // Rerender on animation updates
     animate.listeners += object: Listener {
         override fun changed(animator: Animator, animations: Set<Animation<*>>) {
             rerenderNow() // only called once per animation tick
         }
     }
-\n
+
     // ...
 }
 `}</KPlayground>

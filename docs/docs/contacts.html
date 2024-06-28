@@ -11,7 +11,7 @@
 
 
 <script src="https://unpkg.com/kotlin-playground@1"></script><link rel="stylesheet" href="/doodle-tutorials/assets/css/styles.8934ba38.css">
-<script src="/doodle-tutorials/assets/js/runtime~main.6895b875.js" defer="defer"></script>
+<script src="/doodle-tutorials/assets/js/runtime~main.d8542a75.js" defer="defer"></script>
 <script src="/doodle-tutorials/assets/js/main.2c8e2dcd.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -99,22 +99,17 @@ installFullScreenDemo(&quot;Production&quot; )</code><div class="theme-admonitio
 <code theme="darcula" mode="kotlin" data-highlight-only="true">
 class ContactsApp(/*...*/): Application {
 
-
     // ...
-
 
     init {
         // Coroutine used to load assets
         appScope.launch(uiDispatcher) {
             val appAssets = assets()
 
-
             themeManager.selected = theme // Install theme
-
 
             header      = Header     (appAssets)
             contactList = ContactList(appAssets)
-
 
             // Register handlers for different routes
             router[&quot;&quot;                      ] = { _,_        -&gt; /* Contact List     */ }
@@ -122,30 +117,23 @@ class ContactsApp(/*...*/): Application {
             router[&quot;/contact/([0-9]+)&quot;     ] = { _, matches -&gt; /* Contact          */ }
             router[&quot;/contact/([0-9]+)/edit&quot;] = { _, matches -&gt; /* Contact Editing  */ }
 
-
             display += header
-
 
             // Happens after header is added to ensure view goes below create button
             router.fireAction()
 
-
             display += CreateButton(appAssets)
-
 
             // Setup layout that manages how Header, CreateButton, and current View are positioned
             display.layout = simpleLayout { container -&gt;
                 // ...
             }
 
-
             display.fill(appAssets.background.paint)
         }
     }
 
-
     // ...
-
 
     override fun shutdown() { /* no-op */ }
 }
@@ -170,7 +158,6 @@ class ContactsApp(
         }
     }
 
-
     // ...
 }
 </code>
@@ -180,7 +167,6 @@ class ContactsApp(
 fun main() {
     // ...
     val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
-
 
     application (modules = listOf(
         // ...
@@ -202,7 +188,6 @@ fun main() {
 <code theme="darcula" mode="kotlin" data-highlight-only="true">
 fun main() {
     // ...
-
 
     application (modules = listOf(
         // ...
@@ -241,7 +226,6 @@ class ContactsApp(
         }
     }
 
-
     // ...
 }
 </code>
@@ -259,18 +243,15 @@ class ContactsApp(
         appScope.launch(uiDispatcher) {
             // ...
 
-
             // Register handlers for different routes
             router[&quot;&quot;                      ] = { _,_        -&gt; /* Contact List     */ }
             router[&quot;/add&quot;                  ] = { _,_        -&gt; /* Contact Creation */ }
             router[&quot;/contact/([0-9]+)&quot;     ] = { _, matches -&gt; /* Contact          */ }
             router[&quot;/contact/([0-9]+)/edit&quot;] = { _, matches -&gt; /* Contact Editing  */ }
 
-
             // ...
         }
     }
-
 
     // ...
 }
@@ -290,7 +271,6 @@ class ContactsApp(
         appScope.launch(uiDispatcher) {
             // ...
 
-
             display.layout = object: Layout {
                 // Header needs to be sized based on its minimumSize, so this layout should respond to any changes to it.
                 override fun requiresLayout(
@@ -300,15 +280,12 @@ class ContactsApp(
                     new  : View.SizePreferences
                 ) = new.minimumSize != old.minimumSize
 
-
                 override fun layout(container: PositionableContainer) {
                     val mainView = container.children[1]
                     val button   = container.children[2]
 
-
                     header.size     = Size(container.width, header.minimumSize.height)
                     mainView.bounds = Rectangle(INSET, header.height, max(0.0, header.width - 2 * INSET), max(0.0, container.height - header.height))
-
 
                     button.bounds = when {
                         container.width &gt; header.filterCenterAboveWidth -&gt; Rectangle(container.width - appAssets.createButtonLargeSize.width - 20, (header.naturalHeight - appAssets.createButtonLargeSize.height) / 2, appAssets.createButtonLargeSize.width, appAssets.createButtonLargeSize.height)
@@ -317,11 +294,9 @@ class ContactsApp(
                 }
             }
 
-
             // ...
         }
     }
-
 
     // ...
 }
@@ -337,26 +312,21 @@ class ContactsApp(
 <code theme="darcula" mode="kotlin" data-highlight-only="true">
 class Header(/*...*/): View() {
 
-
     /** Search box that filters which contacts are shown */
     private inner class FilterBox: View() {
         // ...
     }
-
 
             val naturalHeight          =  64.0
     private val filterRightAboveWidth  = 672.0
     private val filterCenterAboveWidth = 800.0
     private val filterBox: FilterBox
 
-
     val filterCentered: Boolean get() = width &gt; filterCenterAboveWidth
-
 
     var searchEnabled by observable(true) { _,new -&gt;
         filterBox.enabled = new
     }
-
 
     init {
         children += Photo(assets.logo).apply { size = Size(40) }
@@ -368,19 +338,15 @@ class Header(/*...*/): View() {
         }
         children += FilterBox().apply { size = Size(300, 45); font = assets.medium }.also { filterBox = it }
 
-
         val filterNaturalWidth = 300.0
-
 
         layout = Layout.simpleLayout { container -&gt;
             val logo   = container.children[0]
             val label  = container.children[1]
             val filter = container.children[2]
 
-
             logo.position  = Point(2 * INSET, (naturalHeight - logo.height) / 2)
             label.position = Point(logo.bounds.right + 10, logo.bounds.center.y - label.height / 2)
-
 
             filter.bounds = when {
                 container.width &gt; filterCenterAboveWidth -&gt; Rectangle((container.width - filterNaturalWidth) / 2,        logo.bounds.center.y - filter.height / 2, filterNaturalWidth, filter.height)
@@ -392,7 +358,6 @@ class Header(/*...*/): View() {
             idealSize   = minimumSize
         }
 
-
         // Custom cursor when pointer in the &quot;clickable&quot; region
         pointerMotionChanged += moved {
             cursor = when {
@@ -401,7 +366,6 @@ class Header(/*...*/): View() {
             }
         }
 
-
         // Show Contact list when &quot;clickable&quot; region clicked
         pointerChanged += clicked {
             if (it.inHotspot) {
@@ -409,7 +373,6 @@ class Header(/*...*/): View() {
             }
         }
     }
-
 
     private val PointerEvent.inHotspot get() = this@Header.toLocal(location, target).x &lt; 220
 }
@@ -420,14 +383,11 @@ class Header(/*...*/): View() {
 <code theme="darcula" mode="kotlin" data-highlight-only="true">
 private inner class FilterBox: View() {
 
-
     private var progress              by renderProperty(0f  )
     private var animation: Animation? by observable    (null) { old,_ -&gt; old?.cancel() }
 
-
     private val searchIcon     = PathIcon&lt;View&gt;(path(assets.searchIcon), fill = assets.search, pathMetrics = pathMetrics)
     private val searchIconSize = searchIcon.size(this)
-
 
     val textField = TextField().apply {
         placeHolder      = &quot;Search&quot;
@@ -442,11 +402,9 @@ private inner class FilterBox: View() {
         }
     }
 
-
     init {
         cursor             = Text
         clipCanvasToBounds = false
-
 
         val clearButton = PathIconButton(pathData = assets.deleteIcon, pathMetrics = pathMetrics).apply {
             size            = Size(22, 44)
@@ -458,21 +416,17 @@ private inner class FilterBox: View() {
             }
         }
 
-
         textField.textChanged += { _,_,new -&gt;
             when {
                 new.isBlank() -&gt; contacts.filter = null
                 else          -&gt; contacts.filter = { it.name.contains(new, ignoreCase = true) }
             }
 
-
             clearButton.visible = new.isNotBlank()
         }
 
-
         children += textField
         children += clearButton
-
 
         layout = constrain(children[0], children[1]) { textField, clear -&gt;
             textField.left    = parent.left + searchIconSize.width + 2 * 20
@@ -483,12 +437,10 @@ private inner class FilterBox: View() {
             clear.centerY     = parent.centerY
         }
 
-
         pointerChanged += clicked {
             focusManager.requestFocus(textField)
         }
     }
-
 
     override fun render(canvas: Canvas) {
         when {
@@ -499,7 +451,6 @@ private inner class FilterBox: View() {
             }
             else          -&gt; canvas.rect(bounds.atOrigin, radius = 8.0, color = assets.searchSelected)
         }
-
 
         searchIcon.render(this, canvas, at = Point(20.0, (height - searchIconSize.height) / 2))
     }
@@ -517,14 +468,12 @@ class ContactList(
     val nameVisualizer : CellVisualizer&lt;Contact, String&gt; = // ...
     val toolsVisualizer: CellVisualizer&lt;Contact, Unit&gt;   = // ...
 
-
     column(Label(&quot;Name&quot;        ), { name        }, nameVisualizer   ) { cellAlignment = alignment; headerAlignment = alignment                }
     column(Label(&quot;Phone Number&quot;), { phoneNumber }, TextVisualizer() ) { cellAlignment = alignment; headerAlignment = alignment                }
     column(null,                                   toolsVisualizer  ) { cellAlignment = fill(Insets(top = 20.0, bottom = 20.0, right = 20.0)) }
 }) {
     init {
         // ...
-
 
         // Controls how the table&#x27;s columns resize
         columnSizePolicy = object: ColumnSizePolicy {
@@ -533,22 +482,18 @@ class ContactList(
                 columns[0].width = width / 2
                 columns[1].width = width - columns[0].width - columns[2].width
 
-
                 return width
             }
-
 
             override fun widthChanged(width: Double, columns: List&lt;Column&gt;, index: Int, to: Double) {
                 // no-op
             }
         }
 
-
         behavior      = ContactListBehavior(assets, navigator)
         acceptsThemes = false
     }
 }
-
 
 // ...
 </code>
@@ -566,22 +511,18 @@ class ContactListBehavior(private val assets: AppConfig, private val navigator: 
         // Adds/removes row selection (for highlighting) on pointer enter/exit
     }
 
-
     private val selectionChanged: SetObserver&lt;Table&lt;Contact, *&gt;, Int&gt; = { table,_,_ -&gt;
         // Repaint the Table to show selected rows
         table.bodyDirty()
     }
 
-
     override fun install(view: Table&lt;Contact, *&gt;) {
         view.selectionChanged += selectionChanged
     }
 
-
     override fun uninstall(view: Table&lt;Contact, *&gt;) {
         view.selectionChanged -= selectionChanged
     }
-
 
     override val headerCellGenerator = object: AbstractTableBehavior.HeaderCellGenerator&lt;Table&lt;Contact, *&gt;&gt; {
         override fun &lt;A&gt; invoke(table: Table&lt;Contact, *&gt;, column: Column&lt;A&gt;) = container {
@@ -589,15 +530,12 @@ class ContactListBehavior(private val assets: AppConfig, private val navigator: 
         }
     }
 
-
     override val headerPositioner = object: AbstractTableBehavior.HeaderPositioner&lt;Table&lt;Contact, *&gt;&gt; {
         override fun invoke(table: Table&lt;Contact, *&gt;) = HeaderGeometry(0.0, TABLE_HEADER_HEIGHT)
     }
 
-
     // No overflow column will be in the Table
     override val overflowColumnConfig: Nothing? = null
-
 
     @Suppress(&quot;UNCHECKED_CAST&quot;)
     override val cellGenerator: CellGenerator&lt;Contact&gt; = object: CellGenerator&lt;Contact&gt; {
@@ -607,21 +545,17 @@ class ContactListBehavior(private val assets: AppConfig, private val navigator: 
         }
     }
 
-
     override val rowPositioner: RowPositioner&lt;Contact&gt; = object: RowPositioner&lt;Contact&gt; {
         // Position rows like a vertical list
         private val delegate = VerticalListPositioner(ROW_HEIGHT)
-
 
         override fun rowBounds  (of: Table&lt;Contact, *&gt;, row: Contact, index: Int) = delegate.itemBounds (of.size,     of.insets, index)
         override fun row        (of: Table&lt;Contact, *&gt;, at: Point               ) = delegate.itemFor    (of.size,     of.insets,  at  )
         override fun minimumSize(of: Table&lt;Contact, *&gt;                          ) = delegate.minimumSize(of.numItems, of.insets       )
     }
 
-
     override fun renderBody(table: Table&lt;Contact, *&gt;, canvas: Canvas) {
         canvas.rect(table.bounds.atOrigin, color = assets.background)
-
 
         // Highlight selected rows
         table.selection.map { it to table[it] }.forEach { (index, row) -&gt;
@@ -652,18 +586,15 @@ class CreateContactView(
         }
     }
 
-
     init {
         lateinit var name       : String
         lateinit var phoneNumber: String
-
 
         val label = Label(&quot;Create Contact&quot;).apply {
             font    = assets.medium
             height  = 28.0
             fitText = setOf(Width)
         }
-
 
         val back   = buttons.back  (assets.backIcon)
         val avatar = DynamicAvatar (assets.blankAvatar).apply { size = Size(176); font = assets.medium }
@@ -676,14 +607,12 @@ class CreateContactView(
             }
         }
 
-
         val spacer = view {
             height = 64.0
             render = {
                 line(Point(0.0, height / 2), Point(width, height / 2), stroke = Stroke(assets.outline))
             }
         }
-
 
         val form = editForm(
             assets          = assets,
@@ -697,9 +626,7 @@ class CreateContactView(
             button.enabled = true
         }
 
-
         children += listOf(label, back, avatar, spacer, form, button)
-
 
         layout = constrain(label, back, avatar, spacer, form, button) { (label, back, avatar, spacer, form, button) -&gt;
             // ...
@@ -707,7 +634,6 @@ class CreateContactView(
             idealSize = Size(spacer.width + 2 * INSET, button.bounds.bottom + INSET)
         }
     }
-
 
     // Helper to use constrain with 6 items
     private operator fun &lt;T&gt; List&lt;T&gt;.component6() = this[5]
@@ -726,7 +652,6 @@ class ContactView(/*...*/): ContactCommon(/*...*/) {
                 navigator.showContactEdit(super.contact)
             }
         }
-
 
         val details = container {
             this += Label(&quot;Contact Details&quot;).apply {
@@ -748,15 +673,12 @@ class ContactView(/*...*/): ContactCommon(/*...*/) {
                         val textSize = textMetrics.size(text, font)
                         val iconSize = icon!!.size(view)
 
-
                         // Ensure link&#x27;s size includes icon and text
                         size = Size(textPosition(view).x + textSize.width, max(iconSize.height, textSize.height))
                     }
 
-
                     override fun render(view: HyperLink, canvas: Canvas) {
                         icon!!.render(view, canvas, at = iconPosition(view, icon = icon!!))
-
 
                         // Styled text with phoneNumberLink color and link&#x27;s font
                         canvas.text(assets.phoneNumberLink.invoke { view.font(view.text) }, at = textPosition(view))
@@ -764,11 +686,9 @@ class ContactView(/*...*/): ContactCommon(/*...*/) {
                 }) as Behavior&lt;Button&gt;
             }
 
-
             render = {
                 rect(bounds.atOrigin.inset(0.5), radius = 12.0, stroke = Stroke(assets.outline))
             }
-
 
             layout = constrain(children[0], children[1]) { label, link -&gt;
                 label.top  = parent.top   + INSET
@@ -778,9 +698,7 @@ class ContactView(/*...*/): ContactCommon(/*...*/) {
             }
         }
 
-
         setDetail(details)
-
 
         layout = simpleLayout { layoutCommonItems() }.then {
             idealSize = Size(spacer.width + 2 * INSET, details.bounds.bottom + INSET)
@@ -803,7 +721,6 @@ class EditContactView(
         lateinit var newName       : String
         lateinit var newPhoneNumber: String
 
-
         edit.apply {
             enabled = false
             fired += {
@@ -815,11 +732,9 @@ class EditContactView(
                     super.contact = it // updates its contact to the newly edited one
                 }
 
-
                 enabled = false
             }
         }
-
 
         val form = editForm(super.contact.name, super.contact.phoneNumber, assets, textFieldStyler, pathMetrics, edit) { name, phone -&gt;
             // called whenever the Form becomes valid
@@ -828,13 +743,10 @@ class EditContactView(
             edit.enabled   = name != super.contact.name || phone != super.contact.phoneNumber
         }
 
-
         setDetail(form) // super class utility for specifying details view
-
 
         layout = simpleLayout {
             layoutCommonItems() // super class utility
-
 
             edit.position = Point(form.x, form.bounds.bottom + 2 * INSET)
         }.then {

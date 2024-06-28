@@ -60,27 +60,27 @@ We track the `currentPage` and `pageSize` to fetch a growing list of pages from 
 <KPlayground>{`
 class UnSplashDataModel(private val scope: CoroutineScope, /*...*/): DynamicListModel<Image> {
     // ...
-\n
+
     private var httpRequestJob: Job? by observable(null) { _,old,_ ->
         old?.cancel()
     }
-\n
+
     private var currentPage: Int by observable(-1) { _,_ ->
         fetchActive    = true
         httpRequestJob = scope.launch {
             val results = client.get<List<UnsplashPhoto>>(unsplashLocation)
-\n
+
             loadedImages.addAll(results.mapNotNull { imageLoader.load(it.urls.small) })
-\n
+
             fetchActive = false
-\n
+
             if (nextPageNeeded) {
                 nextPageNeeded  = false
                 currentPage    += 1
             }
         }
     }
-\n
+
     // ...
 }
 `}</KPlayground>
@@ -90,20 +90,20 @@ Fetches are performed using Ktor's HttpClient configured to read JSON data. Thes
 <KPlayground>{`
 class UnSplashDataModel(httpClient: HttpClient, /*...*/): DynamicListModel<Image> {
     // ...
-\n
+
     @Serializable
     data class Urls(val small: String)
-\n
+
     @Serializable
     data class UnsplashPhoto(val id: String, val urls: Urls)
-\n
+
     // HTTP client configured to read JSON  returned from unsplash
     private val client = httpClient.config {
         install(JsonFeature) {
             serializer = KotlinxSerializer(Json { ignoreUnknownKeys = true })
         }
     }
-\n
+
     // ...
 }
 `}</KPlayground>
@@ -113,9 +113,9 @@ Our `loadedImages` list triggers an event whenever we add a new set of images to
 <KPlayground>{`
 class UnSplashDataModel(/*...*/): DynamicListModel<Image> {
     // ...
-\n
+
     override val changed = SetPool<ModelObserver<Image>>()
-\n
+
     // Internal list used to cache images loaded from unsplash
     private val loadedImages = ObservableList<Image>().also {
         it.changed += { _ ,removed, added, moved ->
@@ -125,7 +125,7 @@ class UnSplashDataModel(/*...*/): DynamicListModel<Image> {
             }
         }
     }
-\n
+
     // ...
 }
 `}</KPlayground>
@@ -135,7 +135,7 @@ Finally, we need to decide when to fetch more images. We do this whenever `get` 
 <KPlayground>{`
 class UnSplashDataModel(/*...*/): DynamicListModel<Image> {
     // ...
-\n
+
     override fun get(index: Int): Image? = loadedImages.getOrNull(index).also {
         // Load the next page if the last image is fetched from the model
         if (index == size - 1) {
@@ -145,7 +145,7 @@ class UnSplashDataModel(/*...*/): DynamicListModel<Image> {
             }
         }
     }
-\n
+
     // ...
 }
 `}</KPlayground>
@@ -162,7 +162,7 @@ It is also possible to change the way `BasicListBehavior` (and any `ListBehavior
 class PhotoStreamApp(/*...*/): Application {
     init {
         // ...
-\n
+
         val list = DynamicList(
             model          = UnSplashDataModel(appScope, httpClient, imageLoader),
             itemVisualizer = itemVisualizer { image, recycledView, _ -> when(recycledView) {
@@ -174,7 +174,7 @@ class PhotoStreamApp(/*...*/): Application {
             cellAlignment = fill
         }
     }
-\n
+
     // ...
 }
 `}</KPlayground>

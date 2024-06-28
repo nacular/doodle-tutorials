@@ -70,28 +70,28 @@ The app's structure is fairly simple. It has a main Container that holds the ima
 class PhotosApp(/*...*/): Application {
     init {
         // ...
-\n
+
         val panelToggle                 // Button used to show/hide the panel
         val panel                       // Has controls for manipulating images
         val mainContainer = container { // container that holds images
             // ...
-\n
+
             dropReceiver = object: DropReceiver {
                 // support drag-drop importing
             }
-\n
+
             GlobalScope.launch {
                 listOf("tetons.jpg", "earth.jpg").forEachIndexed { index, file ->
                     // load default images
                 }
             }
         }
-\n
+
         display += listOf(mainContainer, panel, panelToggle)
-\n
+
         // ...
     }
-\n
+
     override fun shutdown() {}
 }
 `}</KPlayground>
@@ -136,7 +136,7 @@ class PhotosApp(/*...*/ private val images: ImageLoader /*...*/): Application {
         // ...
         val mainContainer = container {
             // ...
-\n
+
             dropReceiver = object: DropReceiver {
                 private  val allowedFileTypes                    = Files(ImageType("jpg"), ImageType("jpeg"), ImageType("png"))
                 override val active                              = true
@@ -146,7 +146,7 @@ class PhotosApp(/*...*/ private val images: ImageLoader /*...*/): Application {
                 override fun dropActionChanged(event: DropEvent) = allowed(event)
                 override fun drop             (event: DropEvent) = event.bundle[allowedFileTypes]?.let { files ->
                     val photos = files.map { GlobalScope.async { images.load(it)?.let { FixedAspectPhoto(it) } } }
-\n
+
                     GlobalScope.launch {
                         photos.mapNotNull { it.await() }.forEach { photo ->
                             import(photo, event.location)
@@ -157,7 +157,7 @@ class PhotosApp(/*...*/ private val images: ImageLoader /*...*/): Application {
             }
         }
     }
-\n
+
     // ...
 }
 `}</KPlayground>
@@ -170,7 +170,7 @@ We import images using a local `import` function inside the `mainContainer` crea
 
 <KPlayground>{`
 val import = { photo: View, location: Point ->
-\n
+
 }
 `}</KPlayground>
 
@@ -193,19 +193,19 @@ Import also registers a custom gesture listener to support multi-touch scaling a
 <KPlayground>{`
 GestureRecognizer(photo).changed += object: GestureListener<GestureEvent> {
     // ...
-\n
+
     override fun started(event: GestureEvent) {
         // capture initial state
         event.consume()
     }
-\n
+
     override fun changed(event: GestureEvent) {
         // 1) calculate rotation angle
         // 2) update photo transform to include rotation
         // 3) update photo bounds based on scaling
         event.consume()
     }
-\n
+
     override fun ended(event: GestureEvent) {
         // simply consume event
         event.consume()
@@ -229,7 +229,7 @@ override fun started(event: GestureEvent) {
     originalVector   = event.initial[1].inParent(photo) - event.initial[0].inParent(photo)
     originalPosition = photo.position
     initialTransform = photo.transform
-\n
+
     event.consume() // ensure event is consumed from Resizer
 }
 `}</KPlayground>
@@ -241,21 +241,21 @@ The values recorded in `started` are used--along with the new state--in the `cha
 <KPlayground>{`
 override fun changed(event: GestureEvent) {
     val currentVector = event.current[1].inParent(photo) - event.current[0].inParent(photo)
-\n
+
     // Angle between initial set of points and their current locations
     val transformAngle = atan2(
         originalVector.x * currentVector.y - originalVector.y * currentVector.x,
         originalVector.x * currentVector.x + originalVector.y * currentVector.y
     )
-\n
+
     // Use transform for rotation
     photo.transform = initialTransform.rotate(around = originalCenter, by = transformAngle)
-\n
+
     // Update bounds instead of scale transformation
     photo.bounds = Rectangle(
             originalPosition - ((originalPosition - originalCenter) * (1 - event.scale)),
             originalSize * event.scale)
-\n
+
     event.consume() // ensure event is consumed from Resizer
 }
 `}</KPlayground>

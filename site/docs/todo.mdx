@@ -107,7 +107,7 @@ application(root = element, modules = listOf(FontModule, PointerModule, Keyboard
         nativeTextFieldBehavior(), nativeHyperLinkBehavior(), nativeScrollPanelBehavior(smoothScrolling = true),
         Module(name = "AppModule") {
             // ...
-\n
+
             // Different behavior for docs version
             bind<FilterButtonProvider>() with singleton { EmbeddedFilterButtonProvider(instance()) }
         }

@@ -11,7 +11,7 @@
 
 
 <script src="https://unpkg.com/kotlin-playground@1"></script><link rel="stylesheet" href="/doodle-tutorials/assets/css/styles.8934ba38.css">
-<script src="/doodle-tutorials/assets/js/runtime~main.6895b875.js" defer="defer"></script>
+<script src="/doodle-tutorials/assets/js/runtime~main.d8542a75.js" defer="defer"></script>
 <script src="/doodle-tutorials/assets/js/main.2c8e2dcd.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -100,16 +100,13 @@ installFullScreenDemo(&quot;Production&quot; )</code></div></div></div>
 <code theme="darcula" mode="kotlin" data-highlight-only="true">
 package io.nacular.doodle.examples
 
-
 // ...
-
 
 class CalculatorApp(display: Display): Application {
     init {
         // creat and display a single Calculator
         display += Calculator()
     }
-
 
     override fun shutdown() { /* no-op */ }
 }
@@ -123,9 +120,7 @@ class CalculatorApp(display: Display): Application {
 <code theme="darcula" mode="kotlin" data-highlight-only="true">
 package io.nacular.doodle.examples
 
-
 //...
-
 
 fun fullScreen() {
     application(modules = listOf(PointerModule)) {
@@ -155,22 +150,17 @@ fun fullScreen() {
 private inner class Output: View() {
     //...
 
-
     // Transform used to scale text down as it grows beyond window width
     private var textTransform = Identity
 
-
     //...
-
 
     /** Text representation of number */
     var text = &quot;0&quot;
         set(new) {
             field = new
-
             val textWidth   = textMetrics.width(field, font)
             val windowWidth = width - inset * 2
-
 
             // use transform when text grows beyond window width
             textTransform = when {
@@ -178,13 +168,10 @@ private inner class Output: View() {
                 else                    -&gt; Identity
             }
 
-
             rerender()
         }
 
-
     //...
-
 
     override fun render(canvas: Canvas) {
         val textPosition = textMetrics.size(text, font).let {
@@ -193,10 +180,8 @@ private inner class Output: View() {
                 else                     -&gt; (width - it.width) / 2
             }
 
-
             Point(x, height - it.height)
         }
-
 
         // scaling, if present, is applied to the canvas before text rendered
         canvas.transform(textTransform) {
@@ -221,9 +206,7 @@ class Calculator(
 <code theme="darcula" mode="kotlin" data-highlight-only="true">
 package io.nacular.doodle.examples
 
-
 // ...
-
 
 class CalculatorApp(
         display        : Display,
@@ -235,7 +218,6 @@ class CalculatorApp(
         // creat and display a single Calculator
         display += Calculator(fontDetector, textMetrics, numberFormatter)
     }
-
 
     override fun shutdown() { /* no-op */ }
 }
@@ -266,20 +248,15 @@ fun main() {
 <code theme="darcula" mode="kotlin" data-highlight-only="true">
 class Calculator(/*...*/): View() {
 
-
     //...
-
 
     init {
         GlobalScope.launch {
             loadFonts()
-
             ButtonGroup(allowDeselectAll = true, buttons = *arrayOf(`÷`, `*`, `-`, `+`))
-
 
             val outputHeight  = 100.0
             val buttonSpacing =  10.0
-
 
             val gridPanel = GridPanel().apply {
                 add(clear, 0, 0); add(negate, 0, 1); add(`÷`, 0, 2); add(`÷`, 0, 3)
@@ -288,14 +265,11 @@ class Calculator(/*...*/): View() {
                 add(`1`,   3, 0); add(`2`,    3, 1); add(`3`, 3, 2); add(`+`, 3, 3)
                 add(`0`,   4, 0,  columnSpan = 2  ); add(decimal, 4, 2); add(`=`,  4, 3)
 
-
                 verticalSpacing   = buttonSpacing
                 horizontalSpacing = buttonSpacing
             }
 
-
             children += listOf(output, gridPanel)
-
 
             // Place output outside grid so the height can be more easily controlled
             val constraints = constrain(output, gridPanel) { output, grid -&gt;
@@ -303,13 +277,11 @@ class Calculator(/*...*/): View() {
                 output.left   = parent.left
                 output.right  = parent.right
                 output.height = constant(outputHeight)
-
                 grid.top      = output.bottom + buttonSpacing
                 grid.left     = output.left
                 grid.right    = output.right
                 grid.bottom   = parent.bottom
             }
-
 
             layout = object: Layout by constraints {
                 // Set total height to grid panel&#x27;s ideal width and height, plus output and spacing
@@ -318,14 +290,12 @@ class Calculator(/*...*/): View() {
                 }
             }
 
-
             // Force idealSize when gridPanel is laid out
             gridPanel.sizePreferencesChanged += { _,_,new -&gt;
                 idealSize = new.idealSize?.let { Size(it.width, it.height + outputHeight + buttonSpacing) }
             }
         }
     }
-
 
     //...
 }
@@ -340,12 +310,10 @@ class Calculator(/*...*/): View() {
 class CalcButtonBehavior(textMetrics: TextMetrics): CommonTextButtonBehavior&lt;Button&gt;(textMetrics) {
     //...
 
-
     override fun contains(view: Button, point: Point): Boolean {
         val radius      = view.height / 2
         val leftCircle  = Circle(center = Point(view.x + radius,            view.center.y), radius = radius)
         val rightCircle = Circle(center = Point(view.bounds.right - radius, view.center.y), radius = radius)
-
 
         return when {
             point.x &lt; radius              -&gt; point in leftCircle

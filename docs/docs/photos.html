@@ -11,7 +11,7 @@
 
 
 <script src="https://unpkg.com/kotlin-playground@1"></script><link rel="stylesheet" href="/doodle-tutorials/assets/css/styles.8934ba38.css">
-<script src="/doodle-tutorials/assets/js/runtime~main.6895b875.js" defer="defer"></script>
+<script src="/doodle-tutorials/assets/js/runtime~main.d8542a75.js" defer="defer"></script>
 <script src="/doodle-tutorials/assets/js/main.2c8e2dcd.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -98,17 +98,14 @@ class PhotosApp(/*...*/): Application {
     init {
         // ...
 
-
         val panelToggle                 // Button used to show/hide the panel
         val panel                       // Has controls for manipulating images
         val mainContainer = container { // container that holds images
             // ...
 
-
             dropReceiver = object: DropReceiver {
                 // support drag-drop importing
             }
-
 
             GlobalScope.launch {
                 listOf(&quot;tetons.jpg&quot;, &quot;earth.jpg&quot;).forEachIndexed { index, file -&gt;
@@ -117,13 +114,10 @@ class PhotosApp(/*...*/): Application {
             }
         }
 
-
         display += listOf(mainContainer, panel, panelToggle)
-
 
         // ...
     }
-
 
     override fun shutdown() {}
 }
@@ -143,7 +137,7 @@ import io.nacular.doodle.application.Modules.Companion.KeyboardModule
 import io.nacular.doodle.application.application
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicCircularProgressIndicatorBehavior
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicLabelBehavior
-import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicMutableSpinnerBehavior
+import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicMutableSpinButtonBehavior
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeTextFieldBehavior
 import org.kodein.di.DI.Module
 import org.kodein.di.bindSingleton
@@ -161,7 +155,7 @@ fun main() {
         DragDropModule,
         basicLabelBehavior(),
         nativeTextFieldBehavior(spellCheck = false),
-        basicMutableSpinnerBehavior(),
+        basicMutableSpinButtonBehavior(),
         basicCircularProgressIndicatorBehavior(thickness = 18.0),
         Module(name = &quot;AppModule&quot;) {
             bindSingleton&lt;Animator&gt; { AnimatorImpl(instance(), instance()) }
@@ -196,7 +190,6 @@ class PhotosApp(/*...*/ private val images: ImageLoader /*...*/): Application {
         val mainContainer = container {
             // ...
 
-
             dropReceiver = object: DropReceiver {
                 private  val allowedFileTypes                    = Files(ImageType(&quot;jpg&quot;), ImageType(&quot;jpeg&quot;), ImageType(&quot;png&quot;))
                 override val active                              = true
@@ -206,7 +199,6 @@ class PhotosApp(/*...*/ private val images: ImageLoader /*...*/): Application {
                 override fun dropActionChanged(event: DropEvent) = allowed(event)
                 override fun drop             (event: DropEvent) = event.bundle[allowedFileTypes]?.let { files -&gt;
                     val photos = files.map { GlobalScope.async { images.load(it)?.let { FixedAspectPhoto(it) } } }
-
 
                     GlobalScope.launch {
                         photos.mapNotNull { it.await() }.forEach { photo -&gt;
@@ -219,7 +211,6 @@ class PhotosApp(/*...*/ private val images: ImageLoader /*...*/): Application {
         }
     }
 
-
     // ...
 }
 </code>
@@ -228,7 +219,6 @@ class PhotosApp(/*...*/ private val images: ImageLoader /*...*/): Application {
 <p>We import images using a local <code>import</code> function inside the <code>mainContainer</code> creation block. This simplifies access to local state. The <code>import</code> function takes a photo, which is a <code>View</code>, and a location to place it.</p>
 <code theme="darcula" mode="kotlin" data-highlight-only="true">
 val import = { photo: View, location: Point -&gt;
-
 
 }
 </code>
@@ -248,12 +238,10 @@ photo.pointerChanged += pressed {
 GestureRecognizer(photo).changed += object: GestureListener&lt;GestureEvent&gt; {
     // ...
 
-
     override fun started(event: GestureEvent) {
         // capture initial state
         event.consume()
     }
-
 
     override fun changed(event: GestureEvent) {
         // 1) calculate rotation angle
@@ -261,7 +249,6 @@ GestureRecognizer(photo).changed += object: GestureListener&lt;GestureEvent&gt; 
         // 3) update photo bounds based on scaling
         event.consume()
     }
-
 
     override fun ended(event: GestureEvent) {
         // simply consume event
@@ -282,7 +269,6 @@ override fun started(event: GestureEvent) {
     originalPosition = photo.position
     initialTransform = photo.transform
 
-
     event.consume() // ensure event is consumed from Resizer
 }
 </code>
@@ -292,23 +278,19 @@ override fun started(event: GestureEvent) {
 override fun changed(event: GestureEvent) {
     val currentVector = event.current[1].inParent(photo) - event.current[0].inParent(photo)
 
-
     // Angle between initial set of points and their current locations
     val transformAngle = atan2(
         originalVector.x * currentVector.y - originalVector.y * currentVector.x,
         originalVector.x * currentVector.x + originalVector.y * currentVector.y
     )
 
-
     // Use transform for rotation
     photo.transform = initialTransform.rotate(around = originalCenter, by = transformAngle)
-
 
     // Update bounds instead of scale transformation
     photo.bounds = Rectangle(
             originalPosition - ((originalPosition - originalCenter) * (1 - event.scale)),
             originalSize * event.scale)
-
 
     event.consume() // ensure event is consumed from Resizer
 }

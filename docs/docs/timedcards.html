@@ -11,7 +11,7 @@
 
 
 <script src="https://unpkg.com/kotlin-playground@1"></script><link rel="stylesheet" href="/doodle-tutorials/assets/css/styles.8934ba38.css">
-<script src="/doodle-tutorials/assets/js/runtime~main.6895b875.js" defer="defer"></script>
+<script src="/doodle-tutorials/assets/js/runtime~main.d8542a75.js" defer="defer"></script>
 <script src="/doodle-tutorials/assets/js/main.2c8e2dcd.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -413,7 +413,6 @@ class CardPresenter&lt;T&gt;(private val spacing: Double = 20.0, private val ite
 <code theme="darcula" mode="kotlin" data-highlight-only="true">
 behavior = object: CarouselBehavior&lt;CardData&gt; {
     override val presenter = CardPresenter&lt;CardData&gt; { itemSize(it) }
-
 
     override val transitioner = dampedTransitioner&lt;CardData&gt;(timer, scheduler) { _,_,_, update -&gt;
         animate(0f to 1f, using = tweenFloat(easeInOutCubic, duration = 1.25 * seconds)) {

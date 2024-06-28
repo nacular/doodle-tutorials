@@ -11,7 +11,7 @@
 
 
 <script src="https://unpkg.com/kotlin-playground@1"></script><link rel="stylesheet" href="/doodle-tutorials/assets/css/styles.8934ba38.css">
-<script src="/doodle-tutorials/assets/js/runtime~main.6895b875.js" defer="defer"></script>
+<script src="/doodle-tutorials/assets/js/runtime~main.d8542a75.js" defer="defer"></script>
 <script src="/doodle-tutorials/assets/js/main.2c8e2dcd.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -222,23 +222,18 @@ class UnSplashDataModel(
 class UnSplashDataModel(private val scope: CoroutineScope, /*...*/): DynamicListModel&lt;Image&gt; {
     // ...
 
-
     private var httpRequestJob: Job? by observable(null) { _,old,_ -&gt;
         old?.cancel()
     }
-
 
     private var currentPage: Int by observable(-1) { _,_ -&gt;
         fetchActive    = true
         httpRequestJob = scope.launch {
             val results = client.get&lt;List&lt;UnsplashPhoto&gt;&gt;(unsplashLocation)
 
-
             loadedImages.addAll(results.mapNotNull { imageLoader.load(it.urls.small) })
 
-
             fetchActive = false
-
 
             if (nextPageNeeded) {
                 nextPageNeeded  = false
@@ -246,7 +241,6 @@ class UnSplashDataModel(private val scope: CoroutineScope, /*...*/): DynamicList
             }
         }
     }
-
 
     // ...
 }
@@ -256,14 +250,11 @@ class UnSplashDataModel(private val scope: CoroutineScope, /*...*/): DynamicList
 class UnSplashDataModel(httpClient: HttpClient, /*...*/): DynamicListModel&lt;Image&gt; {
     // ...
 
-
     @Serializable
     data class Urls(val small: String)
 
-
     @Serializable
     data class UnsplashPhoto(val id: String, val urls: Urls)
-
 
     // HTTP client configured to read JSON  returned from unsplash
     private val client = httpClient.config {
@@ -271,7 +262,6 @@ class UnSplashDataModel(httpClient: HttpClient, /*...*/): DynamicListModel&lt;Im
             serializer = KotlinxSerializer(Json { ignoreUnknownKeys = true })
         }
     }
-
 
     // ...
 }
@@ -281,9 +271,7 @@ class UnSplashDataModel(httpClient: HttpClient, /*...*/): DynamicListModel&lt;Im
 class UnSplashDataModel(/*...*/): DynamicListModel&lt;Image&gt; {
     // ...
 
-
     override val changed = SetPool&lt;ModelObserver&lt;Image&gt;&gt;()
-
 
     // Internal list used to cache images loaded from unsplash
     private val loadedImages = ObservableList&lt;Image&gt;().also {
@@ -295,7 +283,6 @@ class UnSplashDataModel(/*...*/): DynamicListModel&lt;Image&gt; {
         }
     }
 
-
     // ...
 }
 </code>
@@ -303,7 +290,6 @@ class UnSplashDataModel(/*...*/): DynamicListModel&lt;Image&gt; {
 <code theme="darcula" mode="kotlin" data-highlight-only="true">
 class UnSplashDataModel(/*...*/): DynamicListModel&lt;Image&gt; {
     // ...
-
 
     override fun get(index: Int): Image? = loadedImages.getOrNull(index).also {
         // Load the next page if the last image is fetched from the model
@@ -314,7 +300,6 @@ class UnSplashDataModel(/*...*/): DynamicListModel&lt;Image&gt; {
             }
         }
     }
-
 
     // ...
 }
@@ -327,7 +312,6 @@ class PhotoStreamApp(/*...*/): Application {
     init {
         // ...
 
-
         val list = DynamicList(
             model          = UnSplashDataModel(appScope, httpClient, imageLoader),
             itemVisualizer = itemVisualizer { image, recycledView, _ -&gt; when(recycledView) {
@@ -339,7 +323,6 @@ class PhotoStreamApp(/*...*/): Application {
             cellAlignment = fill
         }
     }
-
 
     // ...
 }
