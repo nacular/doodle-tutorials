@@ -111,21 +111,14 @@ class TabStrip(private val animate: Animator, private val pathMetrics: PathMetri
 
     // Overall animation handle
     private var animation: Animation<*>? by autoCanceling()
-    private val secondaryAnimations = mutableSetOf<Animation<*>>()
 
     // Monitor changes to the selected item to handle animation
     private var selectedItem by observable(items.first()) { _,selected ->
-        // cancel any ongoing secondary animations and hide droplet
+        // hide droplet
         dropletYAboveIndicator = 0.0
-        secondaryAnimations.forEach { it.cancel() }
-        secondaryAnimations.clear()
 
         // Animation blocks roll all top-level animations (those created while in the block) into a common
         // parent animation. Canceling that animation cancels all the children.
-        // However, our code creates additional animations that are created when top-level ones are completed.
-        // These animations are NOT tracked as part of the returned animation group. So they need to be tracked
-        // separately, so we can cancel them if anything changes mid-flight.
-        // We do that using the secondaryAnimations set.
         animation = animate {
             // All deselected items move back to normal
             items.filter { it != selected && !it.atDefaults }.forEach { deselected ->
@@ -134,34 +127,31 @@ class TabStrip(private val animate: Animator, private val pathMetrics: PathMetri
             }
 
             // Indicator moves to selected item
-            (indicatorCenter.x to selected.centerX using (tweenDouble(easeInOutCubic, slideDuration)) { indicatorCenter = Point(it, height) }).onCompleted {
+            indicatorCenter.x to selected.centerX using (tweenDouble(easeInOutCubic, slideDuration)) { indicatorCenter = Point(it, height) } then {
                 // Selected item moves down
-                (selected.moveProgress to 1f using (tweenFloat(linear, itemMoveDownDuration)) { selected.moveProgress = it }).also { secondaryAnimations += it }
+                selected.moveProgress to 1f using (tweenFloat(linear, itemMoveDownDuration)) { selected.moveProgress = it }
             }
 
             // Indicator primes as it travels to selected item
-            (indicatorHeight to minIndicatorHeight using (tweenDouble(linear, primeDuration)) { indicatorHeight = it }).onCompleted {
-                // NOTE: All these are secondary animations that won't be attached to the outer animation, since it would have been
-                // completed at this point. So they need to be tracked using our secondaryAnimation set.
-
+            indicatorHeight to minIndicatorHeight using (tweenDouble(linear, primeDuration)) { indicatorHeight = it } then {
                 // Indicator fires at selected item
-                (indicatorHeight to maxIndicatorHeight using (tweenDouble(linear, fireDuration)) { indicatorHeight = it }).onCompleted {
+                indicatorHeight to maxIndicatorHeight using (tweenDouble(linear, fireDuration)) { indicatorHeight = it } then {
                     // Indicator height returns to normal
-                    (indicatorHeight to defaultIndicatorHeight using (tweenDouble(linear, recoilDuration)) { indicatorHeight = it }).also { secondaryAnimations += it }
+                    indicatorHeight to defaultIndicatorHeight using (tweenDouble(linear, recoilDuration)) { indicatorHeight = it }
 
                     // Droplet moves up to item
-                    (dropletYAboveIndicator to dropletMaxY using (tweenDouble(linear, dropletTravelDuration)) { dropletYAboveIndicator = it }).onCompleted {
+                    dropletYAboveIndicator to dropletMaxY using (tweenDouble(linear, dropletTravelDuration)) { dropletYAboveIndicator = it } then {
                         // Droplet is instantly hidden
                         dropletYAboveIndicator = 0.0
 
                         // Selected item moves up
-                        (selected.moveProgress to 0f using (tweenFloat(linear, itemMoveUpDuration)) { selected.moveProgress = it }).also { secondaryAnimations += it }
+                        selected.moveProgress to 0f using (tweenFloat(linear, itemMoveUpDuration)) { selected.moveProgress = it }
 
                         // Selected item animates droplet within it
-                        (selected.selectionProgress to 1f using (tweenFloat(linear, itemFillDuration)) { selected.selectionProgress = it }).also { secondaryAnimations += it }
-                    }.also { secondaryAnimations += it }
-                }.also { secondaryAnimations += it }
-            }.also { secondaryAnimations += it }
+                        selected.selectionProgress to 1f using (tweenFloat(linear, itemFillDuration)) { selected.selectionProgress = it }
+                    }
+                }
+            }
         }
     }
 
@@ -275,20 +265,17 @@ class TabStrip(private val animate: Animator, private val pathMetrics: PathMetri
     private fun updateIndicatorPath() {
         val indicatorHalfWidth = indicatorWidth / 2
 
-        val controlPoint1 = Point(x = -indicatorHalfWidth) + Point(19.6113, -5.2466)
-        val controlPoint2 = Point(x = -11.4078, -indicatorHeight)
-        val controlPoint3 = controlPoint2 + Point(x = 2 * 11.4078)
-        val controlPoint4 = Point(x = indicatorHalfWidth) + Point(-19.6113, -5.2466)
+        val offset         = Point(19.6113, -5.2466)
+        val controlPoint2X = -11.4078
+
+        val controlPoint1 = Point(x = -indicatorHalfWidth) + offset
+        val controlPoint2 = Point(x = controlPoint2X, -indicatorHeight)
+        val controlPoint3 = controlPoint2 + Point(x = 2 * -controlPoint2X)
+        val controlPoint4 = Point(x = indicatorHalfWidth) + offset.run { Point(x = -x, y) }
 
         indicatorPath = path(Point(x = -indicatorHalfWidth)).
             cubicTo(Point(y = -indicatorHeight  ), controlPoint1, controlPoint2).
             cubicTo(Point(x = indicatorHalfWidth), controlPoint3, controlPoint4).
             close()
-    }
-
-    private fun <T> Animation<T>.onCompleted(block: () -> Unit): Animation<T> = this.apply {
-        completed += {
-            block()
-        }
     }
 }

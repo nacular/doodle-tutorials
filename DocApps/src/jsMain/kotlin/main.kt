@@ -47,7 +47,7 @@ import io.nacular.doodle.examples.contacts.showcase
 import io.nacular.doodle.examples.contacts.showcaseModules
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicCircularProgressIndicatorBehavior
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicLabelBehavior
-import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicMutableSpinnerBehavior
+import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicMutableSpinButtonBehavior
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeHyperLinkBehavior
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeScrollPanelBehavior
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeTextFieldBehavior
@@ -106,7 +106,7 @@ fun photos(element: HTMLElement) {
             DragDropModule,
             basicLabelBehavior(),
             nativeTextFieldBehavior(spellCheck = false),
-            basicMutableSpinnerBehavior(),
+            basicMutableSpinButtonBehavior(),
             basicCircularProgressIndicatorBehavior(thickness = 18.0),
             Module(name = "AppModule") {
                 bindSingleton<Animator> { AnimatorImpl   (instance(), instance()) }

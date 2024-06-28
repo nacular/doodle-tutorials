@@ -8,11 +8,11 @@ import io.nacular.doodle.application.Application
 import io.nacular.doodle.controls.buttons.PushButton
 import io.nacular.doodle.controls.itemVisualizer
 import io.nacular.doodle.controls.range.CircularSlider
-import io.nacular.doodle.controls.spinner.MutableIntSpinnerModel
-import io.nacular.doodle.controls.spinner.MutableSpinner
-import io.nacular.doodle.controls.spinner.Spinner
-import io.nacular.doodle.controls.spinner.SpinnerModel
-import io.nacular.doodle.controls.spinner.spinnerEditor
+import io.nacular.doodle.controls.spinner.MutableIntSpinButtonModel
+import io.nacular.doodle.controls.spinner.MutableSpinButton
+import io.nacular.doodle.controls.spinner.SpinButton
+import io.nacular.doodle.controls.spinner.SpinButtonModel
+import io.nacular.doodle.controls.spinner.spinButtonEditor
 import io.nacular.doodle.controls.text.Label
 import io.nacular.doodle.controls.theme.simpleButtonRenderer
 import io.nacular.doodle.core.Container
@@ -54,11 +54,12 @@ import io.nacular.doodle.layout.WidthSource.Parent
 import io.nacular.doodle.layout.constraints.Bounds
 import io.nacular.doodle.layout.constraints.ConstraintDslContext
 import io.nacular.doodle.layout.constraints.constrain
+import io.nacular.doodle.layout.constraints.fill
 import io.nacular.doodle.system.Cursor.Companion.Text
 import io.nacular.doodle.theme.ThemeManager
 import io.nacular.doodle.theme.adhoc.DynamicTheme
 import io.nacular.doodle.theme.basic.range.BasicCircularSliderBehavior
-import io.nacular.doodle.theme.basic.spinner.SpinnerTextEditOperation
+import io.nacular.doodle.theme.basic.spinner.SpinButtonTextEditOperation
 import io.nacular.doodle.utils.Dimension.Width
 import io.nacular.doodle.utils.PropertyObserver
 import io.nacular.doodle.utils.PropertyObservers
@@ -86,17 +87,17 @@ import io.nacular.doodle.datatransport.Image as ImageType
  * Panel used to display editable properties of an image.
  */
 private class PropertyPanel(private val focusManager: FocusManager): Container() {
-    private val spinnerHeight = 24.0
+    private val spinButtonHeight = 24.0
 
     /**
-     * Simple View with a [MutableSpinner] and [Label] that displays a numeric property.
+     * Simple View with a [MutableSpinButton] and [Label] that displays a numeric property.
      */
     private inner class Property(
         private val property  : KMutableProperty0<Double>,
         private val updateWhen: PropertyObservers<Any, Any>,
                     suffix    : String = ""
     ): View() {
-        private fun <T, M: SpinnerModel<T>> spinnerVisualizer(suffix: String = "") = itemVisualizer { item: Int, previous: View?, context: Spinner<T, M> ->
+        private fun <T, M: SpinButtonModel<T>> spinButtonVisualizer(suffix: String = "") = itemVisualizer { item: Int, previous: View?, context: SpinButton<T, M> ->
             when (previous) {
                 is Label -> previous.also { it.text = "$item$suffix" }
                 else     -> Label("$item$suffix").apply {
@@ -106,9 +107,9 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
                     foregroundColor = previous?.foregroundColor
                     backgroundColor = previous?.backgroundColor ?: Transparent
 
-                    (context as? MutableSpinner<*,*>)?.let { spinner ->
+                    (context as? MutableSpinButton<*,*>)?.let { spinButton ->
                         pointerFilter += pressed { event ->
-                            spinner.startEditing()
+                            spinButton.startEditing()
                             event.consume()
                         }
                     }
@@ -116,17 +117,15 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
             }
         }
 
-        private val spinner = MutableSpinner(
-            MutableIntSpinnerModel(Int.MIN_VALUE..Int.MAX_VALUE, property.get().toInt()),
-            spinnerVisualizer(suffix)
+        private val spinButton = MutableSpinButton(
+            MutableIntSpinButtonModel(Int.MIN_VALUE..Int.MAX_VALUE, property.get().toInt()),
+            spinButtonVisualizer(suffix)
         ).apply {
-            cellAlignment = {
-                it.edges eq parent.edges
-            }
+            cellAlignment = fill
 
-            // Make the spinner editable
-            editor = spinnerEditor { spinner, value, current ->
-                object: SpinnerTextEditOperation<Int>(focusManager, ToStringIntEncoder, spinner, value, current) {
+            // Make the spinButton editable
+            editor = spinButtonEditor { button, value, current ->
+                object: SpinButtonTextEditOperation<Int>(focusManager, ToStringIntEncoder, button, value, current) {
                     init {
                         textField.selectionBackgroundColor = Darkgray
                     }
@@ -142,22 +141,22 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
             }
         }
 
-        private val callBack: PropertyObserver<Any, Any> = { _,_,_ -> spinner.set(property.get().toInt()) }
+        private val callBack: PropertyObserver<Any, Any> = { _,_,_ -> spinButton.set(property.get().toInt()) }
 
         init {
             updateWhen += callBack
 
-            children += listOf(spinner, Label(property.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }))
+            children += listOf(spinButton, Label(property.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }))
 
-            // Label is centered below spinner, which is stretched to fit its parent's width
-            layout = constrain(children[0], children[1]) { spinner, label ->
-                spinner.top    eq 0
-                spinner.left   eq 0
-                spinner.right  eq parent.right
-                spinner.height eq spinnerHeight
-                label.top      eq spinner.bottom + 2
-                label.centerX  eq parent.centerX
-                label.height   eq label.height.readOnly
+            // Label is centered below spinButton, which is stretched to fit its parent's width
+            layout = constrain(children[0], children[1]) { spinButton, label ->
+                spinButton.top    eq 0
+                spinButton.left   eq 0
+                spinButton.right  eq parent.right
+                spinButton.height eq spinButtonHeight
+                label.top         eq spinButton.bottom + 2
+                label.centerX     eq parent.centerX
+                label.height      eq label.height.readOnly
             }
         }
 
@@ -177,7 +176,7 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
         layout = constrain(children[0], property1, property2) { label, first, second ->
             label.top     eq second.top
             label.left    eq spacing
-            label.height  eq spinnerHeight
+            label.height  eq spinButtonHeight
             first.centerY eq parent.centerY.writable
             first.right   eq second.left - spacing
             first.width   eq second.width
@@ -218,16 +217,16 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
                 }
             }
 
-            val rotationSlider = CircularSlider(0.0 .. 359.0).apply {
+            val rotationSlider = CircularSlider(0 * degrees .. 360 * degrees).apply {
                 size     = Size(50)
-                value    = photoAngle.angle
+                value    = photoAngle.angle * degrees
                 behavior = BasicCircularSliderBehavior(thickness = 18.0)
-                changed += { _,_,new -> photoAngle.angle = new }
+                changed += { _,_,new -> photoAngle.angle = new `in` degrees }
             }
 
             photo.transformChanged += { _,_,_ ->
                 photoAngle.angle     = computeAngle(photo) `in` degrees
-                rotationSlider.value = photoAngle.angle
+                rotationSlider.value = photoAngle.angle * degrees
             }
 
             children += propertyGroup("Size",     Property(photo::width, photoBoundsChanged), Property(photo::height,     photoBoundsChanged                 ))

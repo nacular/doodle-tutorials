@@ -9,7 +9,7 @@ import io.nacular.doodle.application.Modules.Companion.KeyboardModule
 import io.nacular.doodle.application.application
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicCircularProgressIndicatorBehavior
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicLabelBehavior
-import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicMutableSpinnerBehavior
+import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicMutableSpinButtonBehavior
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeTextFieldBehavior
 import org.kodein.di.DI.Module
 import org.kodein.di.bindSingleton
@@ -26,7 +26,7 @@ fun main() {
         DragDropModule,
         basicLabelBehavior(),
         nativeTextFieldBehavior(spellCheck = false),
-        basicMutableSpinnerBehavior(),
+        basicMutableSpinButtonBehavior(),
         basicCircularProgressIndicatorBehavior(thickness = 18.0),
         Module(name = "AppModule") {
             bindSingleton<Animator> { AnimatorImpl(instance(), instance()) }
