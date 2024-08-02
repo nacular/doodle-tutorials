@@ -9,6 +9,7 @@ jupiterVersion                   = { strictly = "5.10.0" }
 logbackVersion                   = { strictly = "1.4.11" }
 ktorVersion                      = { strictly = "2.3.8"  }
 serializationVersion             = { strictly = "1.6.3"  }
+dateTimeVersion                  = { strictly = "0.5.0"  }
 
 [libraries]
 mockk                            = { module = "io.mockk:mockk",                                   version.ref = "mockkVersion"         }
