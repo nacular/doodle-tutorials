@@ -6,10 +6,9 @@ hide_title: true
 import Tabs      from '@theme/Tabs'
 import TabItem   from '@theme/TabItem'
 
-import Gradle            from '!!raw-loader!../../Contacts/build.gradle.kts';
-import RunnerGradle      from '!!raw-loader!../../ContactsRunner/build.gradle.kts';
+import Gradle            from '!!raw-loader!../../Contacts/build.gradle.kts'
 import {KPlayground}     from '../src/components/KotlinPlayground'
-import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
+import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock'
 
 # [Contacts](https://github.com/nacular/doodle-tutorials/tree/master/Contacts) Tutorial
 
@@ -47,13 +46,6 @@ classDiagram
 [**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/Contacts/build.gradle.kts)
 
 <KPlayground>{Gradle}</KPlayground>
-
-</TabItem>
-<TabItem value="runner" label="ContactsRunner">
-
-[**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/ContactsRunner/build.gradle.kts)
-
-<KPlayground>{RunnerGradle}</KPlayground>
 
 :::warning
 The desktop application uses placeholder icons in some cases to work-around a known [Skiko bug](https://github.com/JetBrains/skiko/issues/518) related to SVG path data parsing.

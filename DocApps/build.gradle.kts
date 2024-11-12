@@ -16,16 +16,17 @@ kotlin {
     }
 
     sourceSets {
-        jsMain {
-            dependencies {
-                implementation(project(":Calculator"))
-                implementation(project(":Todo"      ))
-                implementation(project(":Photos"    ))
-                implementation(project(":Contacts"  ))
-                implementation(project(":TabStrip"  ))
-                implementation(project(":TimedCards"))
-                implementation(libs.doodle.browser)
-            }
+        commonMain.dependencies {
+            api(project(":Calculator"))
+            api(project(":Todo"      ))
+            api(project(":Photos"    ))
+            api(project(":Contacts"  ))
+            api(project(":TabStrip"  ))
+            api(project(":TimedCards"))
+        }
+
+        jsMain.dependencies {
+            implementation(libs.doodle.browser)
         }
     }
 }

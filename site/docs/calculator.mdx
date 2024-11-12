@@ -8,8 +8,8 @@ import TabItem   from '@theme/TabItem'
 import CodeBlock from '@theme/CodeBlock';
 
 import Gradle            from '!!raw-loader!../../Calculator/build.gradle.kts';
-import RunnerGradle      from '!!raw-loader!../../CalculatorRunner/build.gradle.kts';
 import Toml              from '!!raw-loader!../../gradle/libs.versions.toml';
+import WebMain           from '!!raw-loader!../../Calculator/src/jsMain/kotlin/io/nacular/doodle/examples/Main.kt';
 import {KPlayground}     from '../src/components/KotlinPlayground'
 import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
 
@@ -27,33 +27,11 @@ You can also see the full-screen apps here: [JavaScript](https://nacular.github.
 
 ## Project Setup
 
-We will use a multi-platform library setup for this app, with a multiplatform launcher that depends on it. This is not necessary to use Doodle. You could create a single multiplatform build with the common parts of your app in `commonMain` etc.. This setup is used here because these apps are also launched by an app within `DocApps` when embedding them like below. Therefore, we need a pure library for each app. This is why there is an app and a runner.
-
-```mermaid
- classDiagram
-      Calculator <|-- CalculatorRunner
-      Calculator <|-- DocApps
-      CalculatorRunner: jvmMain.main
-      CalculatorRunner: jsMain.main
-      DocApps         : main
-```
-
-<Tabs>
-<TabItem value="Calculator">
+This app uses a Kotlin Multiplatform setup so it can be run on all Doodle supported targets. The application logic itself is located in `commonMain`, which means it is entirely reused for each platform. In fact, the same app is used unchanged (just targeting JS) within this documentation.
 
 [**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/Calculator/build.gradle.kts)
 
 <KPlayground>{Gradle}</KPlayground>
-
-</TabItem>
-<TabItem value="CalculatorRunner">
-
-[**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/CalculatorRunner/build.gradle.kts)
-
-<KPlayground>{RunnerGradle}</KPlayground>
-
-</TabItem>
-</Tabs>
 
 :::info
 Build uses [libs.versions.toml](https://github.com/nacular/doodle-tutorials/blob/master/gradle/libs.versions.toml) file.
@@ -86,36 +64,15 @@ class CalculatorApp(display: Display): Application {
 Notice that `shutdown` is a no-op, since we don't have any cleanup to do when the app closes.
 :::
 
-## Launching on Web and Desktop
+## Launching Your App
 
-Doodle apps can be [launched](https://nacular.github.io/doodle/docs/applications) in a few different ways on Web and Desktop. We defined our app logic in a multi-platform `Calculator` library (no `main` functions), so it can be used on both platforms. Notice that we are only using a library here because we also want to run the Calculator in our documentation app. That app will run it as an embedded Web app, which becomes easier if it is a library. Otherwise, we could have defined our platform `main` functions directly in the `Calculator` module. Instead, we created a separate `CalculatorRunner` module that contains our `main` functions.
+Doodle apps can be [launched](https://nacular.github.io/doodle/docs/applications) in a few different ways on Web and Desktop. Use the `application` function to launch top-level apps. It takes a list of modules to and a lambda that builds the app. This lambda is within a Kodein injection context, which means we can inject dependencies into our app via `instance`, `provider`, etc.
 
-## Creating A Fullscreen Web App
+**main.kt**
 
-We create a helper to launch the app in [full screen](https://nacular.github.io/doodle/docs/applications#top-level-apps).
+<KPlayground>{WebMain}</KPlayground>
 
-[**FullScreen.kt**](https://github.com/nacular/doodle-tutorials/blob/master/Calculator/src/jsMain/kotlin/io/nacular/doodle/examples/FullScreen.kt#L12)
-
-<KPlayground>{`
-package io.nacular.doodle.examples
-
-//...
-
-fun fullScreen() {
-    application(modules = listOf(PointerModule)) {
-        // load app
-        CalculatorApp(instance()) // provide the Display
-    }
-}
-`}</KPlayground>
-
-:::tip
-Normally this would just be your `main` function, but this would prevent the app from being used as a library. Which is what happens to allow both an embedded (in the docs) and full-screen version.
-:::
-
-Use the `application` function to launch top-level apps. It takes a list of modules to and a lambda that builds the app. This lambda is within a Kodein injection context, which means we can inject dependencies into our app via `instance`, `provider`, etc.
-
-Notice that we have included the [`PointerModule`](https://nacular.github.io/doodle/docs/pointer_input/overview). This is needed to enable mouse or pointer interactions. Our app will not directly know we loaded this module, but pointer related events will only work because we have.
+Notice that we have included the [`FontModule`](https://nacular.github.io/doodle/docs/rendering/text#fonts) and [`PointerModule`](https://nacular.github.io/doodle/docs/user_input/pointer). These are needed to enable font loading and pointer interactions. Our app will not directly know we loaded the `PointerModule`, but pointer related events will only work because we have.
 
 :::tip
 Check out Kodein to learn more about how it handles dependency injection.

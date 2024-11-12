@@ -8,12 +8,11 @@ import TabItem   from '@theme/TabItem'
 import CodeBlock from '@theme/CodeBlock';
 
 import Gradle            from '!!raw-loader!../../TimedCards/build.gradle.kts';
-import RunnerGradle      from '!!raw-loader!../../TimedCardsRunner/build.gradle.kts';
 import TimedCardsApp     from '!!raw-loader!../../TimedCards/src/commonMain/kotlin/io/nacular/doodle/examples/TimedCardsApp.kt';
 import CardPresenter     from '!!raw-loader!../../TimedCards/src/commonMain/kotlin/io/nacular/doodle/examples/CardPresenter.kt';
 import ButtonControls    from '!!raw-loader!../../TimedCards/src/commonMain/kotlin/io/nacular/doodle/examples/ButtonControls.kt';
 import Card              from '!!raw-loader!../../TimedCards/src/commonMain/kotlin/io/nacular/doodle/examples/Card.kt';
-import WebMain           from '!!raw-loader!../../TimedCardsRunner/src/jsMain/kotlin/main.kt';
+import WebMain           from '!!raw-loader!../../TimedCards/src/jsMain/kotlin/main.kt';
 import {KPlayground}     from '../src/components/KotlinPlayground'
 import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
 
@@ -52,13 +51,6 @@ This app (like the others in this tutorial) is created as a multi-platform libra
 [**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/TimedCards/build.gradle.kts)
 
 <KPlayground>{Gradle}</KPlayground>
-
-</TabItem>
-<TabItem value="TimedCardsRunner">
-
-[**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/TimedCardsRunner/build.gradle.kts)
-
-<KPlayground>{RunnerGradle}</KPlayground>
 
 </TabItem>
 </Tabs>

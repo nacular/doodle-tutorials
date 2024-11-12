@@ -63,12 +63,12 @@ suspend fun loadFonts(fonts: FontLoader): Fonts {
  * Creates the model that stores data for the Carousel
  */
 suspend fun createModel(images: ImageLoader) = SimpleListModel(listOf(
-    listOf("biker",    Rectangle(162,   0, 784, 1208), "Switzerland Alps",              "SAINT\nANTÖNIEN"        ),
-    listOf("monkey",   Rectangle(190,   0, 575,  886), "Japan Alps",                    "NAGANO\nPREFECTURE"     ),
-    listOf("dunes",    Rectangle(316,   0, 298,  459), "Sahara Desert - Morocco",       "MARRAKECH\nMERZOUGA"    ),
-    listOf("yosemite", Rectangle(107,   0, 360,  555), "Sierra Nevada - United States", "YOSEMITE\nNATIONAL PARK"),
-    listOf("surfer",   Rectangle(745,   0, 778, 1199), "Tanifa - Spain",                "LOS LANCES\nBEACH"      ),
-    listOf("balloons", Rectangle(892, 148, 769, 1185), "Cappadocia - Turkey",           "GÖREME\nVALLEY"         ),
+    listOf("biker",    Rectangle(162,   0, 784, 1208), "Switzerland Alps",        "SAINT\nANTÖNIEN"        ),
+    listOf("monkey",   Rectangle(190,   0, 575,  886), "Japan Alps",              "NAGANO\nPREFECTURE"     ),
+    listOf("dunes",    Rectangle(316,   0, 298,  459), "Sahara Desert - Morocco", "MARRAKECH\nMERZOUGA"    ),
+    listOf("yosemite", Rectangle(107,   0, 360,  555), "Sierra Nevada - US",      "YOSEMITE\nNATIONAL PARK"),
+    listOf("surfer",   Rectangle(745,   0, 778, 1199), "Tanifa - Spain",          "LOS LANCES\nBEACH"      ),
+    listOf("balloons", Rectangle(892, 148, 769, 1185), "Cappadocia - Turkey",     "GÖREME\nVALLEY"         ),
 ).map { (name, clip, header, title) ->
     CardData(images.load("$name.png")!!, header as String, title as String, clip as Rectangle)
 })
