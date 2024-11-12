@@ -1,8 +1,8 @@
 [versions]
-kotlinVersion                    = { strictly = "1.9.23" }
+kotlinVersion                    = { strictly = "1.9.25" }
 coroutinesVersion                = { strictly = "1.8.0"  }
 kodeinVersion                    = { strictly = "7.21.1" }
-doodleVersion                    = { strictly = "0.10.2" }
+doodleVersion                    = { strictly = "0.10.3" }
 slf4jVersion                     = { strictly = "2.0.9"  }
 mockkVersion                     = { strictly = "1.13.7" }
 jupiterVersion                   = { strictly = "5.10.0" }
