@@ -29,6 +29,7 @@ kotlin {
         }
 
         jvmMain.dependencies {
+            // osTarget() defined in buildSrc/src/main/kotlin/Common.kt
             when (osTarget()) {
                 "macos-x64"     -> implementation(libs.doodle.desktop.jvm.macos.x64    )
                 "macos-arm64"   -> implementation(libs.doodle.desktop.jvm.macos.arm64  )

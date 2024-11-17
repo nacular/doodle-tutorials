@@ -26,6 +26,7 @@ kotlin {
         }
 
         jvmMain.dependencies {
+            // osTarget() defined in buildSrc/src/main/kotlin/Common.kt
             when (osTarget()) {
                 "macos-x64"     -> implementation(libs.doodle.desktop.jvm.macos.x64    )
                 "macos-arm64"   -> implementation(libs.doodle.desktop.jvm.macos.arm64  )
@@ -39,7 +40,6 @@ kotlin {
         jvmTest.dependencies {
             implementation(kotlin("test-junit"))
             implementation(libs.bundles.test.libs)
-//            implementation(libs.doodle.browser)
         }
     }
 }

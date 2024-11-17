@@ -20,7 +20,7 @@ import io.nacular.doodle.drawing.Color.Companion.White
 import io.nacular.doodle.examples.CalculatorApp
 import io.nacular.doodle.examples.DataStore
 import io.nacular.doodle.examples.FilterButtonProvider
-import foo.LocalStorePersistence
+import io.nacular.doodle.examples.LocalStorePersistence
 import io.nacular.doodle.examples.NumberFormatterImpl
 import io.nacular.doodle.examples.PersistentStore
 import io.nacular.doodle.examples.PhotosApp
@@ -28,7 +28,8 @@ import io.nacular.doodle.examples.Router
 import io.nacular.doodle.examples.TabStripApp
 import io.nacular.doodle.examples.TimedCardsApp
 import io.nacular.doodle.examples.TodoApp
-import foo.TrivialRouter
+import io.nacular.doodle.examples.TrivialRouter
+import io.nacular.doodle.examples.calculator.CalculatorImages
 import io.nacular.doodle.examples.contacts.AppConfig
 import io.nacular.doodle.examples.contacts.AppConfigImpl
 import io.nacular.doodle.examples.contacts.Contact
@@ -71,6 +72,14 @@ fun calculator(element: HTMLElement) {
 }
 
 @JsExport
+fun calculatorImages(element: HTMLElement) {
+    application(root = element, modules = listOf(FontModule, PointerModule)) {
+        // load app
+        CalculatorImages(instance(), instance(), instance(), NumberFormatterImpl())
+    }
+}
+
+@JsExport
 fun todo(element: HTMLElement) {
     class EmbeddedFilterButtonProvider(private val dataStore: DataStore): FilterButtonProvider {
         override fun invoke(text: String, filter: DataStore.Filter?, behavior: Behavior<Button>) = PushButton(text).apply {
@@ -85,10 +94,10 @@ fun todo(element: HTMLElement) {
     application(root = element, modules = listOf(FontModule, ImageModule, PointerModule, KeyboardModule, basicLabelBehavior(),
             nativeTextFieldBehavior(), nativeHyperLinkBehavior(), nativeScrollPanelBehavior(smoothScrolling = true),
             Module(name = "AppModule") {
-                bindSingleton<PersistentStore>      { LocalStorePersistence                   (          ) }
-                bindSingleton                       { DataStore                               (instance()) }
-                bindSingleton<Router>               { TrivialRouter(window    ) }
-                bindSingleton<FilterButtonProvider> { EmbeddedFilterButtonProvider            (instance()) }
+                bindSingleton<PersistentStore>      { LocalStorePersistence       (          ) }
+                bindSingleton                       { DataStore                   (instance()) }
+                bindSingleton<Router>               { TrivialRouter               (window    ) }
+                bindSingleton<FilterButtonProvider> { EmbeddedFilterButtonProvider(instance()) }
 
             }
     )) {

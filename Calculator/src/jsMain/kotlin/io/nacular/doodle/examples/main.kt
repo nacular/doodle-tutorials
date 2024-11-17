@@ -8,9 +8,16 @@ import org.kodein.di.instance
 /**
  * Creates a [CalculatorApp]
  */
+//sampleStart
 fun main() {
     application(modules = listOf(FontModule, PointerModule)) {
         // load app
-        CalculatorApp(instance(), instance(), instance(), NumberFormatterImpl())
+        CalculatorApp(
+            display         = instance(),
+            textMetrics     = instance(),
+            fonts    = instance(),
+            numberFormatter = NumberFormatterImpl()
+        )
     }
 }
+//sampleEnd

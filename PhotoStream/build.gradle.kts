@@ -9,16 +9,14 @@ kotlin {
     wasmJsTargets(executable = true)
 
     sourceSets {
-        jsMain {
-            dependencies {
-                implementation(libs.bundles.ktor.client)
-                implementation(libs.coroutines.core    )
-                implementation(libs.serialization.json )
+        jsMain.dependencies {
+            implementation(libs.bundles.ktor.client)
+            implementation(libs.coroutines.core    )
+            implementation(libs.serialization.json )
 
-                api(libs.doodle.browser )
-                api(libs.doodle.controls)
-                api(libs.doodle.themes  )
-            }
+            implementation(libs.doodle.themes  )
+            implementation(libs.doodle.browser )
+            implementation(libs.doodle.controls)
         }
     }
 }

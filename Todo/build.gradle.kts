@@ -12,8 +12,8 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api(libs.coroutines.core   )
-            api(libs.serialization.json)
+            api(libs.coroutines.core   ) // font loading
+            api(libs.serialization.json) // persistence
 
             api(libs.doodle.themes     )
             api(libs.doodle.controls   )
@@ -34,6 +34,7 @@ kotlin {
         }
 
         jvmMain.dependencies {
+            // osTarget() defined in buildSrc/src/main/kotlin/Common.kt
             when (osTarget()) {
                 "macos-x64"     -> implementation(libs.doodle.desktop.jvm.macos.x64    )
                 "macos-arm64"   -> implementation(libs.doodle.desktop.jvm.macos.arm64  )

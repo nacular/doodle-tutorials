@@ -1,6 +1,5 @@
 package io.nacular.doodle.examples
 
-import JsName
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -16,34 +15,34 @@ import kotlin.test.expect
  * Illustrating how you could test [Calculator].
  */
 class CalculatorTests {
-    @Test @JsName("test1")
+    @Test
     fun `1 + 4 5 = 46`() {
-        expect(46.0) { compute { listOf(`1`, plusButton, `4`, `5`, equalButton) } }
+        expect(46.0) { compute { listOf(`1`, plus, `4`, `5`, equal) } }
     }
 
-    @Test @JsName("test2")
+    @Test
     fun `1 - + 4 5 = 46`() {
-        expect(46.0) { compute { listOf(`1`, minusButton, plusButton, `4`, `5`, equalButton) } }
+        expect(46.0) { compute { listOf(`1`, minus, plus, `4`, `5`, equal) } }
     }
 
-    @Test @JsName("simpleNegation")
+    @Test
     fun `- 1 = -1`() {
-        expect(-1.0) { compute { listOf(negate, `1`, equalButton) } }
+        expect(-1.0) { compute { listOf(negate, `1`, equal) } }
     }
 
-    @Test @JsName("negationToggles")
+    @Test
     fun `- - 2 3 4 = 234`() {
-        expect(234.0) { compute { listOf(negate, negate, `2`, `3`, `4`, equalButton) } }
+        expect(234.0) { compute { listOf(negate, negate, `2`, `3`, `4`, equal) } }
     }
 
-    @Test @JsName("decimals")
+    @Test
     fun `decimal 123 = _123`() {
-        expect(0.123) { compute { listOf(decimal, `1`, `2`, `3`, equalButton) } }
+        expect(0.123) { compute { listOf(decimal, `1`, `2`, `3`, equal) } }
     }
 
-    @Test @JsName("decimalIdempotent")
+    @Test
     fun `decimal decimal 123 = _123`() {
-        expect(0.123) { compute { listOf(decimal, decimal, `1`, `2`, `3`, equalButton) } }
+        expect(0.123) { compute { listOf(decimal, decimal, `1`, `2`, `3`, equal) } }
     }
 
     private fun compute(block: Calculator.() -> List<Button>): Double {

@@ -12,30 +12,29 @@ import kotlinx.coroutines.SupervisorJob
 /**
  * Simple calculate app that places a [Calculator] at the center of the display.
  */
+//sampleStart
 class CalculatorApp(
-        display        : Display,
-        textMetrics    : TextMetrics,
-        fontDetector   : FontLoader,
-        numberFormatter: NumberFormatter
+    display        : Display,
+    textMetrics    : TextMetrics,
+    fonts          : FontLoader,
+    numberFormatter: NumberFormatter
 ): Application {
     init {
         val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
-        // creat and display a single Calculator
-        display += Calculator(fontDetector, appScope, textMetrics, numberFormatter).apply {
-            // layout the Display whenever the Calculator's size preferences are updated.
-            // this allows us to constrain its size to match its ideal size (which it sets).
+        display += Calculator(fonts, appScope, textMetrics, numberFormatter).apply {
             sizePreferencesChanged += { _,_,_ ->
                 display.relayout()
             }
         }
 
         display.layout = constrain(display.children[0]) {
-            it.width  eq (display.children.firstOrNull()?.idealSize?.width  ?: 0.0) // set width to ideal width or 0 if no ideal size set
-            it.height eq (display.children.firstOrNull()?.idealSize?.height ?: 0.0) // set height to ideal height or 0 if no ideal size set
+            it.width  eq (display.children.firstOrNull()?.idealSize?.width  ?: 0.0)
+            it.height eq (display.children.firstOrNull()?.idealSize?.height ?: 0.0)
             it.center eq parent.center
         }
     }
 
     override fun shutdown() { /* no-op */ }
 }
+//sampleEnd

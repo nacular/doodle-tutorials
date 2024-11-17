@@ -41,10 +41,10 @@ import kotlin.math.pow
  * @property numberFormatter used to display number output
  */
 class Calculator(
-        private val fonts          : FontLoader,
-                    appScope       : CoroutineScope,
-        private val textMetrics    : TextMetrics,
-        private val numberFormatter: NumberFormatter
+    private val fonts          : FontLoader,
+                appScope       : CoroutineScope,
+    private val textMetrics    : TextMetrics,
+    private val numberFormatter: NumberFormatter
 ): View() {
     // region ================ Helper Classes ==================================
 
@@ -129,19 +129,18 @@ class Calculator(
 
     // region ================ Internal State ==================================
 
-    private var activeOperator: OperatorButton? = null
-        set(new) {
-            field = new
+    private var activeOperator: OperatorButton? = null; set(new) {
+        field = new
 
-            when (field) {
-                null -> {
-                    divButtton.selected  = false
-                    timesButton.selected = false
-                    minusButton.selected = false
-                    plusButton.selected  = false
-                }
+        when (field) {
+            null -> {
+                div.selected  = false
+                times.selected = false
+                minus.selected = false
+                plus.selected  = false
             }
         }
+    }
 
     private var reset             = true                    // indicates when to begin a new operand
     private var negated           = false                   // tracks whether number is negative
@@ -158,12 +157,12 @@ class Calculator(
 
     val result get() = output.number
 
-    val divButtton  = OperatorButton("÷", method = Double::div  )
-    val timesButton = OperatorButton("x", method = Double::times)
-    val minusButton = OperatorButton("-", method = Double::minus)
-    val plusButton  = OperatorButton("+", method = Double::plus )
+    val div   = OperatorButton("÷", method = Double::div  )
+    val times = OperatorButton("x", method = Double::times)
+    val minus = OperatorButton("-", method = Double::minus)
+    val plus  = OperatorButton("+", method = Double::plus )
 
-    val clear  = func("AC" ).apply {
+    val clear = func("AC" ).apply {
         fired += {
             output.number = 0.0
             clearInternalState()
@@ -180,7 +179,7 @@ class Calculator(
         }
     }
 
-    val percentButton = func("%").apply {
+    val percent = func("%").apply {
         fired += {
             output.number *= 0.01
         }
@@ -197,7 +196,7 @@ class Calculator(
         }
     }
 
-    val equalButton = func("=", operatorColor, White).apply {
+    val equal = func("=", operatorColor, White).apply {
         fired += {
             compute()
             clearInternalState()
@@ -310,61 +309,67 @@ class Calculator(
                 output.font        = fonts(lightFont) { size = 72 }
                 clear.font         = lightFont
                 negate.font        = lightFont
-                percentButton.font = lightFont
+                percent.font = lightFont
             }
         }
     }
 
+//sampleStart
     init {
         appScope.launch {
             loadFonts()
 
-            ButtonGroup(allowDeselectAll = true, buttons = arrayOf(timesButton, timesButton, minusButton, plusButton))
+            ButtonGroup(allowDeselectAll = true, buttons = arrayOf(times, times, minus, plus))
 
             val outputHeight  = 100.0
             val buttonSpacing =  10.0
 
+            // Use GridPanel to hold all buttons
             val gridPanel = GridPanel().apply {
-                add(clear, 0, 0); add(negate, 0, 1); add(percentButton, 0, 2); add(divButtton,   0, 3)
-                add(`7`,   1, 0); add(`8`,    1, 1); add(`9`,           1, 2); add(timesButton,  1, 3)
-                add(`4`,   2, 0); add(`5`,    2, 1); add(`6`,           2, 2); add(minusButton,  2, 3)
-                add(`1`,   3, 0); add(`2`,    3, 1); add(`3`,           3, 2); add(plusButton,   3, 3)
-                add(`0`,   4, 0,  columnSpan = 2  ); add(decimal,       4, 2); add(equalButton,  4, 3)
+                add(clear, 0, 0); add(negate, 0, 1); add(percent, 0, 2); add(div,   0, 3)
+                add(`7`,   1, 0); add(`8`,    1, 1); add(`9`,     1, 2); add(times, 1, 3)
+                add(`4`,   2, 0); add(`5`,    2, 1); add(`6`,     2, 2); add(minus, 2, 3)
+                add(`1`,   3, 0); add(`2`,    3, 1); add(`3`,     3, 2); add(plus,  3, 3)
+                add(`0`,   4, 0,  columnSpan = 2  ); add(decimal, 4, 2); add(equal, 4, 3)
 
                 rowSpacing    = { buttonSpacing }
                 columnSpacing = { buttonSpacing }
             }
 
+            // Add output and gridPanel to the Calculator view
             children += listOf(output, gridPanel)
 
-            // Place output outside grid so the height can be more easily controlled
+            val insets = 10.0
+
+            // Place Output outside grid so the height can be more easily controlled
             val constraints = constrain(output, gridPanel) { output, grid ->
-                output.top    eq 0
-                output.left   eq 0
-                output.right  eq parent.right
+                output.top    eq insets
+                output.left   eq insets
+                output.right  eq parent.right - insets
                 output.height eq outputHeight
 
                 grid.top      eq output.bottom + buttonSpacing
                 grid.left     eq output.left
                 grid.right    eq output.right
-                grid.bottom   eq parent.bottom
+                grid.bottom   eq parent.bottom - insets
             }
 
             layout = object: Layout by constraints {
                 // Set total height to grid panel's ideal width and height, plus output and spacing
                 override fun idealSize(container: PositionableContainer, default: Size?) = gridPanel.idealSize?.let {
-                    Size(it.width, it.height + outputHeight + buttonSpacing)
+                    Size(it.width + 2 * insets, it.height + outputHeight + buttonSpacing + 2 * insets)
                 }
             }
 
             // Force idealSize when gridPanel is laid out
             gridPanel.sizePreferencesChanged += { _,_,new ->
-                idealSize = new.idealSize?.let { Size(it.width, it.height + outputHeight + buttonSpacing) }
+                idealSize = new.idealSize?.let { Size(it.width + 2 * insets, it.height + outputHeight + buttonSpacing + 2 * insets) }
             }
         }
     }
+//sampleEnd
 
     override fun render(canvas: Canvas) {
-        canvas.rect(bounds.atOrigin, color = Black)
+        canvas.rect(bounds.atOrigin, radius = 40.0, color = Black)
     }
 }

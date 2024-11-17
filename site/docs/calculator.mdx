@@ -9,7 +9,9 @@ import CodeBlock from '@theme/CodeBlock';
 
 import Gradle            from '!!raw-loader!../../Calculator/build.gradle.kts';
 import Toml              from '!!raw-loader!../../gradle/libs.versions.toml';
-import WebMain           from '!!raw-loader!../../Calculator/src/jsMain/kotlin/io/nacular/doodle/examples/Main.kt';
+import WebMain           from '!!raw-loader!../../Calculator/src/jsMain/kotlin/io/nacular/doodle/examples/main.kt';
+import Calculator        from '!!raw-loader!../../Calculator/src/commonMain/kotlin/io/nacular/doodle/examples/Calculator.kt';
+import CalculatorApp     from '!!raw-loader!../../Calculator/src/commonMain/kotlin/io/nacular/doodle/examples/CalculatorApp.kt';
 import {KPlayground}     from '../src/components/KotlinPlayground'
 import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
 
@@ -27,21 +29,27 @@ You can also see the full-screen apps here: [JavaScript](https://nacular.github.
 
 ## Project Setup
 
-This app uses a Kotlin Multiplatform setup so it can be run on all Doodle supported targets. The application logic itself is located in `commonMain`, which means it is entirely reused for each platform. In fact, the same app is used unchanged (just targeting JS) within this documentation.
+### Build
 
-[**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/Calculator/build.gradle.kts)
+The `build.gradle.kts` file defines how the app is configured and all its dependencies. In our case, we will use a multi-plaform configuration so our app can run on all Doodle supported targets.
+
+**build.gradle.kts**
 
 <KPlayground>{Gradle}</KPlayground>
 
 :::info
-Build uses [libs.versions.toml](https://github.com/nacular/doodle-tutorials/blob/master/gradle/libs.versions.toml) file.
+The gradle build uses [libs.versions.toml](https://github.com/nacular/doodle-tutorials/blob/master/gradle/libs.versions.toml) file.
 :::
 
-## Defining Our Application
+### Source Files
 
-All Doodle apps must implement the [`Application`](https://nacular.github.io/doodle/docs/applications) interface. The framework will then initialize our app via the constructor. Our app will be fairly simple: just create an instance of our calculator and add it to the display.
+All source code and resources are located under the `src` directory. The application logic itself is located in the common source set (`src/commonMain`), which means it is entirely reused for each platform. In fact, the same app is used unchanged (just targeting JS) within this documentation. Font files are located in `src/commonMain/resources`. Then we have the platform-specific launch code in `src/jsMain`, `src/wasmJsMain` and `src/jvmMain`. Lastly, there are some app tests written for the JVM in `src/jvmTest`.
 
-Doodle apps can be defined in `commonMain`, since they do not require any platform-specific dependencies. Therefore, we will do the same and place ours in `commonMain/kotlin/io/nacular/doodle/examples`.
+## The Application
+
+All Doodle apps must implement the [`Application`](https://nacular.github.io/doodle/docs/applications) interface. The constructor is used as the app's initialization entry point, and it is called as part of the `application` launch block. Doodle apps can be created in a platform agnostic way and placed into the `commonMain` source set so they are usable on multiple targets. This is how we will define the Calculator app.
+
+This app will be fairly simple: just create an instance of our calculator and add it to the display.
 
 [**CalculatorApp.kt**](https://github.com/nacular/doodle-tutorials/blob/master/Calculator/src/commonMain/kotlin/io/nacular/doodle/examples/CalculatorApp.kt#L11)
 
@@ -64,9 +72,9 @@ class CalculatorApp(display: Display): Application {
 Notice that `shutdown` is a no-op, since we don't have any cleanup to do when the app closes.
 :::
 
-## Launching Your App
+## App Launcher
 
-Doodle apps can be [launched](https://nacular.github.io/doodle/docs/applications) in a few different ways on Web and Desktop. Use the `application` function to launch top-level apps. It takes a list of modules to and a lambda that builds the app. This lambda is within a Kodein injection context, which means we can inject dependencies into our app via `instance`, `provider`, etc.
+Doodle apps can be [launched](https://nacular.github.io/doodle/docs/applications) in a few different ways on Web and Desktop. Use the `application` function to launch top-level apps. It takes a list of modules to load and a lambda that builds the app. This lambda is within a Kodein injection context, which means we can inject dependencies into our app via `instance`, `provider`, etc.
 
 **main.kt**
 
@@ -75,27 +83,26 @@ Doodle apps can be [launched](https://nacular.github.io/doodle/docs/applications
 Notice that we have included the [`FontModule`](https://nacular.github.io/doodle/docs/rendering/text#fonts) and [`PointerModule`](https://nacular.github.io/doodle/docs/user_input/pointer). These are needed to enable font loading and pointer interactions. Our app will not directly know we loaded the `PointerModule`, but pointer related events will only work because we have.
 
 :::tip
-Check out Kodein to learn more about how it handles dependency injection.
+Check out [Kodein](https://github.com/kosi-libs/Kodein) to learn more about how it handles dependency injection.
 :::
 
-The `application` function also takes an optional HTML element within which the app will be hosted. The app will be hosted in
-`document.body` if no element is specified.
+The `application` function also takes an optional HTML element (for Web targets) within which the app will be hosted. The app will be hosted in `document.body` if no element is specified.
 
-App launching is the only part of our code that is platform-specific. This makes sense, since it is the only time we might need to know about an HTML element; say when embedding our app in a non-Doodle context.
+App launching is the only part of our code that is platform-specific. This makes sense, since it is where we define concrete dependencies to pass into our app that can vary by platform. It is also where we control how our app runs, which is platform specific.
 
-## The Calculator View
+## Calculator View
 
 We will implement our calculator as a single [`View`](https://nacular.github.io/doodle/docs/views) that manages its state directly. This makes sense for simple use-cases, but might not be the right choice for larger apps.
 
 This View will be broken into a hierarchy of views, with two top-level items: a custom output and a [`GridPanel`](https://nacular.github.io/doodle/docs/ui_components/overview#gridpanel).
 
+<DoodleCodeBlock function="calculatorImages" height="500" />
+
 <br />
 <img src="/doodle-tutorials/calc-top2.png" alt="calculator top" />
 <img src="/doodle-tutorials/calc-bottom2.png" alt="calculator bottom" style={{float:'right'}} />
 
-### Calculator Output
-
-The Output will be a really simple View that tracks a number and its text representation, which it will render to the screen. It will also expose the number as the current "answer" on the calculator. Its most complex role is displaying the text with proper alignment and scaling to avoid any clipping.
+The [**Output**](https://github.com/nacular/doodle-tutorials/blob/master/Calculator/src/commonMain/kotlin/io/nacular/doodle/examples/Calculator.kt#L48) is a really simple `View` that tracks a number and its text representation, which it renders to the screen. It also exposes the number as the current "answer" on the calculator. Its most complex role is displaying the text with proper alignment and scaling to avoid any clipping.
 
 :::tip
 Notice how the output text starts off center aligned with the operator buttons; and how it shrinks as the number grows beyond the screen size.
@@ -150,131 +157,45 @@ private inner class Output: View() {
 
 ## More Dependencies
 
-The `Output` class, and others in `Calculator` need things like fonts, and the ability to measure text. Doodle provides these capabilities via interfaces like `FontDetector` and `TextMetrics`. These can be provided to `Calculator` via constructor injection.
-
-That results in a constructor as follows:
+The `Output` class, and others in `Calculator` need things like fonts, and the ability to measure text. Doodle provides these capabilities via interfaces like `FontLoader` and `TextMetrics`. These are provided to `Calculator` via constructor injection. That results in a constructor as follows:
 
 [**Calculator.kt**](https://github.com/nacular/doodle-tutorials/blob/master/Calculator/src/commonMain/kotlin/io/nacular/doodle/examples/Calculator.kt#L35)
 
 <KPlayground>{`
 class Calculator(
-        private val fonts          : FontDetector,
-        private val textMetrics    : TextMetrics,
-        private val numberFormatter: NumberFormatter
+    private val fonts          : FontLoader,
+                appScope       : CoroutineScope,
+    private val textMetrics    : TextMetrics,
+    private val numberFormatter: NumberFormatter
 ): View() {
 }
 `}</KPlayground>
 
-This means `CalculatorApp` needs to be updated as well. We continue by injecting these dependencies there as well.
+This means `CalculatorApp` needs to be updated as well. We continue by injecting these dependencies there.
 
-<KPlayground>{`
-package io.nacular.doodle.examples
+<KPlayground>{CalculatorApp}</KPlayground>
 
-// ...
+Now `main` needs to provide these, along with `Display`, when constructing the app.
 
-class CalculatorApp(
-        display        : Display,
-        textMetrics    : TextMetrics,
-        fontDetector   : FontDetector,
-        numberFormatter: NumberFormatter
-): Application {
-    init {
-        // creat and display a single Calculator
-        display += Calculator(fontDetector, textMetrics, numberFormatter)
-    }
-
-    override fun shutdown() { /* no-op */ }
-}
-`}</KPlayground>
-
-Now `Main` needs to provide these, along with Display, when constructing the app.
-
-<KPlayground>{`
-package io.nacular.doodle.examples
-
-//...
-
-fun main() {
-    application(modules = listOf(
-        PointerModule,
-        Module(name = "AppModule") {
-            // Used to get fonts that should've been loaded
-            bind<FontDetector>() with singleton { FontDetectorImpl(instance(), instance(), instance()) }
-        }
-    )) {
-        // load app
-        CalculatorApp(instance(), instance(), instance(), NumberFormatterImpl())
-    }
-}
-`}</KPlayground>
+<KPlayground>{WebMain}</KPlayground>
 
 :::tip
-Unlike `TextMetrics`, `FontDetector` is not included in Doodle's default modules, so we have to wire it explicitly. We define a new `Module` to do so because it has dependencies that can be injected as well.
+Unlike `TextMetrics`, `FontLoader` and is not included in Doodle's default modules, so we have to load it explicitly using the [`FontModule`](https://nacular.github.io/doodle/docs/rendering/text#fonts).
 :::
 
 ## The Buttons
 
-We can manage the set of buttons within the calculator with a `GridPanel`. This way we get the layout support it provides. This results in the following initialization for `Calculator`.
+We can manage the set of buttons within the calculator with a [`GridPanel`](https://nacular.github.io/doodle/docs/ui_components/overview#gridpanel), which provides the kind of layout we need. This results in the following initialization for `Calculator`.
 
 [**Calculator.kt**](https://github.com/nacular/doodle-tutorials/blob/master/Calculator/src/commonMain/kotlin/io/nacular/doodle/examples/Calculator.kt#L35)
 
-<KPlayground>{`
-class Calculator(/*...*/): View() {
+<KPlayground>{Calculator}</KPlayground>
 
-    //...
-
-    init {
-        GlobalScope.launch {
-            loadFonts()
-            ButtonGroup(allowDeselectAll = true, buttons = *arrayOf(\`\u00F7\`, \`*\`, \`-\`, \`+\`))
-
-            val outputHeight  = 100.0
-            val buttonSpacing =  10.0
-
-            val gridPanel = GridPanel().apply {
-                add(clear, 0, 0); add(negate, 0, 1); add(\`\u00F7\`, 0, 2); add(\`\u00F7\`, 0, 3)
-                add(\`7\`,   1, 0); add(\`8\`,    1, 1); add(\`9\`, 1, 2); add(\`*\`, 1, 3)
-                add(\`4\`,   2, 0); add(\`5\`,    2, 1); add(\`6\`, 2, 2); add(\`-\`, 2, 3)
-                add(\`1\`,   3, 0); add(\`2\`,    3, 1); add(\`3\`, 3, 2); add(\`+\`, 3, 3)
-                add(\`0\`,   4, 0,  columnSpan = 2  ); add(decimal, 4, 2); add(\`=\`,  4, 3)
-
-                verticalSpacing   = buttonSpacing
-                horizontalSpacing = buttonSpacing
-            }
-
-            children += listOf(output, gridPanel)
-
-            // Place output outside grid so the height can be more easily controlled
-            val constraints = constrain(output, gridPanel) { output, grid ->
-                output.top    = parent.top
-                output.left   = parent.left
-                output.right  = parent.right
-                output.height = constant(outputHeight)
-                grid.top      = output.bottom + buttonSpacing
-                grid.left     = output.left
-                grid.right    = output.right
-                grid.bottom   = parent.bottom
-            }
-
-            layout = object: Layout by constraints {
-                // Set total height to grid panel's ideal width and height, plus output and spacing
-                override fun idealSize(container: PositionableContainer, default: Size?) = gridPanel.idealSize?.let {
-                    Size(it.width, it.height + outputHeight + buttonSpacing)
-                }
-            }
-
-            // Force idealSize when gridPanel is laid out
-            gridPanel.sizePreferencesChanged += { _,_,new ->
-                idealSize = new.idealSize?.let { Size(it.width, it.height + outputHeight + buttonSpacing) }
-            }
-        }
-    }
-
-    //...
-}
-`}</KPlayground>
-
-The initialization steps are: **(1) load fonts**, **(2) setup buttons in GridPanel**, **(3) add Output and grid as children**, **(4) configure the layout**.
+The final initialization steps are:
+  1) Load fonts
+  2) Setup buttons in `GridPanel`
+  3) Add `Output` and `grid` as children
+  4) Configure the `layout`
 
 This example uses non-standard/recommended property names for buttons to improve readability slightly. This also makes tests a little simpler to understand.
 

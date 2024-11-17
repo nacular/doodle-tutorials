@@ -160,12 +160,14 @@ private class TaskEditOperation(focusManager: FocusManager?, list: MutableList<T
  * @property focusManager used to control focus in the app
  * @property filterButtonProvider used to create the filter buttons
  */
-private class TodoView(private val config              : TodoConfig,
-                       private val dataStore           : DataStore,
-                       private val linkStyler          : NativeHyperLinkStyler,
-                       private val textMetrics         : TextMetrics,
-                       private val focusManager        : FocusManager,
-                       private val filterButtonProvider: FilterButtonProvider): View() {
+private class TodoView(
+    private val config              : TodoConfig,
+    private val dataStore           : DataStore,
+    private val linkStyler          : NativeHyperLinkStyler,
+    private val textMetrics         : TextMetrics,
+    private val focusManager        : FocusManager,
+    private val filterButtonProvider: FilterButtonProvider
+): View() {
 
     init {
         val header = Label("todos").apply {
