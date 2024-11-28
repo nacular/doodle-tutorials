@@ -24,15 +24,14 @@ fun main() {
     val contacts = SimpleContactsModel(FilePersistence())
     val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
 
-        // Contacts App
     application (modules = listOf(
         FontModule,
+        PathModule,
+        ImageModule,
         FocusModule,
         ModalModule,
         PointerModule,
         KeyboardModule,
-        ImageModule,
-        PathModule,
         basicLabelBehavior       (),
         nativeTextFieldBehavior  (),
         nativeHyperLinkBehavior  (),
@@ -40,13 +39,13 @@ fun main() {
         appModule(appScope = appScope, contacts = contacts, uiDispatcher = Dispatchers.UI),
         Module   (name = "PlatformModule") {
             // Platform-specific bindings
-            bindInstance<Router> { TrivialRouter() }
+            bindInstance<Router> { InMemoryRouter() }
         }
     )) {
         // load app
         ContactsApp(
             theme             = instance(),
-            assets            = { AppConfigImpl(instance(), instance()) },
+            config            = { AppConfigImpl(instance(), instance()) },
             router            = instance(),
             Header            = factory(),
             display           = instance(),

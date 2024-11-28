@@ -13,7 +13,7 @@ import io.nacular.doodle.examples.FilterButtonProvider
 import io.nacular.doodle.examples.PersistentStore
 import io.nacular.doodle.examples.Router
 import io.nacular.doodle.examples.TodoApp
-import io.nacular.doodle.examples.TrivialRouter
+import io.nacular.doodle.examples.InMemoryRouter
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicLabelBehavior
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeHyperLinkBehavior
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeScrollPanelBehavior
@@ -41,7 +41,7 @@ fun main() {
             Module(name = "AppModule") {
                 bindSingleton<PersistentStore>      { FilePersistence()                        }
                 bindSingleton                       { DataStore(instance())                    }
-                bindSingleton<Router>               { TrivialRouter()                          }
+                bindSingleton<Router>               { InMemoryRouter()                          }
                 bindSingleton<FilterButtonProvider> { EmbeddedFilterButtonProvider(instance()) }
             }
     )) {

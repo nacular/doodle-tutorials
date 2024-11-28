@@ -383,8 +383,9 @@ class PhotosApp(display     : Display,
 
                         // Use bounds to keep panel updated
                         photo.bounds = Rectangle(
-                                originalPosition - ((originalPosition - originalCenter) * (1 - event.scale)),
-                                originalSize * event.scale)
+                            position = originalPosition - ((originalPosition - originalCenter) * (1 - event.scale)),
+                            size     = originalSize * event.scale
+                        )
 
                         event.consume() // ensure event is consumed from Resizer
                     }
@@ -423,6 +424,8 @@ class PhotosApp(display     : Display,
                 listOf("tetons.jpg", "earth.jpg").forEachIndexed { index, file ->
                     images.load(file)?.let { FixedAspectPhoto(it) }?.let {
                         import(it, display.center + Point(y = index * 50.0))
+
+                        propertyPanel.photo = it
                     }
                 }
             }

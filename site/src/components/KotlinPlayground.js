@@ -1,6 +1,6 @@
-import React            from 'react';
-// import KotlinPlayground from 'kotlin-playground'
-import { findDOMNode }  from 'react-dom';
+import React           from 'react';
+import { findDOMNode } from 'react-dom';
+
 
 export class KPlayground extends React.Component {
     constructor(props) {
@@ -15,7 +15,7 @@ export class KPlayground extends React.Component {
 
     componentDidMount() {
         this.node   = this.ref.current
-        this.parent = findDOMNode(this).parentNode ?? null
+        this.parent = this.node.parentNode
 
         switch (true) {
             case !this.withinTabbedPanel(): this.convertToPlayground      (); break // Ok to load playground since parent should be visible

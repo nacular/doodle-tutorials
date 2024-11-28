@@ -3,17 +3,16 @@ title: Calculator
 hide_title: true
 ---
 
-import Tabs      from '@theme/Tabs'
-import TabItem   from '@theme/TabItem'
-import CodeBlock from '@theme/CodeBlock';
+import Tabs                          from '@theme/Tabs'
+import TabItem                       from '@theme/TabItem'
+import {KPlayground}                 from '../src/components/KotlinPlayground'
+import {DoodleCodeBlock}             from '../src/components/DoodleCodeBlock';
+import {BasicRichTreeView, sanitize} from '../src/components/BasicRichTreeView';
 
-import Gradle            from '!!raw-loader!../../Calculator/build.gradle.kts';
-import Toml              from '!!raw-loader!../../gradle/libs.versions.toml';
-import WebMain           from '!!raw-loader!../../Calculator/src/jsMain/kotlin/io/nacular/doodle/examples/main.kt';
-import Calculator        from '!!raw-loader!../../Calculator/src/commonMain/kotlin/io/nacular/doodle/examples/Calculator.kt';
-import CalculatorApp     from '!!raw-loader!../../Calculator/src/commonMain/kotlin/io/nacular/doodle/examples/CalculatorApp.kt';
-import {KPlayground}     from '../src/components/KotlinPlayground'
-import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
+import Gradle                        from '!!raw-loader!../../Calculator/build.gradle.kts';
+import WebMain                       from '!!raw-loader!../../Calculator/src/jsMain/kotlin/io/nacular/doodle/examples/main.kt';
+import Calculator                    from '!!raw-loader!../../Calculator/src/commonMain/kotlin/io/nacular/doodle/examples/Calculator.kt';
+import CalculatorApp                 from '!!raw-loader!../../Calculator/src/commonMain/kotlin/io/nacular/doodle/examples/CalculatorApp.kt';
 
 # [Calculator](https://github.com/nacular/doodle-tutorials/tree/master/Calculator) Tutorial
 
@@ -29,21 +28,112 @@ You can also see the full-screen apps here: [JavaScript](https://nacular.github.
 
 ## Project Setup
 
-### Build
+The app will use a Kotlin Multiplatform setup, which means we can run it on a range of targets supported by Doodle. The directory structure follows a fairly common layout, with common classes and resources in one source set and platform-specific items in their own.
 
-The `build.gradle.kts` file defines how the app is configured and all its dependencies. In our case, we will use a multi-plaform configuration so our app can run on all Doodle supported targets.
+export const sourceTree = sanitize([
+{ label: 'src', children: [
+    { label: 'commonMain', children: [
+        { label: 'kotlin'    },
+        { label: 'resources' },
+    ] },
+    { label: 'jsMain', children: [
+        { label: 'kotlin'    },
+        { label: 'resources' },
+    ] },
+    { label: 'jvmMain', children: [{ label: 'kotlin' }] },
+    { label: 'jvmTest', children: [{ label: 'kotlin' }] },
+    { label: 'wasmJsMain', children: [
+        { label: 'kotlin'    },
+        { label: 'resources' },
+    ] },
+]},
+{ label: 'build.gradle.kts' }
+]);
+
+:::info Directory Layout
+
+<BasicRichTreeView items={sourceTree} defaultExpandedItems={["src", "src/commonMain"]} defaultSelectedItem={"src"}>
+
+<div value="src">
+
+All source code and resources are located under the `src` directory.
+
+The application logic itself is located in the common source set (`src/commonMain`), which means it is entirely reused for each platform. In fact, the same app is used unchanged (just targeting JS) within this documentation.
+
+</div><div value="src/commonMain">
+
+Source code and resources for that are usable for platforms are stored in `commonMain`. This app is designed to work on all platforms, so our app code and all logic is found under this directory.
+
+</div><div value="src/commonMain/kotlin">
+
+The `kotlin` directory is where all code for a platform resides. In this case, we have all the classes for our app including `CalculatorApp`, `Calculator`, `CalculatorButtonBehavior` and `NumberFormatter`.
+
+All of these classes are platform agnostic and used by all targets. This makes our app work on any target Doodle supports.
+
+</div><div value="src/commonMain/resources">
+
+An app can have resources like fonts, images, etc. that it loads at runtime. This directory contains these resources.
+
+In our case, we will be loading two fonts that we store here.
+
+</div><div value="src/jsMain">
+
+Source code and resources that are needed for Web (JS) target are stored in `jsMain`. Our app is platform agnostic except for the launch portion, which is located in the source below this directory.
+
+</div><div value="src/jsMain/kotlin">
+
+The Web launch portion of our app is located here in the program's `main` function. The JS version uses a platform-specific `NumberFormatter` that is based on `Intl.NumberFormat`.
+
+</div><div value="src/jsMain/resources">
+
+Holds the `index.html` file that loads the generated JS file produced for the Web (JS) target.
+
+</div><div value="src/jvmMain">
+
+Source code and resources that are needed for Desktop (JVM) target are stored in `jvmMain`.
+
+</div><div value="src/jvmMain/kotlin">
+
+The Desktop launch portion of our app is located here in the program's `main` function. This version uses a platform-specific `NumberFormatter` that is based on `java.text.NumberFormat`.
+
+</div><div value="src/jvmTest">
+
+Tests written for our `Calculator` that will be run on the JVM. These tests are here instead of in `commonTest` because they use Mockk, which only runs on the JVM.
+
+</div><div value="src/jvmTest/kotlin">
+
+Tests written for our `Calculator` that will be run on the JVM. These tests are here instead of in `commonTest` because they use Mockk, which only runs on the JVM.
+
+</div><div value="src/wasmJsMain">
+
+Source code and resources that are needed for Web (WASM) target are stored in `wasmJsMain`. Our app is platform agnostic except for the launch portion, which is located in the source below this directory.
+
+</div><div value="src/wasmJsMain/kotlin">
+
+The Web launch portion of our app is located here in the program's `main` function. The WASM version uses a platform-specific `NumberFormatter` that is based on `Intl.NumberFormat`.
+
+</div><div value="src/wasmJsMain/resources">
+
+Holds the `index.html` file that loads the generated JS file produced for the Web (WASM) target.
+
+</div><div value="build.gradle.kts">
+
+The `build.gradle.kts` file defines how the app is configured and all its dependencies. The Calculator app uses a multi-platform configuration so it can run on all Doodle supported targets.
+
+</div>
+
+</BasicRichTreeView>
+:::
+
+Doodle apps are built using gradle like other Kotlin apps. The build is controlled by the `build.gradle.kts` script in the root of the `Calculator` directory.
 
 **build.gradle.kts**
 
 <KPlayground>{Gradle}</KPlayground>
 
 :::info
-The gradle build uses [libs.versions.toml](https://github.com/nacular/doodle-tutorials/blob/master/gradle/libs.versions.toml) file.
+The gradle build uses [gradle version catalogs](https://docs.gradle.org/current/userguide/version_catalogs.html); see [libs.versions.toml](https://github.com/nacular/doodle-tutorials/blob/master/gradle/libs.versions.toml) file for library info.
 :::
-
-### Source Files
-
-All source code and resources are located under the `src` directory. The application logic itself is located in the common source set (`src/commonMain`), which means it is entirely reused for each platform. In fact, the same app is used unchanged (just targeting JS) within this documentation. Font files are located in `src/commonMain/resources`. Then we have the platform-specific launch code in `src/jsMain`, `src/wasmJsMain` and `src/jvmMain`. Lastly, there are some app tests written for the JVM in `src/jvmTest`.
 
 ## The Application
 
@@ -74,7 +164,7 @@ Notice that `shutdown` is a no-op, since we don't have any cleanup to do when th
 
 ## App Launcher
 
-Doodle apps can be [launched](https://nacular.github.io/doodle/docs/applications) in a few different ways on Web and Desktop. Use the `application` function to launch top-level apps. It takes a list of modules to load and a lambda that builds the app. This lambda is within a Kodein injection context, which means we can inject dependencies into our app via `instance`, `provider`, etc.
+Doodle apps can be [launched](https://nacular.github.io/doodle/docs/applications) in a few different ways on Web and Desktop. Use the `application` function in a platform source-set (i.e. `jsMain`, `jvmMain`, etc.) to launch top-level apps. It takes a list of modules to load and a lambda that builds the app. This lambda is within a Kodein injection context, which means we can inject dependencies into our app via `instance`, `provider`, etc.
 
 **main.kt**
 
@@ -94,13 +184,9 @@ App launching is the only part of our code that is platform-specific. This makes
 
 We will implement our calculator as a single [`View`](https://nacular.github.io/doodle/docs/views) that manages its state directly. This makes sense for simple use-cases, but might not be the right choice for larger apps.
 
-This View will be broken into a hierarchy of views, with two top-level items: a custom output and a [`GridPanel`](https://nacular.github.io/doodle/docs/ui_components/overview#gridpanel).
+This View will be broken into a hierarchy of views, with two top-level items: a custom `Output` and a [`GridPanel`](https://nacular.github.io/doodle/docs/ui_components/overview#gridpanel).
 
 <DoodleCodeBlock function="calculatorImages" height="500" />
-
-<br />
-<img src="/doodle-tutorials/calc-top2.png" alt="calculator top" />
-<img src="/doodle-tutorials/calc-bottom2.png" alt="calculator bottom" style={{float:'right'}} />
 
 The [**Output**](https://github.com/nacular/doodle-tutorials/blob/master/Calculator/src/commonMain/kotlin/io/nacular/doodle/examples/Calculator.kt#L48) is a really simple `View` that tracks a number and its text representation, which it renders to the screen. It also exposes the number as the current "answer" on the calculator. Its most complex role is displaying the text with proper alignment and scaling to avoid any clipping.
 
@@ -201,11 +287,11 @@ This example uses non-standard/recommended property names for buttons to improve
 
 ## Button Styling
 
-The calculator buttons come in a few different color schemes. But they all share the same [`Behavior`](https://nacular.github.io/doodle/docs/rendering/behaviors), defined by [`CalcButtonBehavior`](https://github.com/nacular/doodle-tutorials/blob/master/Calculator/src/commonMain/kotlin/io/nacular/doodle/examples/CalcButtonBehavior.kt#L16). Buttons--like many Views--let you define their look-and-feel using a `Behavior`. Ours is fairly simple; it draws the rounded rectangle for the button background and centers the text above it. These are both managed with the right color based on the button's state. It gets state tracking and text positioning for free via its base class: `CommonTextButtonBehavior`.
+The calculator buttons come in a few different color schemes. But they all share the same [`Behavior`](https://nacular.github.io/doodle/docs/rendering/behaviors), defined by [`CalcButtonBehavior`](https://github.com/nacular/doodle-tutorials/blob/master/Calculator/src/commonMain/kotlin/io/nacular/doodle/examples/CalcButtonBehavior.kt#L16). Buttons--like many Views--let you define their look-and-feel using a `Behavior`. Ours is fairly simple; it draws the rounded rectangle for the button background and centers the text above it. These are both managed with the right color based on the button's state. It gets state tracking and text positioning for free via its base class: `CommonButtonBehavior`.
 
 ## Custom Hit Detection
 
-`CalcButtonBehavior` provides a rounded style for our buttons. But the default hit-detection for Views is tied to their rectangular bounds. We can fix this by writing custom pointer hit-detection in our behavior.
+[`CalcButtonBehavior`](https://github.com/nacular/doodle-tutorials/blob/master/Calculator/src/commonMain/kotlin/io/nacular/doodle/examples/CalcButtonBehavior.kt#L16) provides a rounded style for our buttons. But the default hit-detection for Views is tied to their rectangular bounds. We can fix this by writing custom pointer hit-detection in our behavior.
 
 <KPlayground>{`
 class CalcButtonBehavior(textMetrics: TextMetrics): CommonTextButtonBehavior<Button>(textMetrics) {
@@ -233,6 +319,8 @@ The `contains` check provides a `Point` in the View's **parent's** coordinates.
 
 ## Testing
 
-Common code testing is one reason to use a multi-platform setup. Doodle is designed to avoid platform specific dependencies except in the small amount of launch code. This means we can easily test `Calculator` and the other components by writing tests in `commonTest` and running them on the JVM target. One advantage is the speed of running these tests, since there are no external dependencies.
+Doodle is designed to avoid platform specific dependencies except in the small amount of launch code. The `CalculatorApp` and `Calculator` are written in `commonMain`, which means we can test them by writing tests in `commonTest` and running them on each platform.
+
+In our case, we will use the Mockk library for testing, which means we will actually only write tests for the JVM where that library works. Test speed is a big advantage of this setup, since there are no external dependencies.
 
 The tests in [`CalculatorTests`](https://github.com/nacular/doodle-tutorials/blob/master/Calculator/src/jvmTest/kotlin/io/nacular/doodle/examples/CalculatorTests.kt#L18) are a bit contrived, but they illustrate how you might validate various parts of your app.

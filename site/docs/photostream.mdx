@@ -3,11 +3,13 @@ title: Photo Stream
 hide_title: true
 ---
 
-import Gradle             from '!!raw-loader!../../PhotoStream/build.gradle.kts';
-import {KPlayground}      from '../src/components/KotlinPlayground'
-import PhotoStreamApp     from '!!raw-loader!../../PhotoStream/src/jsMain/kotlin/io/nacular/doodle/examples/PhotoStreamApp.kt';
-import UnSplashDataModel  from '!!raw-loader!../../PhotoStream/src/jsMain/kotlin/io/nacular/doodle/examples/UnSplashDataModel.kt';
-import CenterCroppedPhoto from '!!raw-loader!../../PhotoStream/src/jsMain/kotlin/io/nacular/doodle/examples/CenterCroppedPhoto.kt';
+import {KPlayground}                 from '../src/components/KotlinPlayground'
+import {BasicRichTreeView, sanitize} from '../src/components/BasicRichTreeView';
+
+import Gradle                        from '!!raw-loader!../../PhotoStream/build.gradle.kts';
+import PhotoStreamApp                from '!!raw-loader!../../PhotoStream/src/jsMain/kotlin/io/nacular/doodle/examples/PhotoStreamApp.kt';
+import UnSplashDataModel             from '!!raw-loader!../../PhotoStream/src/jsMain/kotlin/io/nacular/doodle/examples/UnSplashDataModel.kt';
+import CenterCroppedPhoto            from '!!raw-loader!../../PhotoStream/src/jsMain/kotlin/io/nacular/doodle/examples/CenterCroppedPhoto.kt';
 
 
 # [Photo Stream](https://github.com/nacular/doodle-tutorials/tree/master/PhotoStream) Tutorial
@@ -30,13 +32,62 @@ A key is required to make API requests and fetch image urls.
 We will use a JS only-setup for this app. Our app will use Ktor for the HTTP client and Kotlin Serialization to unmarshal the resulting JSON.
 We also need Kotlin's Coroutines library to load images asynchronously.
 
-[**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/PhotoStream/build.gradle.kts)
+export const sourceTree = sanitize([
+{ label: 'src', children: [
+    { label: 'jsMain', children: [
+        { label: 'kotlin'    },
+        { label: 'resources' },
+    ] },
+]},
+{ label: 'build.gradle.kts' }
+]);
+
+:::info Directory Layout
+
+<BasicRichTreeView items={sourceTree} defaultExpandedItems={["src", "src/jsMain"]} defaultSelectedItem={"src"}>
+
+<div value="src">
+
+All source code and resources are located under the `src` directory.
+
+All logic and resources for this web-only (JS) app is located in the jsMain source set (`src/jsMain`), which means it will only target that single platform.
+
+</div><div value="src/jsMain">
+
+Source code and resources that are needed for our app are stored in `jsMain`. This is be design as our app is only meant to run in the browser using Javascript. The launch portion of our app is located in the program's `main` function found in  `main.kt`.
+
+</div><div value="src/jsMain/kotlin">
+
+Source code and resources that are needed for our app are stored in `jsMain`. This is be design as our app is only meant to run in the browser using Javascript. The launch portion of our app is located in the program's `main` function found in  `main.kt`.
+
+</div><div value="src/jsMain/resources">
+
+Holds the `index.html` file that loads the generated JS file produced for the Web (JS) target.
+
+</div><div value="build.gradle.kts">
+
+The `build.gradle.kts` file defines how the app is configured and all its dependencies. The PhotoStream app uses a single-platform configuration and runs only as a web-app.
+
+</div>
+
+</BasicRichTreeView>
+:::
+
+Doodle apps are built using gradle like other Kotlin apps. The build is controlled by the `build.gradle.kts` script in the root of the `Photos` directory.
+
+**build.gradle.kts**
 
 <KPlayground>{Gradle}</KPlayground>
+
+:::info
+The gradle build uses [gradle version catalogs](https://docs.gradle.org/current/userguide/version_catalogs.html); see [libs.versions.toml](https://github.com/nacular/doodle-tutorials/blob/master/gradle/libs.versions.toml) file for library info.
+:::
 
 ## The Application
 
 Our application will be fairly simple. It will create a [`DynamicList`](https://nacular.github.io/doodle/docs/ui_components/overview#list) with a data model bound to Unsplash's APIs. This list will be within a [`ScrollPanel`](https://nacular.github.io/doodle-api/core/io.nacular.doodle.controls.panels/-scroll-panel) that fits the [`Display`](https://nacular.github.io/doodle/docs/display/overview) height.
+
+Doodle apps can be [launched](https://nacular.github.io/doodle/docs/applications) in a few different ways on Web and Desktop. Use the `application` function in a platform source-set (i.e. `jsMain`, `jvmMain`, etc.) to launch top-level apps. It takes a list of modules to load and a lambda that builds the app. This lambda is within a Kodein injection context, which means we can inject dependencies into our app via `instance`, `provider`, etc.
 
 <KPlayground>{PhotoStreamApp}</KPlayground>
 

@@ -3,12 +3,15 @@ title: Contacts
 hide_title: true
 ---
 
-import Tabs      from '@theme/Tabs'
-import TabItem   from '@theme/TabItem'
+import Tabs                          from '@theme/Tabs'
+import TabItem                       from '@theme/TabItem'
+import {KPlayground}                 from '../src/components/KotlinPlayground'
+import {DoodleCodeBlock}             from '../src/components/DoodleCodeBlock';
+import {BasicRichTreeView, sanitize} from '../src/components/BasicRichTreeView';
 
-import Gradle            from '!!raw-loader!../../Contacts/build.gradle.kts'
-import {KPlayground}     from '../src/components/KotlinPlayground'
-import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock'
+import Gradle                        from '!!raw-loader!../../Contacts/build.gradle.kts'
+import WebMain                       from '!!raw-loader!../../Contacts/src/jsMain/kotlin/io/nacular/doodle/examples/contacts/main.kt';
+import ContactsApp                   from '!!raw-loader!../../Contacts/src/commonMain/kotlin/io/nacular/doodle/examples/contacts/ContactsApp.kt';
 
 # [Contacts](https://github.com/nacular/doodle-tutorials/tree/master/Contacts) Tutorial
 
@@ -16,7 +19,7 @@ This tutorial shows how you might build a simple app to track a list of contacts
 
 The app is multiplatform and is initialized with different dependencies based on the hosting situation. For example, the one embedded in these docs does not support deep linking, as the router used is a memory only implementation. The full screen, Web version does support deep links though. This works seamlessly, as the app itself is unaware of the implementation details of its dependencies.
 
-<DoodleCodeBlock function="contacts" height="700" />
+<DoodleCodeBlock function="contacts" height="590" />
 
 :::tip
 
@@ -25,90 +28,113 @@ You can also see the full-screen apps here: [JavaScript](https://nacular.github.
 
 ## Project Setup
 
-This app (like the others in this tutorial) is created as a multi-platform library, with a multiplatform launcher that depends on it. This is not necessary to use Doodle. You could create a single multiplatform build with the common parts of your app in `commonMain` etc.. This setup is used here because the app are also launched by an app within `DocApps` when embedding it like below. Therefore, we need a pure library for the app. This is why there is an app and a runner.
+The app will use a Kotlin Multiplatform setup, which means we can run it on a range of targets supported by Doodle. The directory structure follows a fairly common layout, with common classes and resources in one source set and platform-specific items in their own.
 
-```mermaid
-classDiagram
-      Contacts      <|-- ContactsRunner
-      Contacts      <|-- DocApps
-      ContactsRunner: commonMain.resources
-      ContactsRunner: jvmMain.main
-      ContactsRunner: jsMain.main
-      DocApps       : main
-      Contacts      : commonMain
-      Contacts      : jvmMain
-      Contacts      : jsMain
-```
+export const sourceTree = sanitize([
+{ label: 'src', children: [
+    { label: 'commonMain', children: [
+        { label: 'kotlin'    },
+        { label: 'resources' },
+    ] },
+    { label: 'jsMain', children: [
+        { label: 'kotlin'    },
+        { label: 'resources' },
+    ] },
+    { label: 'jvmMain', children: [{ label: 'kotlin' }] },
+    { label: 'wasmJsMain', children: [
+        { label: 'kotlin'    },
+        { label: 'resources' },
+    ] },
+]},
+{ label: 'build.gradle.kts' }
+]);
 
-<Tabs>
-<TabItem value="app" label="Contacts">
+:::info Directory Layout
 
-[**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/Contacts/build.gradle.kts)
+<BasicRichTreeView items={sourceTree} defaultExpandedItems={["src", "src/commonMain"]} defaultSelectedItem={"src"}>
+
+<div value="src">
+
+All source code and resources are located under the `src` directory.
+
+The application logic itself is located in the common source set (`src/commonMain`), which means it is entirely reused for each platform. In fact, the same app is used unchanged (just targeting JS) within this documentation.
+
+</div><div value="src/commonMain">
+
+Source code and resources for that are usable for platforms are stored in `commonMain`. This app is designed to work on all platforms, so our app code and all logic is found under this directory.
+
+</div><div value="src/commonMain/kotlin">
+
+The `kotlin` directory is where all code for a platform resides. In this case, we have all the classes for our app including `ContactsApp`, `ContactsList`, `ContactListBehavior`, `ContactsModel`, etc.. All of these classes are platform agnostic and used by all targets. This makes our app work on any target Doodle supports.
+
+There are also a couple interfaces that need platform-specific implementations that are defined here: `PersistentStore` and `Router`. This allows our app to work with them in a platform independent way, even if they will vary depending on the target it is run on.
+
+</div><div value="src/commonMain/resources">
+
+An app can have resources like fonts, images, etc. that it loads at runtime. This directory contains these resources.
+
+In our case, we will be loading two images and some fonts that we store here.
+
+</div><div value="src/jsMain">
+
+Source code and resources that are needed for Web (JS) target are stored in `jsMain`. Our app is platform agnostic except for the launch portion, which is located in the source below this directory.
+
+</div><div value="src/jsMain/kotlin">
+
+The Web launch portion of our app is located here in the program's `main` function. The JS version uses a platform-specific `LocalStorePersistence` that is based on the browser's `LocalStorage`. It also have a `TrivialRouter` that uses `window.location.hash` to track/update routes.
+
+</div><div value="src/jsMain/resources">
+
+Holds the `index.html` file that loads the generated JS file produced for the Web (JS) target.
+
+</div><div value="src/jvmMain">
+
+Source code and resources that are needed for Desktop (JVM) target are stored in `jvmMain`.
+
+</div><div value="src/jvmMain/kotlin">
+
+The Desktop launch portion of our app is located here in the program's `main` function. This version uses a platform-specific `FilePersistence` that is based on the file system via `java.io.File`. It also has an `InMemoryRouter` that uses a hashmap internally to track/update routes.
+
+</div><div value="src/wasmJsMain">
+
+Source code and resources that are needed for Web (WASM) target are stored in `wasmJsMain`. Our app is platform agnostic except for the launch portion, which is located in the source below this directory.
+
+</div><div value="src/wasmJsMain/kotlin">
+
+The Web launch portion of our app is located here in the program's `main` function. The WASM version uses a platform-specific `LocalStorePersistence` that is based on the browser's `LocalStorage`. It also have a `TrivialRouter` that uses `window.location.hash` to track/update routes.
+
+</div><div value="src/wasmJsMain/resources">
+
+Holds the `index.html` file that loads the generated JS file produced for the Web (WASM) target.
+
+</div><div value="build.gradle.kts">
+
+The `build.gradle.kts` file defines how the app is configured and all its dependencies. The Contacts app uses a multi-platform configuration so it can run on all Doodle supported targets.
+
+</div>
+
+</BasicRichTreeView>
+:::
+
+Doodle apps are built using gradle like other Kotlin apps. The build is controlled by the `build.gradle.kts` script in the root of the `Contacts` directory.
+
+**build.gradle.kts**
 
 <KPlayground>{Gradle}</KPlayground>
 
-:::warning
-The desktop application uses placeholder icons in some cases to work-around a known [Skiko bug](https://github.com/JetBrains/skiko/issues/518) related to SVG path data parsing.
-:::
-
-</TabItem>
-</Tabs>
-
 :::info
-Build uses [libs.versions.toml](https://github.com/nacular/doodle-tutorials/blob/master/gradle/libs.versions.toml) file.
+The gradle build uses [gradle version catalogs](https://docs.gradle.org/current/userguide/version_catalogs.html); see [libs.versions.toml](https://github.com/nacular/doodle-tutorials/blob/master/gradle/libs.versions.toml) file for library info.
 :::
 
 ## The Application
 
 [`ContactsApp`](https://github.com/nacular/doodle-tutorials/blob/master/Contacts/src/commonMain/kotlin/io/nacular/doodle/examples/contacts/ContactsApp.kt) is the entry point into our application. This is where the general structure of our app is defined. Note that Doodle creates all apps via constructor and passes their dependencies that way. This means the ContactsApp can begin work on setting up its views, layout, and routing directly in `init`.
 
+Doodle apps can be [launched](https://nacular.github.io/doodle/docs/applications) in a few different ways on Web and Desktop. Use the `application` function in a platform source-set (i.e. `jsMain`, `jvmMain`, etc.) to launch top-level apps. It takes a list of modules to load and a lambda that builds the app. This lambda is within a Kodein injection context, which means we can inject dependencies into our app via `instance`, `provider`, etc.
 
 [**ContactsApp.kt**](https://github.com/nacular/doodle-tutorials/blob/master/Contacts/src/commonMain/kotlin/io/nacular/doodle/examples/contacts/ContactsApp.kt#L19)
 
-**ContactsApp.kt**
-
-<KPlayground>{`
-class ContactsApp(/*...*/): Application {
-
-    // ...
-
-    init {
-        // Coroutine used to load assets
-        appScope.launch(uiDispatcher) {
-            val appAssets = assets()
-
-            themeManager.selected = theme // Install theme
-
-            header      = Header     (appAssets)
-            contactList = ContactList(appAssets)
-
-            // Register handlers for different routes
-            router[""                      ] = { _,_        -> /* Contact List     */ }
-            router["/add"                  ] = { _,_        -> /* Contact Creation */ }
-            router["/contact/([0-9]+)"     ] = { _, matches -> /* Contact          */ }
-            router["/contact/([0-9]+)/edit"] = { _, matches -> /* Contact Editing  */ }
-
-            display += header
-
-            // Happens after header is added to ensure view goes below create button
-            router.fireAction()
-
-            display += CreateButton(appAssets)
-
-            // Setup layout that manages how Header, CreateButton, and current View are positioned
-            display.layout = simpleLayout { container ->
-                // ...
-            }
-
-            display.fill(appAssets.background.paint)
-        }
-    }
-
-    // ...
-
-    override fun shutdown() { /* no-op */ }
-}
-`}</KPlayground>
+<KPlayground>{ContactsApp}</KPlayground>
 
 :::tip
 Notice that `shutdown` is a no-op, since we don't have any cleanup to do when the app closes.
@@ -116,14 +142,14 @@ Notice that `shutdown` is a no-op, since we don't have any cleanup to do when th
 
 ### Async Assets
 
-The app uses custom fonts and images, both of which require async loading via [`FontLoader`](https://nacular.github.io/doodle/docs/rendering/text#fonts) and [`ImageLoader`](https://nacular.github.io/doodle/docs/rendering/images). It is easiest to load these within the app itself (instead of trying to load them in the launcher and injecting). We are using the `AppConfig` interface to hold these assets and many different app attributes. The ContactsApp therefore needs to create an instance of this config, which must happen asynchronously since it internally loads fonts and images. This is what the `assets` factory does, and why the app needs a `CoroutineScope` and `CoroutineDispatcher` injected.
+The app uses custom fonts and images, both of which require async loading via [`FontLoader`](https://nacular.github.io/doodle/docs/rendering/text#fonts) and [`ImageLoader`](https://nacular.github.io/doodle/docs/rendering/images). It is easiest to load these within the app itself (instead of trying to load them in the launcher and injecting). We are using the `AppConfig` interface to hold these assets and many different app attributes. The `ContactsApp` therefore needs to create an instance of this config, which must happen asynchronously since it internally loads fonts and images. This is what the `config` factory does, and why the app needs a `CoroutineScope` and `CoroutineDispatcher` injected.
 
 **ContactsApp.kt**
 
 <KPlayground>{`
 class ContactsApp(
     // ...
-    assets      : suspend () -> AppConfig,
+    config      : suspend () -> AppConfig,
     appScope    : CoroutineScope,
     uiDispatcher: CoroutineDispatcher,
     // ...
@@ -131,7 +157,10 @@ class ContactsApp(
     // ...
     init {
         appScope.launch(uiDispatcher) {
-            val appAssets = assets()
+            // ...
+
+            val appConfig = config() // load app configuration
+
             // ...
         }
     }

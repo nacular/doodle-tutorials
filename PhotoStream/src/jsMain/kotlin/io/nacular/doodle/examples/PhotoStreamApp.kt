@@ -20,11 +20,13 @@ import kotlinx.coroutines.SupervisorJob
  * Streams an unbounded list of images from unsplash and displays them in a list.
  */
 //sampleStart
-class PhotoStreamApp(display    : Display,
-                     themes     : ThemeManager,
-                     theme      : DynamicTheme,
-                     httpClient : HttpClient,
-                     imageLoader: ImageLoader): Application {
+class PhotoStreamApp(
+    display    : Display,
+    themes     : ThemeManager,
+    theme      : DynamicTheme,
+    httpClient : HttpClient,
+    imageLoader: ImageLoader
+): Application {
     init {
         // For scroll panel behavior
         themes.selected = theme

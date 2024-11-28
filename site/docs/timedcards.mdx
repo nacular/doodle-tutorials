@@ -3,18 +3,18 @@ title: Timed Cards
 hide_title: true
 ---
 
-import Tabs      from '@theme/Tabs'
-import TabItem   from '@theme/TabItem'
-import CodeBlock from '@theme/CodeBlock';
+import Tabs                          from '@theme/Tabs'
+import TabItem                       from '@theme/TabItem'
+import {KPlayground}                 from '../src/components/KotlinPlayground'
+import {DoodleCodeBlock}             from '../src/components/DoodleCodeBlock';
+import {BasicRichTreeView, sanitize} from '../src/components/BasicRichTreeView';
 
-import Gradle            from '!!raw-loader!../../TimedCards/build.gradle.kts';
-import TimedCardsApp     from '!!raw-loader!../../TimedCards/src/commonMain/kotlin/io/nacular/doodle/examples/TimedCardsApp.kt';
-import CardPresenter     from '!!raw-loader!../../TimedCards/src/commonMain/kotlin/io/nacular/doodle/examples/CardPresenter.kt';
-import ButtonControls    from '!!raw-loader!../../TimedCards/src/commonMain/kotlin/io/nacular/doodle/examples/ButtonControls.kt';
-import Card              from '!!raw-loader!../../TimedCards/src/commonMain/kotlin/io/nacular/doodle/examples/Card.kt';
-import WebMain           from '!!raw-loader!../../TimedCards/src/jsMain/kotlin/main.kt';
-import {KPlayground}     from '../src/components/KotlinPlayground'
-import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
+import Card                          from '!!raw-loader!../../TimedCards/src/commonMain/kotlin/io/nacular/doodle/examples/Card.kt';
+import Gradle                        from '!!raw-loader!../../TimedCards/build.gradle.kts';
+import WebMain                       from '!!raw-loader!../../TimedCards/src/jsMain/kotlin/main.kt';
+import TimedCardsApp                 from '!!raw-loader!../../TimedCards/src/commonMain/kotlin/io/nacular/doodle/examples/TimedCardsApp.kt';
+import CardPresenter                 from '!!raw-loader!../../TimedCards/src/commonMain/kotlin/io/nacular/doodle/examples/CardPresenter.kt';
+import ButtonControls                from '!!raw-loader!../../TimedCards/src/commonMain/kotlin/io/nacular/doodle/examples/ButtonControls.kt';
 
 # [TimedCards](https://github.com/nacular/doodle-tutorials/tree/master/TimedCards) Tutorial
 
@@ -30,49 +30,102 @@ You can also see the full-screen app here: [JavaScript](https://nacular.github.i
 
 ## Project Setup
 
-This app (like the others in this tutorial) is created as a multi-platform library, with a multiplatform launcher that depends on it. This is not necessary to use Doodle. You could create a single multiplatform build with the common parts of your app in `commonMain` etc.. This setup is used here because the app are also launched by an app within `DocApps` when embedding it like below. Therefore, we need a pure library for the app. This is why there is an app and a runner.
+The app will use a Kotlin Multiplatform setup, which means we can run it on a range of targets supported by Doodle. The directory structure follows a fairly common layout, with common classes and resources in one source set and platform-specific items in their own.
 
-```mermaid
- classDiagram
-      TimedCards      <|-- TimedCardsRunner
-      TimedCards      <|-- DocApps
-      TimedCardsRunner: commonMain.resources
-      TimedCardsRunner: jvmMain.main
-      TimedCardsRunner: jsMain.main
-      DocApps         : main
-      TimedCards      : commonMain
-      TimedCards      : jvmMain
-      TimedCards      : jsMain
-```
+export const sourceTree = sanitize([
+{ label: 'src', children: [
+    { label: 'commonMain', children: [
+        { label: 'kotlin'    },
+    ] },
+    { label: 'jsMain', children: [
+        { label: 'kotlin'    },
+        { label: 'resources' },
+    ] },
+    { label: 'jvmMain', children: [{ label: 'kotlin' }] },
+    { label: 'wasmJsMain', children: [
+        { label: 'kotlin'    },
+        { label: 'resources' },
+    ] },
+]},
+{ label: 'build.gradle.kts' }
+]);
 
-<Tabs>
-<TabItem value="TimedCards">
+:::info Directory Layout
 
-[**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/TimedCards/build.gradle.kts)
+<BasicRichTreeView items={sourceTree} defaultExpandedItems={["src", "src/commonMain"]} defaultSelectedItem={"src"}>
+
+<div value="src">
+
+All source code and resources are located under the `src` directory.
+
+The application logic itself is located in the common source set (`src/commonMain`), which means it is entirely reused for each platform. In fact, the same app is used unchanged (just targeting JS) within this documentation.
+
+</div><div value="src/commonMain">
+
+Source code and resources for that are usable for platforms are stored in `commonMain`. This app is designed to work on all platforms, so our app code and all logic is found under this directory.
+
+</div><div value="src/commonMain/kotlin">
+
+The `kotlin` directory is where all code for a platform resides. In this case, we have all the classes for our app, including `TimedCardsApp`, `Card`, `CardPresenter`, `ButtonControls` and `Utils`.
+
+All of these classes are platform agnostic and used by all targets. This makes our app work on any target Doodle supports.
+
+</div><div value="src/jsMain">
+
+Source code and resources that are needed for Web (JS) target are stored in `jsMain`. Our app is platform agnostic except for the launch portion, which is located in the source below this directory.
+
+</div><div value="src/jsMain/kotlin">
+
+The Web launch portion of our app is located here in the program's `main` function.
+
+</div><div value="src/jsMain/resources">
+
+Holds the `index.html` file that loads the generated JS file produced for the Web (JS) target.
+
+</div><div value="src/jvmMain">
+
+Source code and resources that are needed for Desktop (JVM) target are stored in `jvmMain`.
+
+</div><div value="src/jvmMain/kotlin">
+
+The Desktop launch portion of our app is located here in the program's `main` function.
+
+</div><div value="src/wasmJsMain">
+
+Source code and resources that are needed for Web (WASM) target are stored in `wasmJsMain`. Our app is platform agnostic except for the launch portion, which is located in the source below this directory.
+
+</div><div value="src/wasmJsMain/kotlin">
+
+The Web launch portion of our app is located here in the program's `main` function.
+
+</div><div value="src/wasmJsMain/resources">
+
+Holds the `index.html` file that loads the generated JS file produced for the Web (WASM) target.
+
+</div><div value="build.gradle.kts">
+
+The `build.gradle.kts` file defines how the app is configured and all its dependencies. The TimedCards app uses a multi-platform configuration so it can run on all Doodle supported targets.
+
+</div>
+
+</BasicRichTreeView>
+:::
+
+Doodle apps are built using gradle like other Kotlin apps. The build is controlled by the `build.gradle.kts` script in the root of the `TimedCards` directory.
+
+**build.gradle.kts**
 
 <KPlayground>{Gradle}</KPlayground>
 
-</TabItem>
-</Tabs>
-
 :::info
-Build uses [libs.versions.toml](https://github.com/nacular/doodle-tutorials/blob/master/gradle/libs.versions.toml) file.
+The gradle build uses [gradle version catalogs](https://docs.gradle.org/current/userguide/version_catalogs.html); see [libs.versions.toml](https://github.com/nacular/doodle-tutorials/blob/master/gradle/libs.versions.toml) file for library info.
 :::
 
-## Launching on Web and Desktop
-
-Doodle apps can be [launched](https://nacular.github.io/doodle/docs/applications) in a few different ways on Web and Desktop. We defined our app logic in a multi-platform `TimedCards` library (no `main` functions), so it can be used on both platforms. Notice that we are only using a library here because we also want to run the TimedCards in our documentation app. That app will run it as an embedded Web app, which becomes easier if it is a library. Otherwise, we could have defined our platform `main` functions directly in the `TimedCards` module. Instead, we created a separate `TimedCardsRunner` module that contains our `main` functions.
-
-**main.kt**
-
-<KPlayground>{WebMain}</KPlayground>
-
-## Defining Our Application
+## The Application
 
 All Doodle apps must implement the [`Application`](https://nacular.github.io/doodle/docs/applications) interface. The framework will then initialize our app via the constructor. Our app will be fairly simple: just create an instance of our calculator and add it to the display.
 
-Doodle apps can be defined in `commonMain`, since they do not require any platform-specific dependencies. Therefore, we will do
-the same and place ours in `commonMain/kotlin/io/nacular/doodle/examples`.
+Doodle apps can be defined in `commonMain`, since they do not require any platform-specific dependencies (we will do this as well). They can also be [launched](https://nacular.github.io/doodle/docs/applications) in a few different ways on Web and Desktop. Use the `application` function in a platform source-set (i.e. `jsMain`, `jvmMain`, etc.) to launch top-level apps. It takes a list of modules to load and a lambda that builds the app. This lambda is within a Kodein injection context, which means we can inject dependencies into our app via `instance`, `provider`, etc.
 
 [**TimedCardsApp.kt**](https://github.com/nacular/doodle-tutorials/blob/master/TimedCards/src/commonMain/kotlin/io/nacular/doodle/examples/TimedCardsApp.kt#L43)
 

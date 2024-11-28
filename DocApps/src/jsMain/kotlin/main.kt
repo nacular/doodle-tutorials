@@ -3,6 +3,8 @@
 
 import io.nacular.doodle.animation.Animator
 import io.nacular.doodle.animation.AnimatorImpl
+import io.nacular.doodle.application.HtmlElementViewModule
+import io.nacular.doodle.application.Modules
 import io.nacular.doodle.application.Modules.Companion.DragDropModule
 import io.nacular.doodle.application.Modules.Companion.FocusModule
 import io.nacular.doodle.application.Modules.Companion.FontModule
@@ -30,6 +32,7 @@ import io.nacular.doodle.examples.TimedCardsApp
 import io.nacular.doodle.examples.TodoApp
 import io.nacular.doodle.examples.TrivialRouter
 import io.nacular.doodle.examples.calculator.CalculatorImages
+import io.nacular.doodle.examples.calculator.GlassPanelFactoryImpl
 import io.nacular.doodle.examples.contacts.AppConfig
 import io.nacular.doodle.examples.contacts.AppConfigImpl
 import io.nacular.doodle.examples.contacts.Contact
@@ -73,9 +76,15 @@ fun calculator(element: HTMLElement) {
 
 @JsExport
 fun calculatorImages(element: HTMLElement) {
-    application(root = element, modules = listOf(FontModule, PointerModule)) {
+    application(root = element, modules = listOf(FontModule, PointerModule, Modules.HtmlElementViewModule)) {
         // load app
-        CalculatorImages(instance(), instance(), instance(), NumberFormatterImpl())
+        CalculatorImages(
+            display           = instance(),
+            fonts             = instance(),
+            textMetrics       = instance(),
+            numberFormatter   = NumberFormatterImpl(),
+            glassPanelFactory = GlassPanelFactoryImpl(instance())
+        )
     }
 }
 
@@ -152,7 +161,7 @@ fun contacts(element: HTMLElement) {
         // load app
         ContactsApp(
             theme             = instance(),
-            assets            = { AppConfigImpl(instance(), instance()) },
+            config            = { AppConfigImpl(instance(), instance()) },
             router            = instance(),
             Header            = factory(),
             display           = instance(),

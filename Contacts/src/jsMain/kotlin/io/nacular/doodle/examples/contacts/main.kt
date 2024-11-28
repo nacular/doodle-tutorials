@@ -46,7 +46,7 @@ fun main() {
         // load app
         ContactsApp(
             theme             = instance(),
-            assets            = { AppConfigImpl(instance(), instance()) },
+            config            = { AppConfigImpl(instance(), instance()) },
             router            = instance(),
             Header            = factory(),
             display           = instance(),

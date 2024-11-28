@@ -60,28 +60,26 @@ class Calculator(
         private var textTransform = Identity
 
         /** Numeric value of the output */
-        var number = 0.0
-            set(new) {
-                field = new
-                text  = numberFormatter(number)
-            }
+        var number = 0.0; set(new) {
+            field = new
+            text  = numberFormatter(number)
+        }
 
         /** Text representation of [number] */
-        var text = "0"
-            set(new) {
-                field = new
+        var text = "0"; set(new) {
+            field = new
 
-                val textWidth   = textMetrics.width(field, font)
-                val windowWidth = width - inset * 2
+            val textWidth   = textMetrics.width(field, font)
+            val windowWidth = width - inset * 2
 
-                // use transform when text grows beyond window width
-                textTransform = when {
-                    textWidth > windowWidth -> (windowWidth/textWidth).let { Identity.scale(x = it, y = it, around = Point(width / 2, height)) }
-                    else                    -> Identity
-                }
-
-                rerender()
+            // use transform when text grows beyond window width
+            textTransform = when {
+                textWidth > windowWidth -> (windowWidth/textWidth).let { Identity.scale(x = it, y = it, around = Point(width / 2, height)) }
+                else                    -> Identity
             }
+
+            rerender()
+        }
 
         init {
             foregroundColor = White
@@ -158,7 +156,7 @@ class Calculator(
     val result get() = output.number
 
     val div   = OperatorButton("÷", method = Double::div  )
-    val times = OperatorButton("x", method = Double::times)
+    val times = OperatorButton("×", method = Double::times)
     val minus = OperatorButton("-", method = Double::minus)
     val plus  = OperatorButton("+", method = Double::plus )
 

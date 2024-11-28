@@ -9,7 +9,6 @@ import io.nacular.doodle.core.PositionableContainer
 import io.nacular.doodle.core.View
 import io.nacular.doodle.drawing.paint
 import io.nacular.doodle.geometry.Size
-import io.nacular.doodle.layout.constraints.Strength
 import io.nacular.doodle.theme.ThemeManager
 import io.nacular.doodle.theme.adhoc.DynamicTheme
 import kotlinx.coroutines.CoroutineDispatcher
@@ -23,7 +22,7 @@ import kotlin.math.max
  * @param theme for the app
  * @param Header factory for creating the [Header] view
  * @param router for managing app routes
- * @param assets creation for the app
+ * @param config creation for the app
  * @param display where all content for the app is shown
  * @param contacts data model
  * @param appScope for launching coroutines
@@ -40,7 +39,7 @@ class ContactsApp(
     theme            : DynamicTheme,
     Header           : (AppConfig) -> Header,
     router           : Router,
-    assets           : suspend () -> AppConfig,
+    config           : suspend () -> AppConfig,
     display          : Display,
     contacts         : ContactsModel,
     appScope         : CoroutineScope,
@@ -57,29 +56,30 @@ class ContactsApp(
     private lateinit var header     : Header
     private lateinit var contactList: View
 
+//sampleStart
     init {
-        // Coroutine used to load assets
+        // Coroutine used to load config
         appScope.launch(uiDispatcher) {
-            val appAssets = assets()
-
             themeManager.selected = theme // Install theme
 
-            header      = Header     (appAssets)
-            contactList = ContactList(appAssets)
+            val appConfig = config() // load app configuration
+
+            header        = Header     (appConfig)
+            contactList   = ContactList(appConfig)
 
             // Register handlers for different routes
             router[""                 ] = { _,_        -> setMainView(display, contactList                              ) }
-            router["/add"             ] = { _,_        -> setMainView(display, scrollPanel(CreateContactView(appAssets))) }
+            router["/add"             ] = { _,_        -> setMainView(display, scrollPanel(CreateContactView(appConfig))) }
             router["/contact/([0-9]+)"] = { _, matches ->
                 when (val contact = matches.firstOrNull()?.toInt()?.let { contacts.find(it) }) {
                     null -> navigator.showContactList()
-                    else -> setMainView(display, scrollPanel(ContactView(appAssets, contact)))
+                    else -> setMainView(display, scrollPanel(ContactView(appConfig, contact)))
                 }
             }
             router["/contact/([0-9]+)/edit"] = { _, matches ->
                 when (val contact = matches.firstOrNull()?.toInt()?.let { contacts.find(it) }) {
                     null -> navigator.showContactList()
-                    else -> setMainView(display, scrollPanel(EditContactView(appAssets, contact)))
+                    else -> setMainView(display, scrollPanel(EditContactView(appConfig, contact)))
                 }
             }
 
@@ -90,14 +90,15 @@ class ContactsApp(
 
             // Reset layout whenever display children change since the layout stores the display's children internally.
             display.childrenChanged += { _,_ ->
-                updateLayout(display, appAssets)
+                updateLayout(display, appConfig)
             }
 
-            display += CreateButton(appAssets)
+            display += CreateButton(appConfig)
 
-            display.fill(appAssets.background.paint)
+            display.fill(appConfig.background.paint)
         }
     }
+//sampleEnd
 
     private fun scrollPanel(content: View) = ScrollPanel(content).apply {
         contentWidthConstraints = { it eq width - verticalScrollBarWidth }

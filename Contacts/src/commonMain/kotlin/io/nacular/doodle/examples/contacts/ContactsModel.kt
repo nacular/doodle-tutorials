@@ -44,11 +44,6 @@ interface ContactsModel {
     fun find(id: Int    ): Contact?
 }
 
-interface PersistentStore<T> {
-    fun load(              ): List<T>
-    fun save(tasks: List<T>)
-}
-
 /**
  * Model based on [FilteredList]
  */

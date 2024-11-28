@@ -4,19 +4,18 @@ plugins {
 }
 
 kotlin {
-    // Defined in buildSrc/src/main/kotlin/Common.kt
-    jsTargets    (executable = true)
-    wasmJsTargets(executable = true)
+    js { browser { binaries.executable() } } // Web (JS) executable
 
     sourceSets {
+        // Web (JS) platform source set
         jsMain.dependencies {
-            implementation(libs.bundles.ktor.client)
-            implementation(libs.coroutines.core    )
-            implementation(libs.serialization.json )
+            implementation(libs.coroutines.core    ) // async api calls
+            implementation(libs.bundles.ktor.client) // api calls to images service
+            implementation(libs.serialization.json ) // serialization for api calls
 
             implementation(libs.doodle.themes  )
-            implementation(libs.doodle.browser )
             implementation(libs.doodle.controls)
+            implementation(libs.doodle.browser )
         }
     }
 }

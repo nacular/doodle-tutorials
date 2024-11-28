@@ -3,13 +3,14 @@ title: Photos
 hide_title: true
 ---
 
-import Tabs      from '@theme/Tabs'
-import TabItem   from '@theme/TabItem'
+import Tabs                          from '@theme/Tabs'
+import TabItem                       from '@theme/TabItem'
+import {KPlayground}                 from '../src/components/KotlinPlayground'
+import {DoodleCodeBlock}             from '../src/components/DoodleCodeBlock';
+import {BasicRichTreeView, sanitize} from '../src/components/BasicRichTreeView';
 
-import Gradle            from '!!raw-loader!../../Photos/build.gradle.kts';
-import {KPlayground}     from '../src/components/KotlinPlayground'
-import {DoodleCodeBlock} from '../src/components/DoodleCodeBlock';
-import WebMain           from '!!raw-loader!../../Photos/src/jsMain/kotlin/main.kt';
+import Gradle                        from '!!raw-loader!../../Photos/build.gradle.kts';
+import WebMain                       from '!!raw-loader!../../Photos/src/jsMain/kotlin/main.kt';
 
 # [Photos](https://github.com/nacular/doodle-tutorials/tree/master/Photos) Tutorial
 
@@ -25,34 +26,109 @@ You can also see the full-screen app here: [JavaScript](https://nacular.github.i
 
 ## Project Setup
 
-We will use a multi-platform library setup for this app, with a multiplatform launcher that depends on it. This is not necessary to use Doodle. You could create a single multiplatform build with the common parts of your app in `commonMain` etc.. This setup is used here because these apps are also launched by an app within `DocApps` when embedding them like below. Therefore, we need a pure library for each app. This is why there is an app and a runner.
+The app will use a Kotlin Multiplatform setup, which means we can run it on a range of targets supported by Doodle. The directory structure follows a fairly common layout, with common classes and resources in one source set and platform-specific items in their own.
 
-```mermaid
- classDiagram
-      Photos      <|-- PhotosRunner
-      Photos      <|-- DocApps
-      PhotosRunner: jvmMain.main
-      PhotosRunner: jsMain.main
-      DocApps     : main
-```
+export const sourceTree = sanitize([
+{ label: 'src', children: [
+    { label: 'commonMain', children: [
+        { label: 'kotlin'    },
+        { label: 'resources' },
+    ] },
+    { label: 'jsMain', children: [
+        { label: 'kotlin'    },
+        { label: 'resources' },
+    ] },
+    { label: 'jvmMain', children: [{ label: 'kotlin' }] },
+    { label: 'wasmJsMain', children: [
+        { label: 'kotlin'    },
+        { label: 'resources' },
+    ] },
+]},
+{ label: 'build.gradle.kts' }
+]);
 
-<Tabs>
-<TabItem value="app" label="Photos">
+:::info Directory Layout
 
-[**build.gradle.kts**](https://github.com/nacular/doodle-tutorials/blob/master/Photos/build.gradle.kts)
+<BasicRichTreeView items={sourceTree} defaultExpandedItems={["src", "src/commonMain"]} defaultSelectedItem={"src"}>
+
+<div value="src">
+
+All source code and resources are located under the `src` directory.
+
+The application logic itself is located in the common source set (`src/commonMain`), which means it is entirely reused for each platform. In fact, the same app is used unchanged (just targeting JS) within this documentation.
+
+</div><div value="src/commonMain">
+
+Source code and resources for that are usable for platforms are stored in `commonMain`. This app is designed to work on all platforms, so our app code and all logic is found under this directory.
+
+</div><div value="src/commonMain/kotlin">
+
+The `kotlin` directory is where all code for a platform resides. In this case, we have all the classes for our app including `PhotosApp`, `GestureRecognizer` and `Utils`.
+
+All of these classes are platform agnostic and used by all targets. This makes our app work on any target Doodle supports.
+
+</div><div value="src/commonMain/resources">
+
+An app can have resources like fonts, images, etc. that it loads at runtime. This directory contains these resources.
+
+In our case, we will be loading 2 default images we store here.
+
+</div><div value="src/jsMain">
+
+Source code and resources that are needed for Web (JS) target are stored in `jsMain`. Our app is platform agnostic except for the launch portion, which is located in the source below this directory.
+
+</div><div value="src/jsMain/kotlin">
+
+The Web launch portion of our app is located here in the program's `main` function.
+
+</div><div value="src/jsMain/resources">
+
+Holds the `index.html` file that loads the generated JS file produced for the Web (JS) target.
+
+</div><div value="src/jvmMain">
+
+Source code and resources that are needed for Desktop (JVM) target are stored in `jvmMain`.
+
+</div><div value="src/jvmMain/kotlin">
+
+The Desktop launch portion of our app is located here in the program's `main` function.
+
+</div><div value="src/wasmJsMain">
+
+Source code and resources that are needed for Web (WASM) target are stored in `wasmJsMain`. Our app is platform agnostic except for the launch portion, which is located in the source below this directory.
+
+</div><div value="src/wasmJsMain/kotlin">
+
+The Web launch portion of our app is located here in the program's `main` function.
+
+</div><div value="src/wasmJsMain/resources">
+
+Holds the `index.html` file that loads the generated JS file produced for the Web (WASM) target.
+
+</div><div value="build.gradle.kts">
+
+The `build.gradle.kts` file defines how the app is configured and all its dependencies. The Photos app uses a multi-platform configuration so it can run on all Doodle supported targets.
+
+</div>
+
+</BasicRichTreeView>
+:::
+
+Doodle apps are built using gradle like other Kotlin apps. The build is controlled by the `build.gradle.kts` script in the root of the `Photos` directory.
+
+**build.gradle.kts**
 
 <KPlayground>{Gradle}</KPlayground>
 
-</TabItem>
-</Tabs>
-
 :::info
-Build uses [libs.versions.toml](https://github.com/nacular/doodle-tutorials/blob/master/gradle/libs.versions.toml) file.
+The gradle build uses [gradle version catalogs](https://docs.gradle.org/current/userguide/version_catalogs.html); see [libs.versions.toml](https://github.com/nacular/doodle-tutorials/blob/master/gradle/libs.versions.toml) file for library info.
 :::
 
 ## The Application
 
 All Doodle apps must implement the [`Application`](https://nacular.github.io/doodle/docs/applications) interface. The framework will then initialize our app via the constructor.
+
+Doodle apps can be [launched](https://nacular.github.io/doodle/docs/applications) in a few different ways on Web and Desktop. Use the `application` function in a platform source-set (i.e. `jsMain`, `jvmMain`, etc.) to launch top-level apps. It takes a list of modules to load and a lambda that builds the app. This lambda is within a Kodein injection context, which means we can inject dependencies into our app via `instance`, `provider`, etc.
 
 The app's structure is fairly simple. It has a main Container that holds the images and supports drag-drop, and a panel with controls for manipulating a selected image.
 
@@ -91,12 +167,6 @@ class PhotosApp(/*...*/): Application {
 :::tip
 Notice that `shutdown` is a no-op, since we don't have any cleanup to do when the app closes.
 :::
-
-## Creating A Full Screen App
-
-Doodle apps can be [launched](https://nacular.github.io/doodle/docs/applications) in a few different ways. We create a helper to launch the app in [full screen](https://nacular.github.io/doodle/docs/applications#top-level-apps).
-
-[**FullScreen.kt**](https://github.com/nacular/doodle-tutorials/blob/master/Photos/src/main/kotlin/io/nacular/doodle/examples/FullScreen.kt#L22)
 
 <KPlayground>{WebMain}</KPlayground>
 
@@ -166,7 +236,7 @@ val import = { photo: View, location: Point ->
 }
 `}</KPlayground>
 
-Import resizes and centers the photo at the given point. It is center-rotates it between -15° and 15°. Finally, a listener is added to the `pressed` pointer event. This moves the photo to the foreground and updates the panel.
+Import resizes and centers the photo at the given point. It center-rotates it between -15° and 15°. Finally, a listener is added to the `pressed` pointer event. This moves the photo to the foreground and updates the panel.
 
 <KPlayground>{`
 photo.width           = 400.0
@@ -209,7 +279,7 @@ GestureRecognizer(photo).changed += object: GestureListener<GestureEvent> {
 
 We register a listener that uses the events to update the photo's `transform` and `bounds`. The listener also consumes events to avoid them making it to subsequent pointer listeners (the `Resizer` used for single pointer manipulation in this case).
 
-### Capturing Initial Gesture State
+#### Capturing Initial Gesture State
 
 We record the state of our photo, and the pointers provided by the `GestureRecognizer` on the `started` event. Notice that `GestureRecognizer` provides locations in the photo's local coordinate. This makes sense for a general-purpose utility and matches the way Doodle reports pointer events. We use these values to modify the photo's bounds though, which is defined in its parent's coordinates. So we map the points into the parent before our calculations.
 
@@ -226,7 +296,7 @@ override fun started(event: GestureEvent) {
 }
 `}</KPlayground>
 
-### Handling Gesture Updates
+#### Handling Gesture Updates
 
 The values recorded in `started` are used--along with the new state--in the `changed` event to update the selected photo.
 

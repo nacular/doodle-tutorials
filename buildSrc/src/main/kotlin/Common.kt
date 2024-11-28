@@ -8,81 +8,54 @@ import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
 import java.util.*
 
-private fun KotlinJsTargetDsl.configure(executable: Boolean) {
-    compilations.configureEach {
-        kotlinOptions {
-            moduleKind            = "umd"
-            sourceMapEmbedSources = "always"
-        }
-    }
-    browser {
-        testTask {
-            enabled = false
-        }
-
-        if (executable) {
-            binaries.executable()
-        }
-    }
-}
-
+/**
+ * Helper to make using js platform in build.gradle.kts files simpler
+ */
 fun KotlinMultiplatformExtension.jsTargets(executable: Boolean = false) {
-    js().configure(executable)
+    js {
+        browser {
+            if (executable) {
+                binaries.executable()
+            }
+        }
+    }
 }
 
+/**
+ * Helper to make using wasmJs platform in build.gradle.kts files simpler
+ */
 @OptIn(ExperimentalWasmDsl::class)
 fun KotlinMultiplatformExtension.wasmJsTargets(executable: Boolean = false) {
     wasmJs {
-        compilations.all {
-            kotlinOptions {
-                moduleKind            = "umd"
-                sourceMapEmbedSources = "always"
-            }
-        }
         browser {
-            testTask { enabled = false }
-        }
-        if (executable) {
-            binaries.executable()
-//            applyBinaryen {
-//                binaryenArgs += "-g" // keep original names
-//            }
-
-//            if (project.gradle.startParameter.taskNames.find { it.contains("wasmJsBrowserProductionWebpack") } != null) {
+            if (executable) {
+                binaries.executable()
 //                applyBinaryen {
-//                    binaryenArgs = mutableListOf(
-//                        "--enable-nontrapping-float-to-int",
-//                        "--enable-gc",
-//                        "--enable-reference-types",
-//                        "--enable-exception-handling",
-//                        "--enable-bulk-memory",
-//                        "--inline-functions-with-loops",
-//                        "--traps-never-happen",
-//                        "--fast-math",
-//                        "--closed-world",
-//                        "--metrics",
-//                        "-O3", "--gufa", "--metrics",
-//                        "-O3", "--gufa", "--metrics",
-//                        "-O3", "--gufa", "--metrics",
-//                    )
+//                    binaryenArgs += "-g" // keep original names
 //                }
-//            }
+            }
         }
     }
 }
 
-fun KotlinTargetContainerWithPresetFunctions.jvmTargets(jvmTargetOverrid: String = "11", vararg additoinalFlags: String) {
+/**
+ * Helper to make using jvm platform in build.gradle.kts files simpler
+ */
+fun KotlinTargetContainerWithPresetFunctions.jvmPlatform(jvmTarget: String, vararg additoinalFlags: String) {
     jvm {
         withJava()
         compilations.all {
             kotlinOptions {
-                jvmTarget        = jvmTargetOverrid
+                this.jvmTarget   = jvmTarget
                 freeCompilerArgs = additoinalFlags.toList()
             }
         }
     }
 }
 
+/**
+ * Helper for determining OS - architecture pair for the build machine. This helper could be used by all Doodle desktop sourc-sets.
+ */
 fun osTarget(): String {
     val osName = System.getProperty("os.name")
     val targetOs = when {
@@ -101,10 +74,13 @@ fun osTarget(): String {
     return "${targetOs}-${targetArch}"
 }
 
+/**
+ * Helper used to build full-screen versions of all apps an install them in the docs directory so they are accessible from the docs site
+ */
 fun Project.installFullScreenDemo(suffix: String) {
     try {
-        val jsWebPack   = project.tasks.getByName("jsBrowser${suffix}Webpack",     org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack::class)
-        val wasmWebPack = project.tasks.getByName("wasmJsBrowser${suffix}Webpack", org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack::class)
+        val jsWebPack   = tasks.getByName("jsBrowser${suffix}Webpack",     org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack::class)
+        val wasmWebPack = tasks.getByName("wasmJsBrowser${suffix}Webpack", org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack::class)
 
         val jsDocDirectory = "$buildDir/../../docs/${project.name.lowercase(Locale.getDefault()).removeSuffix("runner")}"
 

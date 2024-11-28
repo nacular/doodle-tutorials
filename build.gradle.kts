@@ -9,6 +9,11 @@ subprojects {
     tasks.withType<org.jetbrains.kotlin.gradle.targets.js.npm.tasks.KotlinNpmInstallTask> {
         args += "--ignore-scripts"
     }
+
+    afterEvaluate {
+        installFullScreenDemo("Development")
+        installFullScreenDemo("Production")
+    }
 }
 
 rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {

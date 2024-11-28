@@ -6,17 +6,19 @@ import io.nacular.doodle.event.Interaction
 import io.nacular.doodle.event.PointerEvent
 import io.nacular.doodle.event.PointerListener
 import io.nacular.doodle.event.PointerMotionListener
-import io.nacular.doodle.examples.GestureRecognizer.Type.*
+import io.nacular.doodle.examples.GestureRecognizer.Type.Change
+import io.nacular.doodle.examples.GestureRecognizer.Type.End
+import io.nacular.doodle.examples.GestureRecognizer.Type.Start
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.utils.Pool
 import io.nacular.doodle.utils.SetPool
 
 class GestureEvent(
         target : View,
-        val initial: List<Interaction>,
-        val current: List<Interaction>,
-        val center : Point,
-        val scale  : Double
+    val initial: List<Interaction>,
+    val current: List<Interaction>,
+    val center : Point,
+    val scale  : Double
 ): Event<View>(source = target)
 
 interface GestureListener<T> {

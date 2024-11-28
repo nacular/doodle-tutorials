@@ -15,7 +15,7 @@ fun main() {
         CalculatorApp(
             display         = instance(),
             textMetrics     = instance(),
-            fonts    = instance(),
+            fonts           = instance(),
             numberFormatter = NumberFormatterImpl()
         )
     }
