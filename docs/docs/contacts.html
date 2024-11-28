@@ -2,77 +2,79 @@
 <html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-contacts" data-has-hydrated="false">
 <head>
 <meta charset="UTF-8">
-<meta name="generator" content="Docusaurus v3.1.1">
-<title data-rh="true">Contacts | Doodle Tutorials</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://nacular.github.io/doodle-tutorials/img/site_preview.png"><meta data-rh="true" name="twitter:image" content="https://nacular.github.io/doodle-tutorials/img/site_preview.png"><meta data-rh="true" property="og:url" content="https://nacular.github.io/doodle-tutorials/docs/contacts"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="og:image:width" content="380"><meta data-rh="true" name="og:image:height" content="78"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Contacts | Doodle Tutorials"><meta data-rh="true" name="description" content="This tutorial shows how you might build a simple app to track a list of contacts, each with a name and phone number. It is inspired by phonebook-pi.vercel.app, which was built using React."><meta data-rh="true" property="og:description" content="This tutorial shows how you might build a simple app to track a list of contacts, each with a name and phone number. It is inspired by phonebook-pi.vercel.app, which was built using React."><link data-rh="true" rel="icon" href="/doodle-tutorials/img/favicon.png"><link data-rh="true" rel="canonical" href="https://nacular.github.io/doodle-tutorials/docs/contacts"><link data-rh="true" rel="alternate" href="https://nacular.github.io/doodle-tutorials/docs/contacts" hreflang="en"><link data-rh="true" rel="alternate" href="https://nacular.github.io/doodle-tutorials/docs/contacts" hreflang="x-default"><link rel="preconnect" href="https://www.google-analytics.com">
+<meta name="generator" content="Docusaurus v3.6.3">
+<title data-rh="true">Contacts | Doodle Tutorials</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://nacular.github.io/doodle-tutorials/img/site_preview.png"><meta data-rh="true" name="twitter:image" content="https://nacular.github.io/doodle-tutorials/img/site_preview.png"><meta data-rh="true" property="og:url" content="https://nacular.github.io/doodle-tutorials/docs/contacts"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="og:image:width" content="380"><meta data-rh="true" name="og:image:height" content="78"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Contacts | Doodle Tutorials"><meta data-rh="true" name="description" content="Contacts Tutorial"><meta data-rh="true" property="og:description" content="Contacts Tutorial"><link data-rh="true" rel="icon" href="/doodle-tutorials/img/favicon.png"><link data-rh="true" rel="canonical" href="https://nacular.github.io/doodle-tutorials/docs/contacts"><link data-rh="true" rel="alternate" href="https://nacular.github.io/doodle-tutorials/docs/contacts" hreflang="en"><link data-rh="true" rel="alternate" href="https://nacular.github.io/doodle-tutorials/docs/contacts" hreflang="x-default"><link rel="preconnect" href="https://www.google-analytics.com">
 <link rel="preconnect" href="https://www.googletagmanager.com">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-KN5YH7BJYG"></script>
 <script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","G-KN5YH7BJYG",{anonymize_ip:!0})</script>
 
 
 
-<script src="https://unpkg.com/kotlin-playground@1"></script><link rel="stylesheet" href="/doodle-tutorials/assets/css/styles.8934ba38.css">
-<script src="/doodle-tutorials/assets/js/runtime~main.d8542a75.js" defer="defer"></script>
-<script src="/doodle-tutorials/assets/js/main.2c8e2dcd.js" defer="defer"></script>
+<script src="https://unpkg.com/kotlin-playground@1"></script><link rel="stylesheet" href="/doodle-tutorials/assets/css/styles.59830250.css">
+<script src="/doodle-tutorials/assets/js/runtime~main.34b5d15c.js" defer="defer"></script>
+<script src="/doodle-tutorials/assets/js/main.28ebd436.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
-<script>!function(){function t(t){document.documentElement.setAttribute("data-theme",t)}var e=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return localStorage.getItem("theme")}catch(t){}}();null!==e?t(e):window.matchMedia("(prefers-color-scheme: dark)").matches?t("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,t("light"))}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="navbar navbar--fixed-top"><div class="navbar__inner"><div class="navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/doodle-tutorials/"><div class="navbar__logo"><img src="/doodle-tutorials/img/doodle.svg" alt="Doodle Logo" class="themedComponent_mlkZ themedComponent--light_NVdE"><img src="/doodle-tutorials/img/doodle.svg" alt="Doodle Logo" class="themedComponent_mlkZ themedComponent--dark_xIcU"></div></a></div><div class="navbar__items navbar__items--right"><a href="https://github.com/nacular/doodle-tutorials" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link header-github-link" aria-label="GitHub repository"></a><a href="https://kotlinlang.slack.com/messages/doodle" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link header-slack-link" aria-label="Slack channel"></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="Switch between dark and light mode (currently light mode)" aria-label="Switch between dark and light mode (currently light mode)" aria-live="polite"><svg viewBox="0 0 24 24" width="24" height="24" class="lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" class="darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg></button></div><div class="navbarSearchContainer_Bca1"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><aside class="theme-doc-sidebar-container docSidebarContainer_YfHR"><div class="sidebarViewport_aRkj"><div class="sidebar_njMd"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_SIkG"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/doodle-tutorials/docs/introduction">Introduction</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/doodle-tutorials/docs/timedcards">Timed Cards</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/doodle-tutorials/docs/tabstrip">Animating Tab Strip</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" href="/doodle-tutorials/docs/contacts">Contacts</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/doodle-tutorials/docs/calculator">Calculator</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/doodle-tutorials/docs/todo">Todo</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/doodle-tutorials/docs/photos">Photos</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/doodle-tutorials/docs/photostream">Photo Stream</a></li></ul></nav></div></div></aside><main class="docMainContainer_TBSr"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><div class="theme-doc-markdown markdown"><h1><a href="https://github.com/nacular/doodle-tutorials/tree/master/Contacts" target="_blank" rel="noopener noreferrer">Contacts</a> Tutorial</h1>
+<script>!function(){function t(t){document.documentElement.setAttribute("data-theme",t)}var e=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();null!==e?t(e):window.matchMedia("(prefers-color-scheme: dark)").matches?t("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,t("light"))}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="navbar navbar--fixed-top"><div class="navbar__inner"><div class="navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/doodle-tutorials/"><div class="navbar__logo"><img src="/doodle-tutorials/img/doodle.svg" alt="Doodle Logo" class="themedComponent_mlkZ themedComponent--light_NVdE"><img src="/doodle-tutorials/img/doodle.svg" alt="Doodle Logo" class="themedComponent_mlkZ themedComponent--dark_xIcU"></div></a></div><div class="navbar__items navbar__items--right"><a href="https://github.com/nacular/doodle-tutorials" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link header-github-link" aria-label="GitHub repository"></a><a href="https://kotlinlang.slack.com/messages/doodle" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link header-slack-link" aria-label="Slack channel"></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="Switch between dark and light mode (currently light mode)" aria-label="Switch between dark and light mode (currently light mode)" aria-live="polite" aria-pressed="false"><svg viewBox="0 0 24 24" width="24" height="24" class="lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" class="darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg></button></div><div class="navbarSearchContainer_Bca1"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><aside class="theme-doc-sidebar-container docSidebarContainer_YfHR"><div class="sidebarViewport_aRkj"><div class="sidebar_njMd"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_SIkG"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/doodle-tutorials/docs/introduction">Introduction</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/doodle-tutorials/docs/timedcards">Timed Cards</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/doodle-tutorials/docs/tabstrip">Animating Tab Strip</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" href="/doodle-tutorials/docs/contacts">Contacts</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/doodle-tutorials/docs/calculator">Calculator</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/doodle-tutorials/docs/todo">Todo</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/doodle-tutorials/docs/photos">Photos</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/doodle-tutorials/docs/photostream">Photo Stream</a></li></ul></nav></div></div></aside><main class="docMainContainer_TBSr"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><div class="theme-doc-markdown markdown"><h1><a class="inline-github-link" href="https://github.com/nacular/doodle-tutorials/tree/master/Contacts" target="_blank">Contacts Tutorial</a></h1>
 <p>This tutorial shows how you might build a simple app to track a list of contacts, each with a name and phone number. It is inspired by <a href="https://phonebook-pi.vercel.app/" target="_blank" rel="noopener noreferrer">phonebook-pi.vercel.app</a>, which was built using React.</p>
 <p>The app is multiplatform and is initialized with different dependencies based on the hosting situation. For example, the one embedded in these docs does not support deep linking, as the router used is a memory only implementation. The full screen, Web version does support deep links though. This works seamlessly, as the app itself is unaware of the implementation details of its dependencies.</p>
-<div class="doodle_u3ra"><div style="position:relative;height:700px"></div></div>
+<div class="doodle_u3ra"><div style="position:relative;height:590px"></div></div>
 <div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_BuS1"><p>You can also see the full-screen apps here: <a href="https://nacular.github.io/doodle-tutorials/contacts" target="_blank" rel="noopener noreferrer">JavaScript</a>, <a href="https://nacular.github.io/doodle-tutorials/contacts_wasm" target="_blank" rel="noopener noreferrer">WebAssembly</a>.</p></div></div>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="project-setup">Project Setup<a href="#project-setup" class="hash-link" aria-label="Direct link to Project Setup" title="Direct link to Project Setup">​</a></h2>
-<p>This app (like the others in this tutorial) is created as a multi-platform library, with a multiplatform launcher that depends on it. This is not necessary to use Doodle. You could create a single multiplatform build with the common parts of your app in <code>commonMain</code> etc.. This setup is used here because the app are also launched by an app within <code>DocApps</code> when embedding it like below. Therefore, we need a pure library for the app. This is why there is an app and a runner.</p>
+<p>The app will use a Kotlin Multiplatform setup, which means we can run it on a range of targets supported by Doodle. The directory structure follows a fairly common layout, with common classes and resources in one source set and platform-specific items in their own.</p>
 <!-- -->
-<div class="tabs-container tabList__CuJ"><ul role="tablist" aria-orientation="horizontal" class="tabs"><li role="tab" tabindex="0" aria-selected="true" class="tabs__item tabItem_LNqP tabs__item--active">Contacts</li><li role="tab" tabindex="-1" aria-selected="false" class="tabs__item tabItem_LNqP">ContactsRunner</li></ul><div class="margin-top--md"><div role="tabpanel" class="tabItem_Ymn6"><p><a href="https://github.com/nacular/doodle-tutorials/blob/master/Contacts/build.gradle.kts" target="_blank" rel="noopener noreferrer"><strong>build.gradle.kts</strong></a></p><code theme="darcula" mode="kotlin" data-highlight-only="true">plugins {
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>Directory Layout</div><div class="admonitionContent_BuS1"><div style="display:flex"><style data-emotion="css 13s4dk6">.css-13s4dk6{min-width:250px;}</style><div class="MuiBox-root css-13s4dk6"><style data-emotion="css 1q7nh3k">.css-1q7nh3k{padding:0;margin:0;list-style:none;outline:0;position:relative;}</style><ul role="tree" style="--TreeView-itemChildrenIndentation:12px" aria-multiselectable="false" class="MuiRichTreeView-root css-1q7nh3k"><style data-emotion="css ljgrlg">.css-ljgrlg{list-style:none;margin:0;padding:0;outline:0;}</style><li class="MuiTreeItem-root css-ljgrlg" role="treeitem" aria-expanded="true" aria-selected="true" id="-src" tabindex="0"><style data-emotion="css zgkbnr">.css-zgkbnr{padding:4px 8px;border-radius:4px;width:100%;box-sizing:border-box;position:relative;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;gap:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;}.css-zgkbnr:hover{background-color:rgba(0, 0, 0, 0.04);}@media (hover: none){.css-zgkbnr:hover{background-color:transparent;}}.css-zgkbnr.Mui-disabled{opacity:0.38;background-color:transparent;}.css-zgkbnr.Mui-focused{background-color:rgba(0, 0, 0, 0.12);}.css-zgkbnr.Mui-selected{background-color:rgba(25, 118, 210, 0.08);}.css-zgkbnr.Mui-selected:hover{background-color:rgba(25, 118, 210, 0.12);}@media (hover: none){.css-zgkbnr.Mui-selected:hover{background-color:rgba(25, 118, 210, 0.08);}}.css-zgkbnr.Mui-selected.Mui-focused{background-color:rgba(25, 118, 210, 0.2);}.css-zgkbnr .MuiTreeItem-iconContainer{width:16px;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex-shrink:0;-ms-flex-negative:0;flex-shrink:0;-webkit-box-pack:center;-ms-flex-pack:center;-webkit-justify-content:center;justify-content:center;}.css-zgkbnr .MuiTreeItem-iconContainer svg{font-size:18px;}.css-zgkbnr .MuiTreeItem-label{width:100%;box-sizing:border-box;min-width:0;position:relative;font-family:"Roboto","Helvetica","Arial",sans-serif;font-weight:400;font-size:1rem;line-height:1.5;letter-spacing:0.00938em;}.css-zgkbnr .MuiTreeItem-checkbox{padding:0;}</style><div class="MuiTreeItem-content css-zgkbnr Mui-expanded Mui-selected"><div class="MuiTreeItem-iconContainer"><style data-emotion="css q7mezt">.css-q7mezt{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;width:1em;height:1em;display:inline-block;-webkit-flex-shrink:0;-ms-flex-negative:0;flex-shrink:0;-webkit-transition:fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;transition:fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;fill:currentColor;font-size:1.5rem;}</style><svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-q7mezt" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="TreeViewCollapseIconIcon"><path d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"></path></svg></div><div class="MuiTreeItem-label">src</div></div><style data-emotion="css gadsb9">.css-gadsb9{margin:0;padding:0;padding-left:var(--TreeView-itemChildrenIndentation);}</style><style data-emotion="css 1eefoa2">.css-1eefoa2{height:0;overflow:hidden;-webkit-transition:height 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;transition:height 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;height:auto;overflow:visible;margin:0;padding:0;padding-left:var(--TreeView-itemChildrenIndentation);}</style><ul class="MuiCollapse-root MuiCollapse-vertical MuiTreeItem-groupTransition MuiCollapse-entered css-1eefoa2" style="min-height:0px" role="group"><style data-emotion="css 15830to">.css-15830to{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;width:100%;}</style><div class="MuiCollapse-wrapper MuiCollapse-vertical css-15830to"><style data-emotion="css 9vd5ud">.css-9vd5ud{width:100%;}</style><div class="MuiCollapse-wrapperInner MuiCollapse-vertical css-9vd5ud"><li class="MuiTreeItem-root css-ljgrlg" role="treeitem" aria-expanded="true" aria-selected="false" id="-src/commonMain" tabindex="-1"><div class="MuiTreeItem-content css-zgkbnr Mui-expanded"><div class="MuiTreeItem-iconContainer"><svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-q7mezt" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="TreeViewCollapseIconIcon"><path d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"></path></svg></div><div class="MuiTreeItem-label">commonMain</div></div><ul class="MuiCollapse-root MuiCollapse-vertical MuiTreeItem-groupTransition MuiCollapse-entered css-1eefoa2" style="min-height:0px" role="group"><div class="MuiCollapse-wrapper MuiCollapse-vertical css-15830to"><div class="MuiCollapse-wrapperInner MuiCollapse-vertical css-9vd5ud"><li class="MuiTreeItem-root css-ljgrlg" role="treeitem" aria-selected="false" id="-src/commonMain/kotlin" tabindex="-1"><div class="MuiTreeItem-content css-zgkbnr"><div class="MuiTreeItem-iconContainer"></div><div class="MuiTreeItem-label">kotlin</div></div></li><li class="MuiTreeItem-root css-ljgrlg" role="treeitem" aria-selected="false" id="-src/commonMain/resources" tabindex="-1"><div class="MuiTreeItem-content css-zgkbnr"><div class="MuiTreeItem-iconContainer"></div><div class="MuiTreeItem-label">resources</div></div></li></div></div></ul></li><li class="MuiTreeItem-root css-ljgrlg" role="treeitem" aria-expanded="false" aria-selected="false" id="-src/jsMain" tabindex="-1"><div class="MuiTreeItem-content css-zgkbnr"><div class="MuiTreeItem-iconContainer"><svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-q7mezt" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="TreeViewExpandIconIcon"><path d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></div><div class="MuiTreeItem-label">jsMain</div></div></li><li class="MuiTreeItem-root css-ljgrlg" role="treeitem" aria-expanded="false" aria-selected="false" id="-src/jvmMain" tabindex="-1"><div class="MuiTreeItem-content css-zgkbnr"><div class="MuiTreeItem-iconContainer"><svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-q7mezt" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="TreeViewExpandIconIcon"><path d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></div><div class="MuiTreeItem-label">jvmMain</div></div></li><li class="MuiTreeItem-root css-ljgrlg" role="treeitem" aria-expanded="false" aria-selected="false" id="-src/wasmJsMain" tabindex="-1"><div class="MuiTreeItem-content css-zgkbnr"><div class="MuiTreeItem-iconContainer"><svg class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-q7mezt" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="TreeViewExpandIconIcon"><path d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></div><div class="MuiTreeItem-label">wasmJsMain</div></div></li></div></div></ul></li><li class="MuiTreeItem-root css-ljgrlg" role="treeitem" aria-selected="false" id="-build.gradle.kts" tabindex="-1"><div class="MuiTreeItem-content css-zgkbnr"><div class="MuiTreeItem-iconContainer"></div><div class="MuiTreeItem-label">build.gradle.kts</div></div></li></ul></div><div style="margin-left:1em"><div value="src"><p>All source code and resources are located under the <code>src</code> directory.</p><p>The application logic itself is located in the common source set (<code>src/commonMain</code>), which means it is entirely reused for each platform. In fact, the same app is used unchanged (just targeting JS) within this documentation.</p></div><div value="src/commonMain" hidden=""><p>Source code and resources for that are usable for platforms are stored in <code>commonMain</code>. This app is designed to work on all platforms, so our app code and all logic is found under this directory.</p></div><div value="src/commonMain/kotlin" hidden=""><p>The <code>kotlin</code> directory is where all code for a platform resides. In this case, we have all the classes for our app including <code>ContactsApp</code>, <code>ContactsList</code>, <code>ContactListBehavior</code>, <code>ContactsModel</code>, etc.. All of these classes are platform agnostic and used by all targets. This makes our app work on any target Doodle supports.</p><p>There are also a couple interfaces that need platform-specific implementations that are defined here: <code>PersistentStore</code> and <code>Router</code>. This allows our app to work with them in a platform independent way, even if they will vary depending on the target it is run on.</p></div><div value="src/commonMain/resources" hidden=""><p>An app can have resources like fonts, images, etc. that it loads at runtime. This directory contains these resources.</p><p>In our case, we will be loading two images and some fonts that we store here.</p></div><div value="src/jsMain" hidden=""><p>Source code and resources that are needed for Web (JS) target are stored in <code>jsMain</code>. Our app is platform agnostic except for the launch portion, which is located in the source below this directory.</p></div><div value="src/jsMain/kotlin" hidden=""><p>The Web launch portion of our app is located here in the program&#x27;s <code>main</code> function. The JS version uses a platform-specific <code>LocalStorePersistence</code> that is based on the browser&#x27;s <code>LocalStorage</code>. It also have a <code>TrivialRouter</code> that uses <code>window.location.hash</code> to track/update routes.</p></div><div value="src/jsMain/resources" hidden=""><p>Holds the <code>index.html</code> file that loads the generated JS file produced for the Web (JS) target.</p></div><div value="src/jvmMain" hidden=""><p>Source code and resources that are needed for Desktop (JVM) target are stored in <code>jvmMain</code>.</p></div><div value="src/jvmMain/kotlin" hidden=""><p>The Desktop launch portion of our app is located here in the program&#x27;s <code>main</code> function. This version uses a platform-specific <code>FilePersistence</code> that is based on the file system via <code>java.io.File</code>. It also has an <code>InMemoryRouter</code> that uses a hashmap internally to track/update routes.</p></div><div value="src/wasmJsMain" hidden=""><p>Source code and resources that are needed for Web (WASM) target are stored in <code>wasmJsMain</code>. Our app is platform agnostic except for the launch portion, which is located in the source below this directory.</p></div><div value="src/wasmJsMain/kotlin" hidden=""><p>The Web launch portion of our app is located here in the program&#x27;s <code>main</code> function. The WASM version uses a platform-specific <code>LocalStorePersistence</code> that is based on the browser&#x27;s <code>LocalStorage</code>. It also have a <code>TrivialRouter</code> that uses <code>window.location.hash</code> to track/update routes.</p></div><div value="src/wasmJsMain/resources" hidden=""><p>Holds the <code>index.html</code> file that loads the generated JS file produced for the Web (WASM) target.</p></div><div value="build.gradle.kts" hidden=""><p>The <code>build.gradle.kts</code> file defines how the app is configured and all its dependencies. The Contacts app uses a multi-platform configuration so it can run on all Doodle supported targets.</p></div></div></div></div></div>
+<p>Doodle apps are built using gradle like other Kotlin apps. The build is controlled by the <code>build.gradle.kts</code> script in the root of the <code>Contacts</code> directory.</p>
+<p><strong>build.gradle.kts</strong></p>
+<code theme="darcula" mode="kotlin" data-highlight-only="true">@file:OptIn(ExperimentalWasmDsl::class)
+
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+
+//sampleStart
+plugins {
     kotlin(&quot;multiplatform&quot;          )
     alias(libs.plugins.serialization)
-}
-
-kotlin {
-    // Defined in buildSrc/src/main/kotlin/Common.kt
-    jsTargets    ()
-    jvmTargets   ()
-    wasmJsTargets()
-
-    sourceSets {
-        commonMain {
-            dependencies {
-                api(libs.coroutines.core   )
-                api(libs.serialization.json)
-                api(libs.kodein.di         )
-
-                api(libs.doodle.controls )
-                api(libs.doodle.themes   )
-                api(libs.doodle.animation)
-            }
-        }
-    }
-}</code></div><div role="tabpanel" class="tabItem_Ymn6" hidden=""><p><a href="https://github.com/nacular/doodle-tutorials/blob/master/ContactsRunner/build.gradle.kts" target="_blank" rel="noopener noreferrer"><strong>build.gradle.kts</strong></a></p><code theme="darcula" mode="kotlin" data-highlight-only="true">plugins {
-    kotlin(&quot;multiplatform&quot;)
     application
 }
 
 kotlin {
-    jsTargets    (executable = true)
-    wasmJsTargets(executable = true)
-    jvmTargets   (                 )
+    js     { browser { binaries.executable() } } // Web     (JS  ) executable
+    wasmJs { browser { binaries.executable()     // Web     (WASM) executable
+        applyBinaryen {}                         // Binary size optimization
+    } }
+    jvm    {                                     // Desktop (JVM ) executable
+        compilations.all {
+            kotlinOptions { jvmTarget = &quot;11&quot; }   // JVM 11 is needed for Desktop
+        }
+        withJava()
+    }
 
     sourceSets {
+        // Source set for all platforms
         commonMain.dependencies {
-            implementation(project(&quot;:Contacts&quot;))
+            api(libs.coroutines.core   ) // async resource loading (fonts, images, ...)
+            api(libs.serialization.json) // persisting contacts
+
+            api(libs.doodle.themes   )
+            api(libs.doodle.controls )
+            api(libs.doodle.animation)
         }
 
+        // Web (JS) platform source set
         jsMain.dependencies {
             implementation(libs.doodle.browser)
         }
 
+        // Web (WASM) platform source set
         val wasmJsMain by getting {
             dependencies {
                 implementation(libs.doodle.browser)
             }
         }
 
+        // Desktop (JVM) platform source set
         jvmMain.dependencies {
+            // helper to derive OS/architecture pair
             when (osTarget()) {
                 &quot;macos-x64&quot;     -&gt; implementation(libs.doodle.desktop.jvm.macos.x64    )
                 &quot;macos-arm64&quot;   -&gt; implementation(libs.doodle.desktop.jvm.macos.arm64  )
@@ -85,100 +87,240 @@ kotlin {
     }
 }
 
+// Desktop entry point
 application {
-    mainClass.set(&quot;MainKt&quot;)
+    mainClass.set(&quot;io.nacular.doodle.example.MainKt&quot;)
 }
+//sampleEnd
 
-installFullScreenDemo(&quot;Development&quot;)
-installFullScreenDemo(&quot;Production&quot; )</code><div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>warning</div><div class="admonitionContent_BuS1"><p>The desktop application uses placeholder icons in some cases to work-around a known <a href="https://github.com/JetBrains/skiko/issues/518" target="_blank" rel="noopener noreferrer">Skiko bug</a> related to SVG path data parsing.</p></div></div></div></div></div>
-<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>info</div><div class="admonitionContent_BuS1"><p>Build uses <a href="https://github.com/nacular/doodle-tutorials/blob/master/gradle/libs.versions.toml" target="_blank" rel="noopener noreferrer">libs.versions.toml</a> file.</p></div></div>
+// could be moved to buildSrc, but kept here for clarity
+fun osTarget(): String {
+    val osName = System.getProperty(&quot;os.name&quot;)
+    val targetOs = when {
+        osName == &quot;Mac OS X&quot;       -&gt; &quot;macos&quot;
+        osName.startsWith(&quot;Win&quot;  ) -&gt; &quot;windows&quot;
+        osName.startsWith(&quot;Linux&quot;) -&gt; &quot;linux&quot;
+        else                       -&gt; error(&quot;Unsupported OS: $osName&quot;)
+    }
+
+    val targetArch = when (val osArch = System.getProperty(&quot;os.arch&quot;)) {
+        &quot;x86_64&quot;, &quot;amd64&quot; -&gt; &quot;x64&quot;
+        &quot;aarch64&quot;         -&gt; &quot;arm64&quot;
+        else              -&gt; error(&quot;Unsupported arch: $osArch&quot;)
+    }
+
+    return &quot;${targetOs}-${targetArch}&quot;
+}</code>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>info</div><div class="admonitionContent_BuS1"><p>The gradle build uses <a href="https://docs.gradle.org/current/userguide/version_catalogs.html" target="_blank" rel="noopener noreferrer">gradle version catalogs</a>; see <a href="https://github.com/nacular/doodle-tutorials/blob/master/gradle/libs.versions.toml" target="_blank" rel="noopener noreferrer">libs.versions.toml</a> file for library info.</p></div></div>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="the-application">The Application<a href="#the-application" class="hash-link" aria-label="Direct link to The Application" title="Direct link to The Application">​</a></h2>
 <p><a href="https://github.com/nacular/doodle-tutorials/blob/master/Contacts/src/commonMain/kotlin/io/nacular/doodle/examples/contacts/ContactsApp.kt" target="_blank" rel="noopener noreferrer"><code>ContactsApp</code></a> is the entry point into our application. This is where the general structure of our app is defined. Note that Doodle creates all apps via constructor and passes their dependencies that way. This means the ContactsApp can begin work on setting up its views, layout, and routing directly in <code>init</code>.</p>
+<p>Doodle apps can be <a href="https://nacular.github.io/doodle/docs/applications" target="_blank" rel="noopener noreferrer">launched</a> in a few different ways on Web and Desktop. Use the <code>application</code> function in a platform source-set (i.e. <code>jsMain</code>, <code>jvmMain</code>, etc.) to launch top-level apps. It takes a list of modules to load and a lambda that builds the app. This lambda is within a Kodein injection context, which means we can inject dependencies into our app via <code>instance</code>, <code>provider</code>, etc.</p>
 <p><a href="https://github.com/nacular/doodle-tutorials/blob/master/Contacts/src/commonMain/kotlin/io/nacular/doodle/examples/contacts/ContactsApp.kt#L19" target="_blank" rel="noopener noreferrer"><strong>ContactsApp.kt</strong></a></p>
-<p><strong>ContactsApp.kt</strong></p>
-<code theme="darcula" mode="kotlin" data-highlight-only="true">
-class ContactsApp(/*...*/): Application {
+<code theme="darcula" mode="kotlin" data-highlight-only="true">package io.nacular.doodle.examples.contacts
 
-    // ...
+import io.nacular.doodle.application.Application
+import io.nacular.doodle.controls.panels.ScrollPanel
+import io.nacular.doodle.core.Display
+import io.nacular.doodle.core.Layout
+import io.nacular.doodle.core.Positionable
+import io.nacular.doodle.core.PositionableContainer
+import io.nacular.doodle.core.View
+import io.nacular.doodle.drawing.paint
+import io.nacular.doodle.geometry.Size
+import io.nacular.doodle.theme.ThemeManager
+import io.nacular.doodle.theme.adhoc.DynamicTheme
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlin.math.max
 
+/**
+ * Simple contacts app based on https://phonebook-pi.vercel.app/
+ *
+ * @param theme for the app
+ * @param Header factory for creating the [Header] view
+ * @param router for managing app routes
+ * @param config creation for the app
+ * @param display where all content for the app is shown
+ * @param contacts data model
+ * @param appScope for launching coroutines
+ * @param navigator to show different views within the app
+ * @param ContactView factory
+ * @param ContactList factory
+ * @param uiDispatcher allows dispatching to the UI thread
+ * @param themeManager for setting the app&#x27;s theme
+ * @param CreateButton factory to obtain the app&#x27;s create button
+ * @param EditContactView factory to create the Contact edit view
+ * @param CreateContactView factory to create the Contact creation view
+ */
+class ContactsApp(
+    theme            : DynamicTheme,
+    Header           : (AppConfig) -&gt; Header,
+    router           : Router,
+    config           : suspend () -&gt; AppConfig,
+    display          : Display,
+    contacts         : ContactsModel,
+    appScope         : CoroutineScope,
+    navigator        : Navigator,
+    ContactView      : (AppConfig, Contact) -&gt; ContactView,
+    ContactList      : (AppConfig         ) -&gt; ContactList,
+    uiDispatcher     : CoroutineDispatcher,
+    themeManager     : ThemeManager,
+    CreateButton     : (AppConfig         ) -&gt; CreateContactButton,
+    EditContactView  : (AppConfig, Contact) -&gt; EditContactView,
+    CreateContactView: (AppConfig         ) -&gt; CreateContactView,
+): Application {
+
+    private lateinit var header     : Header
+    private lateinit var contactList: View
+
+//sampleStart
     init {
-        // Coroutine used to load assets
+        // Coroutine used to load config
         appScope.launch(uiDispatcher) {
-            val appAssets = assets()
-
             themeManager.selected = theme // Install theme
 
-            header      = Header     (appAssets)
-            contactList = ContactList(appAssets)
+            val appConfig = config() // load app configuration
+
+            header        = Header     (appConfig)
+            contactList   = ContactList(appConfig)
 
             // Register handlers for different routes
-            router[&quot;&quot;                      ] = { _,_        -&gt; /* Contact List     */ }
-            router[&quot;/add&quot;                  ] = { _,_        -&gt; /* Contact Creation */ }
-            router[&quot;/contact/([0-9]+)&quot;     ] = { _, matches -&gt; /* Contact          */ }
-            router[&quot;/contact/([0-9]+)/edit&quot;] = { _, matches -&gt; /* Contact Editing  */ }
+            router[&quot;&quot;                 ] = { _,_        -&gt; setMainView(display, contactList                              ) }
+            router[&quot;/add&quot;             ] = { _,_        -&gt; setMainView(display, scrollPanel(CreateContactView(appConfig))) }
+            router[&quot;/contact/([0-9]+)&quot;] = { _, matches -&gt;
+                when (val contact = matches.firstOrNull()?.toInt()?.let { contacts.find(it) }) {
+                    null -&gt; navigator.showContactList()
+                    else -&gt; setMainView(display, scrollPanel(ContactView(appConfig, contact)))
+                }
+            }
+            router[&quot;/contact/([0-9]+)/edit&quot;] = { _, matches -&gt;
+                when (val contact = matches.firstOrNull()?.toInt()?.let { contacts.find(it) }) {
+                    null -&gt; navigator.showContactList()
+                    else -&gt; setMainView(display, scrollPanel(EditContactView(appConfig, contact)))
+                }
+            }
 
             display += header
 
             // Happens after header is added to ensure view goes below create button
             router.fireAction()
 
-            display += CreateButton(appAssets)
-
-            // Setup layout that manages how Header, CreateButton, and current View are positioned
-            display.layout = simpleLayout { container -&gt;
-                // ...
+            // Reset layout whenever display children change since the layout stores the display&#x27;s children internally.
+            display.childrenChanged += { _,_ -&gt;
+                updateLayout(display, appConfig)
             }
 
-            display.fill(appAssets.background.paint)
+            display += CreateButton(appConfig)
+
+            display.fill(appConfig.background.paint)
+        }
+    }
+//sampleEnd
+
+    private fun scrollPanel(content: View) = ScrollPanel(content).apply {
+        contentWidthConstraints = { it eq width - verticalScrollBarWidth }
+    }
+
+    private fun setMainView(display: Display, view: View) {
+        when {
+            display.children.size &lt; 3 -&gt; display             += view
+            else                      -&gt; display.children[1]  = view
+        }
+
+        header.searchEnabled = view == contactList
+    }
+
+    private fun updateLayout(display: Display, appAssets: AppConfig) {
+        display.layout = if (display.children.size &lt; 3) null else object: Layout {
+            // Header needs to be sized based on its minimumSize, so this layout should respond to any changes to it.
+            override fun requiresLayout(
+                child: Positionable,
+                of   : PositionableContainer,
+                old  : View.SizePreferences,
+                new  : View.SizePreferences
+            ) = new.minimumSize != old.minimumSize
+
+            private val delegate = io.nacular.doodle.layout.constraints.constrain(header, display.children[1], display.children[2]) { header_, mainView, button -&gt;
+                header_.top     eq 0
+                header_.width   eq parent.width
+                header_.height  eq header.minimumSize.height
+
+                mainView.top    eq header_.height
+                mainView.left   eq INSET
+                mainView.width  eq header_.width - 2 * INSET
+                mainView.height eq parent.height - header_.height
+
+                lateinit var buttonSize: Size
+
+                when {
+                    header.filterCentered -&gt; {
+                        buttonSize = appAssets.createButtonLargeSize
+                        button.top eq (header.naturalHeight - buttonSize.height) / 2
+                    }
+                    else                  -&gt; {
+                        buttonSize = appAssets.createButtonSmallSize
+                        button.bottom eq parent.bottom - 40
+                    }
+                }
+
+                button.left   eq max(20.0, parent.width - buttonSize.width - 20)
+                button.width  eq buttonSize.width
+                button.height eq buttonSize.height
+            }
+
+            override fun layout(container: PositionableContainer) {
+                delegate.layout(container)
+            }
         }
     }
 
-    // ...
-
     override fun shutdown() { /* no-op */ }
-}
-</code>
+}</code>
 <div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_BuS1"><p>Notice that <code>shutdown</code> is a no-op, since we don&#x27;t have any cleanup to do when the app closes.</p></div></div>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="async-assets">Async Assets<a href="#async-assets" class="hash-link" aria-label="Direct link to Async Assets" title="Direct link to Async Assets">​</a></h3>
-<p>The app uses custom fonts and images, both of which require async loading via <a href="https://nacular.github.io/doodle/docs/rendering/text#fonts" target="_blank" rel="noopener noreferrer"><code>FontLoader</code></a> and <a href="https://nacular.github.io/doodle/docs/rendering/images" target="_blank" rel="noopener noreferrer"><code>ImageLoader</code></a>. It is easiest to load these within the app itself (instead of trying to load them in the launcher and injecting). We are using the <code>AppConfig</code> interface to hold these assets and many different app attributes. The ContactsApp therefore needs to create an instance of this config, which must happen asynchronously since it internally loads fonts and images. This is what the <code>assets</code> factory does, and why the app needs a <code>CoroutineScope</code> and <code>CoroutineDispatcher</code> injected.</p>
+<p>The app uses custom fonts and images, both of which require async loading via <a href="https://nacular.github.io/doodle/docs/rendering/text#fonts" target="_blank" rel="noopener noreferrer"><code>FontLoader</code></a> and <a href="https://nacular.github.io/doodle/docs/rendering/images" target="_blank" rel="noopener noreferrer"><code>ImageLoader</code></a>. It is easiest to load these within the app itself (instead of trying to load them in the launcher and injecting). We are using the <code>AppConfig</code> interface to hold these assets and many different app attributes. The <code>ContactsApp</code> therefore needs to create an instance of this config, which must happen asynchronously since it internally loads fonts and images. This is what the <code>config</code> factory does, and why the app needs a <code>CoroutineScope</code> and <code>CoroutineDispatcher</code> injected.</p>
 <p><strong>ContactsApp.kt</strong></p>
 <code theme="darcula" mode="kotlin" data-highlight-only="true">
 class ContactsApp(
-    // ...
-    assets      : suspend () -&gt; AppConfig,
-    appScope    : CoroutineScope,
-    uiDispatcher: CoroutineDispatcher,
-    // ...
+  // ...
+  config      : suspend () -&gt; AppConfig,
+  appScope    : CoroutineScope,
+  uiDispatcher: CoroutineDispatcher,
+  // ...
 ): Application {
-    // ...
-    init {
-        appScope.launch(uiDispatcher) {
-            val appAssets = assets()
-            // ...
-        }
-    }
+  // ...
+  init {
+      appScope.launch(uiDispatcher) {
+          // ...
 
-    // ...
+          val appConfig = config() // load app configuration
+
+          // ...
+      }
+  }
+
+  // ...
 }
 </code>
 <p>Our launcher creates the <code>appScope</code> ahead of app creation and injects it, along with <code>Dispatchers.UI</code> (<a href="https://nacular.github.io/doodle-api/browser/io.nacular.doodle.coroutines/-dispatchers" target="_blank" rel="noopener noreferrer">web</a>, <a href="https://nacular.github.io/doodle-api/desktop/io.nacular.doodle.coroutines/-dispatchers" target="_blank" rel="noopener noreferrer">desktop</a>).</p>
 <p><strong>main.kt</strong></p>
 <code theme="darcula" mode="kotlin" data-highlight-only="true">
 fun main() {
-    // ...
-    val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
+  // ...
+  val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
 
-    application (modules = listOf(
-        // ...
-    )) {
-        // load app
-        ContactsApp(
-            // ...
-            appScope     = appScope
-            uiDispatcher = Dispatchers.UI,
-            // ...
-        )
-    }
+  application (modules = listOf(
+      // ...
+  )) {
+      // load app
+      ContactsApp(
+          // ...
+          appScope     = appScope
+          uiDispatcher = Dispatchers.UI,
+          // ...
+      )
+  }
 }
 </code>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="theming">Theming<a href="#theming" class="hash-link" aria-label="Direct link to Theming" title="Direct link to Theming">​</a></h3>
@@ -187,24 +329,24 @@ fun main() {
 <p><strong>main.kt</strong></p>
 <code theme="darcula" mode="kotlin" data-highlight-only="true">
 fun main() {
-    // ...
+  // ...
 
-    application (modules = listOf(
-        // ...
-        basicLabelBehavior       (),
-        nativeTextFieldBehavior  (spellCheck = false),
-        nativeHyperLinkBehavior  (),
-        nativeScrollPanelBehavior(),
-        // ...
-    )) {
-        // load app
-        ContactsApp(
-            // ...
-            theme        = instance(), // automatically available b/c Behavior modules installed
-            themeManager = instance(), // automatically available b/c Behavior modules installed
-            // ...
-        )
-    }
+  application (modules = listOf(
+      // ...
+      basicLabelBehavior       (),
+      nativeTextFieldBehavior  (spellCheck = false),
+      nativeHyperLinkBehavior  (),
+      nativeScrollPanelBehavior(),
+      // ...
+  )) {
+      // load app
+      ContactsApp(
+          // ...
+          theme        = instance(), // automatically available b/c Behavior modules installed
+          themeManager = instance(), // automatically available b/c Behavior modules installed
+          // ...
+      )
+  }
 }
 </code>
 <div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>info</div><div class="admonitionContent_BuS1"><p>Notice that we also install modules to get support for <a href="https://nacular.github.io/doodle/docs/rendering/text#fonts" target="_blank" rel="noopener noreferrer">fonts</a>, <a href="https://nacular.github.io/doodle/docs/rendering/images" target="_blank" rel="noopener noreferrer">images</a>, <a href="https://nacular.github.io/doodle/docs/pointer_input/overview" target="_blank" rel="noopener noreferrer">pointer</a>, <a href="https://nacular.github.io/doodle/docs/keyboard" target="_blank" rel="noopener noreferrer">keyboard</a> and others.</p></div></div>
@@ -212,21 +354,21 @@ fun main() {
 <p><strong>ContactsApp.kt</strong></p>
 <code theme="darcula" mode="kotlin" data-highlight-only="true">
 class ContactsApp(
-    // ...
-    theme       : DynamicTheme,
-    themeManager: ThemeManager,
-    // ...
+  // ...
+  theme       : DynamicTheme,
+  themeManager: ThemeManager,
+  // ...
 ): Application {
-    // ...
-    init {
-        appScope.launch(uiDispatcher) {
-            // ...
-            themeManager.selected = theme // Install theme
-            // ...
-        }
-    }
+  // ...
+  init {
+      appScope.launch(uiDispatcher) {
+          // ...
+          themeManager.selected = theme // Install theme
+          // ...
+      }
+  }
 
-    // ...
+  // ...
 }
 </code>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="routing">Routing<a href="#routing" class="hash-link" aria-label="Direct link to Routing" title="Direct link to Routing">​</a></h3>
@@ -234,26 +376,26 @@ class ContactsApp(
 <p><strong>ContactsApp.kt</strong></p>
 <code theme="darcula" mode="kotlin" data-highlight-only="true">
 class ContactsApp(
-    // ...
-    router: Router,
-    // ...
+  // ...
+  router: Router,
+  // ...
 ): Application {
-    // ...
-    init {
-        appScope.launch(uiDispatcher) {
-            // ...
+  // ...
+  init {
+      appScope.launch(uiDispatcher) {
+          // ...
 
-            // Register handlers for different routes
-            router[&quot;&quot;                      ] = { _,_        -&gt; /* Contact List     */ }
-            router[&quot;/add&quot;                  ] = { _,_        -&gt; /* Contact Creation */ }
-            router[&quot;/contact/([0-9]+)&quot;     ] = { _, matches -&gt; /* Contact          */ }
-            router[&quot;/contact/([0-9]+)/edit&quot;] = { _, matches -&gt; /* Contact Editing  */ }
+          // Register handlers for different routes
+          router[&quot;&quot;                      ] = { _,_        -&gt; /* Contact List     */ }
+          router[&quot;/add&quot;                  ] = { _,_        -&gt; /* Contact Creation */ }
+          router[&quot;/contact/([0-9]+)&quot;     ] = { _, matches -&gt; /* Contact          */ }
+          router[&quot;/contact/([0-9]+)/edit&quot;] = { _, matches -&gt; /* Contact Editing  */ }
 
-            // ...
-        }
-    }
+          // ...
+      }
+  }
 
-    // ...
+  // ...
 }
 </code>
 <div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>info</div><div class="admonitionContent_BuS1"><p>The <a href="https://github.com/nacular/doodle-tutorials/blob/master/Contacts/src/commonMain/kotlin/io/nacular/doodle/examples/contacts/Router.kt#L9" target="_blank" rel="noopener noreferrer"><code>Router</code></a> interface supports registration of handlers by regex strings. This allows for routes that contain variable data.</p></div></div>
@@ -262,43 +404,43 @@ class ContactsApp(
 <p><strong>ContactsApp.kt</strong></p>
 <code theme="darcula" mode="kotlin" data-highlight-only="true">
 class ContactsApp(
-    // ...
-    display: Display,
-    // ...
+  // ...
+  display: Display,
+  // ...
 ): Application {
-    // ...
-    init {
-        appScope.launch(uiDispatcher) {
-            // ...
+  // ...
+  init {
+      appScope.launch(uiDispatcher) {
+          // ...
 
-            display.layout = object: Layout {
-                // Header needs to be sized based on its minimumSize, so this layout should respond to any changes to it.
-                override fun requiresLayout(
-                    child: Positionable,
-                    of   : PositionableContainer,
-                    old  : View.SizePreferences,
-                    new  : View.SizePreferences
-                ) = new.minimumSize != old.minimumSize
+          display.layout = object: Layout {
+              // Header needs to be sized based on its minimumSize, so this layout should respond to any changes to it.
+              override fun requiresLayout(
+                  child: Positionable,
+                  of   : PositionableContainer,
+                  old  : View.SizePreferences,
+                  new  : View.SizePreferences
+              ) = new.minimumSize != old.minimumSize
 
-                override fun layout(container: PositionableContainer) {
-                    val mainView = container.children[1]
-                    val button   = container.children[2]
+              override fun layout(container: PositionableContainer) {
+                  val mainView = container.children[1]
+                  val button   = container.children[2]
 
-                    header.size     = Size(container.width, header.minimumSize.height)
-                    mainView.bounds = Rectangle(INSET, header.height, max(0.0, header.width - 2 * INSET), max(0.0, container.height - header.height))
+                  header.size     = Size(container.width, header.minimumSize.height)
+                  mainView.bounds = Rectangle(INSET, header.height, max(0.0, header.width - 2 * INSET), max(0.0, container.height - header.height))
 
-                    button.bounds = when {
-                        container.width &gt; header.filterCenterAboveWidth -&gt; Rectangle(container.width - appAssets.createButtonLargeSize.width - 20, (header.naturalHeight - appAssets.createButtonLargeSize.height) / 2, appAssets.createButtonLargeSize.width, appAssets.createButtonLargeSize.height)
-                        else                                            -&gt; Rectangle(container.width - appAssets.createButtonSmallSize.width - 20, container.height - appAssets.createButtonSmallSize.height - 40,      appAssets.createButtonSmallSize.width, appAssets.createButtonSmallSize.height)
-                    }
-                }
-            }
+                  button.bounds = when {
+                      container.width &gt; header.filterCenterAboveWidth -&gt; Rectangle(container.width - appAssets.createButtonLargeSize.width - 20, (header.naturalHeight - appAssets.createButtonLargeSize.height) / 2, appAssets.createButtonLargeSize.width, appAssets.createButtonLargeSize.height)
+                      else                                            -&gt; Rectangle(container.width - appAssets.createButtonSmallSize.width - 20, container.height - appAssets.createButtonSmallSize.height - 40,      appAssets.createButtonSmallSize.width, appAssets.createButtonSmallSize.height)
+                  }
+              }
+          }
 
-            // ...
-        }
-    }
+          // ...
+      }
+  }
 
-    // ...
+  // ...
 }
 </code>
 <p>The Header is placed at the top and allowed to resize based on the <code>Display</code>&#x27;s width. The header will update its <code>minimumSize</code> and <code>idealSize</code> based on its width, which in turn will trigger a re-layout (see <code>requiresLayout</code> above). The main View is always seated below the Header and takes the remaining space within the <code>Display</code>.</p>
@@ -312,69 +454,69 @@ class ContactsApp(
 <code theme="darcula" mode="kotlin" data-highlight-only="true">
 class Header(/*...*/): View() {
 
-    /** Search box that filters which contacts are shown */
-    private inner class FilterBox: View() {
-        // ...
-    }
+  /** Search box that filters which contacts are shown */
+  private inner class FilterBox: View() {
+      // ...
+  }
 
-            val naturalHeight          =  64.0
-    private val filterRightAboveWidth  = 672.0
-    private val filterCenterAboveWidth = 800.0
-    private val filterBox: FilterBox
+          val naturalHeight          =  64.0
+  private val filterRightAboveWidth  = 672.0
+  private val filterCenterAboveWidth = 800.0
+  private val filterBox: FilterBox
 
-    val filterCentered: Boolean get() = width &gt; filterCenterAboveWidth
+  val filterCentered: Boolean get() = width &gt; filterCenterAboveWidth
 
-    var searchEnabled by observable(true) { _,new -&gt;
-        filterBox.enabled = new
-    }
+  var searchEnabled by observable(true) { _,new -&gt;
+      filterBox.enabled = new
+  }
 
-    init {
-        children += Photo(assets.logo).apply { size = Size(40) }
-        children += Label(&quot;Phonebook&quot;).apply {
-            font            = assets.large
-            behavior        = CommonLabelBehavior(textMetrics)
-            acceptsThemes   = false
-            foregroundColor = assets.header
-        }
-        children += FilterBox().apply { size = Size(300, 45); font = assets.medium }.also { filterBox = it }
+  init {
+      children += Photo(assets.logo).apply { size = Size(40) }
+      children += Label(&quot;Phonebook&quot;).apply {
+          font            = assets.large
+          behavior        = CommonLabelBehavior(textMetrics)
+          acceptsThemes   = false
+          foregroundColor = assets.header
+      }
+      children += FilterBox().apply { size = Size(300, 45); font = assets.medium }.also { filterBox = it }
 
-        val filterNaturalWidth = 300.0
+      val filterNaturalWidth = 300.0
 
-        layout = Layout.simpleLayout { container -&gt;
-            val logo   = container.children[0]
-            val label  = container.children[1]
-            val filter = container.children[2]
+      layout = Layout.simpleLayout { container -&gt;
+          val logo   = container.children[0]
+          val label  = container.children[1]
+          val filter = container.children[2]
 
-            logo.position  = Point(2 * INSET, (naturalHeight - logo.height) / 2)
-            label.position = Point(logo.bounds.right + 10, logo.bounds.center.y - label.height / 2)
+          logo.position  = Point(2 * INSET, (naturalHeight - logo.height) / 2)
+          label.position = Point(logo.bounds.right + 10, logo.bounds.center.y - label.height / 2)
 
-            filter.bounds = when {
-                container.width &gt; filterCenterAboveWidth -&gt; Rectangle((container.width - filterNaturalWidth) / 2,        logo.bounds.center.y - filter.height / 2, filterNaturalWidth, filter.height)
-                container.width &gt; filterRightAboveWidth  -&gt; Rectangle( container.width - filterNaturalWidth - 2 * INSET, logo.bounds.center.y - filter.height / 2, filterNaturalWidth, filter.height)
-                else                                     -&gt; Rectangle(logo.x, logo.bounds.bottom + INSET, max(0.0, container.width - 4 * INSET), filter.height)
-            }
-        }.then {
-            minimumSize = Size(width, max(0.0, filterBox.bounds.bottom + 8))
-            idealSize   = minimumSize
-        }
+          filter.bounds = when {
+              container.width &gt; filterCenterAboveWidth -&gt; Rectangle((container.width - filterNaturalWidth) / 2,        logo.bounds.center.y - filter.height / 2, filterNaturalWidth, filter.height)
+              container.width &gt; filterRightAboveWidth  -&gt; Rectangle( container.width - filterNaturalWidth - 2 * INSET, logo.bounds.center.y - filter.height / 2, filterNaturalWidth, filter.height)
+              else                                     -&gt; Rectangle(logo.x, logo.bounds.bottom + INSET, max(0.0, container.width - 4 * INSET), filter.height)
+          }
+      }.then {
+          minimumSize = Size(width, max(0.0, filterBox.bounds.bottom + 8))
+          idealSize   = minimumSize
+      }
 
-        // Custom cursor when pointer in the &quot;clickable&quot; region
-        pointerMotionChanged += moved {
-            cursor = when {
-                it.inHotspot -&gt; Pointer
-                else         -&gt; null
-            }
-        }
+      // Custom cursor when pointer in the &quot;clickable&quot; region
+      pointerMotionChanged += moved {
+          cursor = when {
+              it.inHotspot -&gt; Pointer
+              else         -&gt; null
+          }
+      }
 
-        // Show Contact list when &quot;clickable&quot; region clicked
-        pointerChanged += clicked {
-            if (it.inHotspot) {
-                navigator.showContactList()
-            }
-        }
-    }
+      // Show Contact list when &quot;clickable&quot; region clicked
+      pointerChanged += clicked {
+          if (it.inHotspot) {
+              navigator.showContactList()
+          }
+      }
+  }
 
-    private val PointerEvent.inHotspot get() = this@Header.toLocal(location, target).x &lt; 220
+  private val PointerEvent.inHotspot get() = this@Header.toLocal(location, target).x &lt; 220
 }
 </code>
 <div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_BuS1"><p>The Header uses pointer tracking to update its Cursor and handle clicking within its hot spot.</p></div></div>
@@ -383,77 +525,77 @@ class Header(/*...*/): View() {
 <code theme="darcula" mode="kotlin" data-highlight-only="true">
 private inner class FilterBox: View() {
 
-    private var progress              by renderProperty(0f  )
-    private var animation: Animation? by observable    (null) { old,_ -&gt; old?.cancel() }
+  private var progress              by renderProperty(0f  )
+  private var animation: Animation? by observable    (null) { old,_ -&gt; old?.cancel() }
 
-    private val searchIcon     = PathIcon&lt;View&gt;(path(assets.searchIcon), fill = assets.search, pathMetrics = pathMetrics)
-    private val searchIconSize = searchIcon.size(this)
+  private val searchIcon     = PathIcon&lt;View&gt;(path(assets.searchIcon), fill = assets.search, pathMetrics = pathMetrics)
+  private val searchIconSize = searchIcon.size(this)
 
-    val textField = TextField().apply {
-        placeHolder      = &quot;Search&quot;
-        borderVisible    = false
-        backgroundColor  = Transparent
-        placeHolderColor = assets.placeHolder
-        focusChanged    += { _,_,hasFocus -&gt;
-            // animate progress based on focus state
-            animation = (animate (progress to if (hasFocus) 1f else 0f) using assets.slowTransition) {
-                progress = it
-            }
-        }
-    }
+  val textField = TextField().apply {
+      placeHolder      = &quot;Search&quot;
+      borderVisible    = false
+      backgroundColor  = Transparent
+      placeHolderColor = assets.placeHolder
+      focusChanged    += { _,_,hasFocus -&gt;
+          // animate progress based on focus state
+          animation = (animate (progress to if (hasFocus) 1f else 0f) using assets.slowTransition) {
+              progress = it
+          }
+      }
+  }
 
-    init {
-        cursor             = Text
-        clipCanvasToBounds = false
+  init {
+      cursor             = Text
+      clipCanvasToBounds = false
 
-        val clearButton = PathIconButton(pathData = assets.deleteIcon, pathMetrics = pathMetrics).apply {
-            size            = Size(22, 44)
-            cursor          = Pointer
-            visible         = textField.text.isNotBlank()
-            foregroundColor = assets.search
-            fired += {
-                textField.text = &quot;&quot;
-            }
-        }
+      val clearButton = PathIconButton(pathData = assets.deleteIcon, pathMetrics = pathMetrics).apply {
+          size            = Size(22, 44)
+          cursor          = Pointer
+          visible         = textField.text.isNotBlank()
+          foregroundColor = assets.search
+          fired += {
+              textField.text = &quot;&quot;
+          }
+      }
 
-        textField.textChanged += { _,_,new -&gt;
-            when {
-                new.isBlank() -&gt; contacts.filter = null
-                else          -&gt; contacts.filter = { it.name.contains(new, ignoreCase = true) }
-            }
+      textField.textChanged += { _,_,new -&gt;
+          when {
+              new.isBlank() -&gt; contacts.filter = null
+              else          -&gt; contacts.filter = { it.name.contains(new, ignoreCase = true) }
+          }
 
-            clearButton.visible = new.isNotBlank()
-        }
+          clearButton.visible = new.isNotBlank()
+      }
 
-        children += textField
-        children += clearButton
+      children += textField
+      children += clearButton
 
-        layout = constrain(children[0], children[1]) { textField, clear -&gt;
-            textField.left    = parent.left + searchIconSize.width + 2 * 20
-            textField.height  = parent.height
-            textField.right   = clear.left
-            textField.centerY = parent.centerY
-            clear.right       = parent.right - 20
-            clear.centerY     = parent.centerY
-        }
+      layout = constrain(children[0], children[1]) { textField, clear -&gt;
+          textField.left    = parent.left + searchIconSize.width + 2 * 20
+          textField.height  = parent.height
+          textField.right   = clear.left
+          textField.centerY = parent.centerY
+          clear.right       = parent.right - 20
+          clear.centerY     = parent.centerY
+      }
 
-        pointerChanged += clicked {
-            focusManager.requestFocus(textField)
-        }
-    }
+      pointerChanged += clicked {
+          focusManager.requestFocus(textField)
+      }
+  }
 
-    override fun render(canvas: Canvas) {
-        when {
-            // draw shadow when animating (progress &gt; 0)
-            progress &gt; 0f -&gt; canvas.outerShadow(horizontal = 0.0, vertical = 4.0 * progress, color = assets.shadow, blurRadius = 3.0 * progress) {
-                // interpolate color during animation
-                canvas.rect(bounds.atOrigin, radius = 8.0, color = interpolate(assets.searchSelected, assets.background, progress))
-            }
-            else          -&gt; canvas.rect(bounds.atOrigin, radius = 8.0, color = assets.searchSelected)
-        }
+  override fun render(canvas: Canvas) {
+      when {
+          // draw shadow when animating (progress &gt; 0)
+          progress &gt; 0f -&gt; canvas.outerShadow(horizontal = 0.0, vertical = 4.0 * progress, color = assets.shadow, blurRadius = 3.0 * progress) {
+              // interpolate color during animation
+              canvas.rect(bounds.atOrigin, radius = 8.0, color = interpolate(assets.searchSelected, assets.background, progress))
+          }
+          else          -&gt; canvas.rect(bounds.atOrigin, radius = 8.0, color = assets.searchSelected)
+      }
 
-        searchIcon.render(this, canvas, at = Point(20.0, (height - searchIconSize.height) / 2))
-    }
+      searchIcon.render(this, canvas, at = Point(20.0, (height - searchIconSize.height) / 2))
+  }
 }
 </code>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="contact-list"><a href="https://github.com/nacular/doodle-tutorials/blob/master/Contacts/src/commonMain/kotlin/io/nacular/doodle/examples/contacts/ContactList.kt#L35" target="_blank" rel="noopener noreferrer">Contact List</a><a href="#contact-list" class="hash-link" aria-label="Direct link to contact-list" title="Direct link to contact-list">​</a></h3>
@@ -462,37 +604,37 @@ private inner class FilterBox: View() {
 <p><strong>ContactList.kt</strong></p>
 <code theme="darcula" mode="kotlin" data-highlight-only="true">
 class ContactList(
-   // ...
+ // ...
 ): DynamicTable&lt;Contact, MutableListModel&lt;Contact&gt;&gt;(contacts, SingleItemSelectionModel(), block = {
-    val alignment      : Constraints.() -&gt; Unit          = // ...
-    val nameVisualizer : CellVisualizer&lt;Contact, String&gt; = // ...
-    val toolsVisualizer: CellVisualizer&lt;Contact, Unit&gt;   = // ...
+  val alignment      : Constraints.() -&gt; Unit          = // ...
+  val nameVisualizer : CellVisualizer&lt;Contact, String&gt; = // ...
+  val toolsVisualizer: CellVisualizer&lt;Contact, Unit&gt;   = // ...
 
-    column(Label(&quot;Name&quot;        ), { name        }, nameVisualizer   ) { cellAlignment = alignment; headerAlignment = alignment                }
-    column(Label(&quot;Phone Number&quot;), { phoneNumber }, TextVisualizer() ) { cellAlignment = alignment; headerAlignment = alignment                }
-    column(null,                                   toolsVisualizer  ) { cellAlignment = fill(Insets(top = 20.0, bottom = 20.0, right = 20.0)) }
+  column(Label(&quot;Name&quot;        ), { name        }, nameVisualizer   ) { cellAlignment = alignment; headerAlignment = alignment                }
+  column(Label(&quot;Phone Number&quot;), { phoneNumber }, TextVisualizer() ) { cellAlignment = alignment; headerAlignment = alignment                }
+  column(null,                                   toolsVisualizer  ) { cellAlignment = fill(Insets(top = 20.0, bottom = 20.0, right = 20.0)) }
 }) {
-    init {
-        // ...
+  init {
+      // ...
 
-        // Controls how the table&#x27;s columns resize
-        columnSizePolicy = object: ColumnSizePolicy {
-            override fun layout(width: Double, columns: List&lt;Column&gt;, startIndex: Int): Double {
-                columns[2].width = if (width &gt; 672.0 - 2 * INSET) 100.0 else 0.0 // FIXME: factor out hard-coded width
-                columns[0].width = width / 2
-                columns[1].width = width - columns[0].width - columns[2].width
+      // Controls how the table&#x27;s columns resize
+      columnSizePolicy = object: ColumnSizePolicy {
+          override fun layout(width: Double, columns: List&lt;Column&gt;, startIndex: Int): Double {
+              columns[2].width = if (width &gt; 672.0 - 2 * INSET) 100.0 else 0.0 // FIXME: factor out hard-coded width
+              columns[0].width = width / 2
+              columns[1].width = width - columns[0].width - columns[2].width
 
-                return width
-            }
+              return width
+          }
 
-            override fun widthChanged(width: Double, columns: List&lt;Column&gt;, index: Int, to: Double) {
-                // no-op
-            }
-        }
+          override fun widthChanged(width: Double, columns: List&lt;Column&gt;, index: Int, to: Double) {
+              // no-op
+          }
+      }
 
-        behavior      = ContactListBehavior(assets, navigator)
-        acceptsThemes = false
-    }
+      behavior      = ContactListBehavior(assets, navigator)
+      acceptsThemes = false
+  }
 }
 
 // ...
@@ -505,65 +647,65 @@ class ContactList(
 <p><strong>ContactListBehavior.kt</strong></p>
 <code theme="darcula" mode="kotlin" data-highlight-only="true">
 class ContactListBehavior(private val assets: AppConfig, private val navigator: Navigator): TableBehavior&lt;Contact&gt;() {
-    private inner class ContactCell&lt;T&gt;(/*...*/): View() {
-        // Represents each cell in the table&#x27;s body
-        // Navigates to ContactView on pointer press
-        // Adds/removes row selection (for highlighting) on pointer enter/exit
-    }
+  private inner class ContactCell&lt;T&gt;(/*...*/): View() {
+      // Represents each cell in the table&#x27;s body
+      // Navigates to ContactView on pointer press
+      // Adds/removes row selection (for highlighting) on pointer enter/exit
+  }
 
-    private val selectionChanged: SetObserver&lt;Table&lt;Contact, *&gt;, Int&gt; = { table,_,_ -&gt;
-        // Repaint the Table to show selected rows
-        table.bodyDirty()
-    }
+  private val selectionChanged: SetObserver&lt;Table&lt;Contact, *&gt;, Int&gt; = { table,_,_ -&gt;
+      // Repaint the Table to show selected rows
+      table.bodyDirty()
+  }
 
-    override fun install(view: Table&lt;Contact, *&gt;) {
-        view.selectionChanged += selectionChanged
-    }
+  override fun install(view: Table&lt;Contact, *&gt;) {
+      view.selectionChanged += selectionChanged
+  }
 
-    override fun uninstall(view: Table&lt;Contact, *&gt;) {
-        view.selectionChanged -= selectionChanged
-    }
+  override fun uninstall(view: Table&lt;Contact, *&gt;) {
+      view.selectionChanged -= selectionChanged
+  }
 
-    override val headerCellGenerator = object: AbstractTableBehavior.HeaderCellGenerator&lt;Table&lt;Contact, *&gt;&gt; {
-        override fun &lt;A&gt; invoke(table: Table&lt;Contact, *&gt;, column: Column&lt;A&gt;) = container {
-            // Column header cell with underline
-        }
-    }
+  override val headerCellGenerator = object: AbstractTableBehavior.HeaderCellGenerator&lt;Table&lt;Contact, *&gt;&gt; {
+      override fun &lt;A&gt; invoke(table: Table&lt;Contact, *&gt;, column: Column&lt;A&gt;) = container {
+          // Column header cell with underline
+      }
+  }
 
-    override val headerPositioner = object: AbstractTableBehavior.HeaderPositioner&lt;Table&lt;Contact, *&gt;&gt; {
-        override fun invoke(table: Table&lt;Contact, *&gt;) = HeaderGeometry(0.0, TABLE_HEADER_HEIGHT)
-    }
+  override val headerPositioner = object: AbstractTableBehavior.HeaderPositioner&lt;Table&lt;Contact, *&gt;&gt; {
+      override fun invoke(table: Table&lt;Contact, *&gt;) = HeaderGeometry(0.0, TABLE_HEADER_HEIGHT)
+  }
 
-    // No overflow column will be in the Table
-    override val overflowColumnConfig: Nothing? = null
+  // No overflow column will be in the Table
+  override val overflowColumnConfig: Nothing? = null
 
-    @Suppress(&quot;UNCHECKED_CAST&quot;)
-    override val cellGenerator: CellGenerator&lt;Contact&gt; = object: CellGenerator&lt;Contact&gt; {
-        override fun &lt;A&gt; invoke(table: Table&lt;Contact, *&gt;, column: Column&lt;A&gt;, cell: A, row: Int, itemGenerator: ItemVisualizer&lt;A, IndexedItem&gt;, current: View?): View = when (current) {
-            is ContactCell&lt;*&gt; -&gt; (current as ContactCell&lt;A&gt;).apply { update(table, cell, row) }
-            else              -&gt; ContactCell(table, column, cell, row, itemGenerator)
-        }
-    }
+  @Suppress(&quot;UNCHECKED_CAST&quot;)
+  override val cellGenerator: CellGenerator&lt;Contact&gt; = object: CellGenerator&lt;Contact&gt; {
+      override fun &lt;A&gt; invoke(table: Table&lt;Contact, *&gt;, column: Column&lt;A&gt;, cell: A, row: Int, itemGenerator: ItemVisualizer&lt;A, IndexedItem&gt;, current: View?): View = when (current) {
+          is ContactCell&lt;*&gt; -&gt; (current as ContactCell&lt;A&gt;).apply { update(table, cell, row) }
+          else              -&gt; ContactCell(table, column, cell, row, itemGenerator)
+      }
+  }
 
-    override val rowPositioner: RowPositioner&lt;Contact&gt; = object: RowPositioner&lt;Contact&gt; {
-        // Position rows like a vertical list
-        private val delegate = VerticalListPositioner(ROW_HEIGHT)
+  override val rowPositioner: RowPositioner&lt;Contact&gt; = object: RowPositioner&lt;Contact&gt; {
+      // Position rows like a vertical list
+      private val delegate = VerticalListPositioner(ROW_HEIGHT)
 
-        override fun rowBounds  (of: Table&lt;Contact, *&gt;, row: Contact, index: Int) = delegate.itemBounds (of.size,     of.insets, index)
-        override fun row        (of: Table&lt;Contact, *&gt;, at: Point               ) = delegate.itemFor    (of.size,     of.insets,  at  )
-        override fun minimumSize(of: Table&lt;Contact, *&gt;                          ) = delegate.minimumSize(of.numItems, of.insets       )
-    }
+      override fun rowBounds  (of: Table&lt;Contact, *&gt;, row: Contact, index: Int) = delegate.itemBounds (of.size,     of.insets, index)
+      override fun row        (of: Table&lt;Contact, *&gt;, at: Point               ) = delegate.itemFor    (of.size,     of.insets,  at  )
+      override fun minimumSize(of: Table&lt;Contact, *&gt;                          ) = delegate.minimumSize(of.numItems, of.insets       )
+  }
 
-    override fun renderBody(table: Table&lt;Contact, *&gt;, canvas: Canvas) {
-        canvas.rect(table.bounds.atOrigin, color = assets.background)
+  override fun renderBody(table: Table&lt;Contact, *&gt;, canvas: Canvas) {
+      canvas.rect(table.bounds.atOrigin, color = assets.background)
 
-        // Highlight selected rows
-        table.selection.map { it to table[it] }.forEach { (index, row) -&gt;
-            row.onSuccess {
-                canvas.rect(rowPositioner.rowBounds(table, it, index).inset(Insets(top = 1.0)), assets.listHighlight)
-            }
-        }
-    }
+      // Highlight selected rows
+      table.selection.map { it to table[it] }.forEach { (index, row) -&gt;
+          row.onSuccess {
+              canvas.rect(rowPositioner.rowBounds(table, it, index).inset(Insets(top = 1.0)), assets.listHighlight)
+          }
+      }
+  }
 }
 </code>
 <div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_BuS1"><p>Highlighting on pointer hover is handled by each cell in the Table. <a href="https://github.com/nacular/doodle-tutorials/blob/master/Contacts/src/commonMain/kotlin/io/nacular/doodle/examples/contacts/ContactListBehavior.kt#L29" target="_blank" rel="noopener noreferrer"><code>ContactCell</code></a> registers Pointer/MotionListeners and sets its row un/selected accordingly. This then results in <code>ContactListBehavior</code> redrawing the Table background and coloring the selected rows.</p></div></div>
@@ -573,70 +715,70 @@ class ContactListBehavior(private val assets: AppConfig, private val navigator: 
 <p><strong>CreateContactView.kt</strong></p>
 <code theme="darcula" mode="kotlin" data-highlight-only="true">
 class CreateContactView(
-    // ...
+  // ...
 ): View() {
-    private inner class DynamicAvatar(private val image: Image): Avatar(textMetrics, &quot;&quot;) {
-        override fun render(canvas: Canvas) {
-            when {
-                name.isBlank() -&gt; canvas.clip(Circle(radius = min(width, height) / 2, center = Point(width / 2, height / 2))) {
-                    canvas.image(image, destination = bounds.atOrigin)
-                }
-                else -&gt; super.render(canvas)
-            }
-        }
-    }
+  private inner class DynamicAvatar(private val image: Image): Avatar(textMetrics, &quot;&quot;) {
+      override fun render(canvas: Canvas) {
+          when {
+              name.isBlank() -&gt; canvas.clip(Circle(radius = min(width, height) / 2, center = Point(width / 2, height / 2))) {
+                  canvas.image(image, destination = bounds.atOrigin)
+              }
+              else -&gt; super.render(canvas)
+          }
+      }
+  }
 
-    init {
-        lateinit var name       : String
-        lateinit var phoneNumber: String
+  init {
+      lateinit var name       : String
+      lateinit var phoneNumber: String
 
-        val label = Label(&quot;Create Contact&quot;).apply {
-            font    = assets.medium
-            height  = 28.0
-            fitText = setOf(Width)
-        }
+      val label = Label(&quot;Create Contact&quot;).apply {
+          font    = assets.medium
+          height  = 28.0
+          fitText = setOf(Width)
+      }
 
-        val back   = buttons.back  (assets.backIcon)
-        val avatar = DynamicAvatar (assets.blankAvatar).apply { size = Size(176); font = assets.medium }
-        val button = buttons.create(assets.buttonBackground, assets.buttonForeground).apply {
-            font     = assets.small
-            enabled  = false
-            fired   += {
-                contacts += Contact(name, phoneNumber)
-                navigator.showContactList()
-            }
-        }
+      val back   = buttons.back  (assets.backIcon)
+      val avatar = DynamicAvatar (assets.blankAvatar).apply { size = Size(176); font = assets.medium }
+      val button = buttons.create(assets.buttonBackground, assets.buttonForeground).apply {
+          font     = assets.small
+          enabled  = false
+          fired   += {
+              contacts += Contact(name, phoneNumber)
+              navigator.showContactList()
+          }
+      }
 
-        val spacer = view {
-            height = 64.0
-            render = {
-                line(Point(0.0, height / 2), Point(width, height / 2), stroke = Stroke(assets.outline))
-            }
-        }
+      val spacer = view {
+          height = 64.0
+          render = {
+              line(Point(0.0, height / 2), Point(width, height / 2), stroke = Stroke(assets.outline))
+          }
+      }
 
-        val form = editForm(
-            assets          = assets,
-            button          = button,
-            pathMetrics     = pathMetrics,
-            nameChanged     = { avatar.name = it },
-            textFieldStyler = textFieldStyler
-        ) { name_, phone_ -&gt;
-            name           = name_
-            phoneNumber    = phone_
-            button.enabled = true
-        }
+      val form = editForm(
+          assets          = assets,
+          button          = button,
+          pathMetrics     = pathMetrics,
+          nameChanged     = { avatar.name = it },
+          textFieldStyler = textFieldStyler
+      ) { name_, phone_ -&gt;
+          name           = name_
+          phoneNumber    = phone_
+          button.enabled = true
+      }
 
-        children += listOf(label, back, avatar, spacer, form, button)
+      children += listOf(label, back, avatar, spacer, form, button)
 
-        layout = constrain(label, back, avatar, spacer, form, button) { (label, back, avatar, spacer, form, button) -&gt;
-            // ...
-        }.then {
-            idealSize = Size(spacer.width + 2 * INSET, button.bounds.bottom + INSET)
-        }
-    }
+      layout = constrain(label, back, avatar, spacer, form, button) { (label, back, avatar, spacer, form, button) -&gt;
+          // ...
+      }.then {
+          idealSize = Size(spacer.width + 2 * INSET, button.bounds.bottom + INSET)
+      }
+  }
 
-    // Helper to use constrain with 6 items
-    private operator fun &lt;T&gt; List&lt;T&gt;.component6() = this[5]
+  // Helper to use constrain with 6 items
+  private operator fun &lt;T&gt; List&lt;T&gt;.component6() = this[5]
 }
 </code>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="contact-view">Contact View<a href="#contact-view" class="hash-link" aria-label="Direct link to Contact View" title="Direct link to Contact View">​</a></h3>
@@ -645,65 +787,65 @@ class CreateContactView(
 <p><strong>ContactView.kt</strong></p>
 <code theme="darcula" mode="kotlin" data-highlight-only="true">
 class ContactView(/*...*/): ContactCommon(/*...*/) {
-    init {
-        edit.apply {
-            fired += {
-                // Show Contact edit when pressed
-                navigator.showContactEdit(super.contact)
-            }
-        }
+  init {
+      edit.apply {
+          fired += {
+              // Show Contact edit when pressed
+              navigator.showContactEdit(super.contact)
+          }
+      }
 
-        val details = container {
-            this += Label(&quot;Contact Details&quot;).apply {
-                font    = assets.small
-                height  = 24.0
-                fitText = setOf(Width)
-            }
-            this += HyperLink(
-                url  = &quot;tel:${contact.phoneNumber}&quot;,
-                text = contact.phoneNumber,
-                icon = PathIcon(path = path(assets.phoneIcon), pathMetrics = pathMetrics, fill = assets.phoneNumber),
-            ).apply {
-                font            = assets.small
-                acceptsThemes   = false
-                iconTextSpacing = INSET
-                behavior        = linkStyler(this, object: CommonTextButtonBehavior&lt;HyperLink&gt;(textMetrics) {
-                    override fun install(view: HyperLink) {
-                        super.install(view)
-                        val textSize = textMetrics.size(text, font)
-                        val iconSize = icon!!.size(view)
+      val details = container {
+          this += Label(&quot;Contact Details&quot;).apply {
+              font    = assets.small
+              height  = 24.0
+              fitText = setOf(Width)
+          }
+          this += HyperLink(
+              url  = &quot;tel:${contact.phoneNumber}&quot;,
+              text = contact.phoneNumber,
+              icon = PathIcon(path = path(assets.phoneIcon), pathMetrics = pathMetrics, fill = assets.phoneNumber),
+          ).apply {
+              font            = assets.small
+              acceptsThemes   = false
+              iconTextSpacing = INSET
+              behavior        = linkStyler(this, object: CommonTextButtonBehavior&lt;HyperLink&gt;(textMetrics) {
+                  override fun install(view: HyperLink) {
+                      super.install(view)
+                      val textSize = textMetrics.size(text, font)
+                      val iconSize = icon!!.size(view)
 
-                        // Ensure link&#x27;s size includes icon and text
-                        size = Size(textPosition(view).x + textSize.width, max(iconSize.height, textSize.height))
-                    }
+                      // Ensure link&#x27;s size includes icon and text
+                      size = Size(textPosition(view).x + textSize.width, max(iconSize.height, textSize.height))
+                  }
 
-                    override fun render(view: HyperLink, canvas: Canvas) {
-                        icon!!.render(view, canvas, at = iconPosition(view, icon = icon!!))
+                  override fun render(view: HyperLink, canvas: Canvas) {
+                      icon!!.render(view, canvas, at = iconPosition(view, icon = icon!!))
 
-                        // Styled text with phoneNumberLink color and link&#x27;s font
-                        canvas.text(assets.phoneNumberLink.invoke { view.font(view.text) }, at = textPosition(view))
-                    }
-                }) as Behavior&lt;Button&gt;
-            }
+                      // Styled text with phoneNumberLink color and link&#x27;s font
+                      canvas.text(assets.phoneNumberLink.invoke { view.font(view.text) }, at = textPosition(view))
+                  }
+              }) as Behavior&lt;Button&gt;
+          }
 
-            render = {
-                rect(bounds.atOrigin.inset(0.5), radius = 12.0, stroke = Stroke(assets.outline))
-            }
+          render = {
+              rect(bounds.atOrigin.inset(0.5), radius = 12.0, stroke = Stroke(assets.outline))
+          }
 
-            layout = constrain(children[0], children[1]) { label, link -&gt;
-                label.top  = parent.top   + INSET
-                label.left = parent.left  + INSET
-                link.top   = label.bottom + INSET
-                link.left  = label.left
-            }
-        }
+          layout = constrain(children[0], children[1]) { label, link -&gt;
+              label.top  = parent.top   + INSET
+              label.left = parent.left  + INSET
+              link.top   = label.bottom + INSET
+              link.left  = label.left
+          }
+      }
 
-        setDetail(details)
+      setDetail(details)
 
-        layout = simpleLayout { layoutCommonItems() }.then {
-            idealSize = Size(spacer.width + 2 * INSET, details.bounds.bottom + INSET)
-        }
-    }
+      layout = simpleLayout { layoutCommonItems() }.then {
+          idealSize = Size(spacer.width + 2 * INSET, details.bounds.bottom + INSET)
+      }
+  }
 }
 </code>
 <div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_BuS1"><p>This view uses a customized HyperLink that contains an icon. HyperLinks are Buttons whose behaviors can be modified. In this case, we want the link to behave like a normal link, but fully customize the rendering. This is why we need to use <code>linkStyler</code>, which is a <a href="https://nacular.github.io/doodle-api/themes/io.nacular.doodle.theme.native/-native-hyper-link-styler" target="_blank" rel="noopener noreferrer"><code>NativeHyperLinkStyler</code></a>.</p></div></div>
@@ -713,46 +855,46 @@ class ContactView(/*...*/): ContactCommon(/*...*/) {
 <p><strong>EditContactView.kt</strong></p>
 <code theme="darcula" mode="kotlin" data-highlight-only="true">
 class EditContactView(
-    // ...
+  // ...
 ): ContactCommon(
-    // ...
+  // ...
 ) {
-    init {
-        lateinit var newName       : String
-        lateinit var newPhoneNumber: String
+  init {
+      lateinit var newName       : String
+      lateinit var newPhoneNumber: String
 
-        edit.apply {
-            enabled = false
-            fired += {
-                // tries to edit its contact
-                contacts.edit(super.contact) {
-                    name        = newName
-                    phoneNumber = newPhoneNumber
-                }.onSuccess {
-                    super.contact = it // updates its contact to the newly edited one
-                }
+      edit.apply {
+          enabled = false
+          fired += {
+              // tries to edit its contact
+              contacts.edit(super.contact) {
+                  name        = newName
+                  phoneNumber = newPhoneNumber
+              }.onSuccess {
+                  super.contact = it // updates its contact to the newly edited one
+              }
 
-                enabled = false
-            }
-        }
+              enabled = false
+          }
+      }
 
-        val form = editForm(super.contact.name, super.contact.phoneNumber, assets, textFieldStyler, pathMetrics, edit) { name, phone -&gt;
-            // called whenever the Form becomes valid
-            newName        = name
-            newPhoneNumber = phone
-            edit.enabled   = name != super.contact.name || phone != super.contact.phoneNumber
-        }
+      val form = editForm(super.contact.name, super.contact.phoneNumber, assets, textFieldStyler, pathMetrics, edit) { name, phone -&gt;
+          // called whenever the Form becomes valid
+          newName        = name
+          newPhoneNumber = phone
+          edit.enabled   = name != super.contact.name || phone != super.contact.phoneNumber
+      }
 
-        setDetail(form) // super class utility for specifying details view
+      setDetail(form) // super class utility for specifying details view
 
-        layout = simpleLayout {
-            layoutCommonItems() // super class utility
+      layout = simpleLayout {
+          layoutCommonItems() // super class utility
 
-            edit.position = Point(form.x, form.bounds.bottom + 2 * INSET)
-        }.then {
-            idealSize = Size(spacer.width + 2 * INSET, edit.bounds.bottom + INSET)
-        }
-    }
+          edit.position = Point(form.x, form.bounds.bottom + 2 * INSET)
+      }.then {
+          idealSize = Size(spacer.width + 2 * INSET, edit.bounds.bottom + INSET)
+      }
+  }
 }
 </code></div></article><nav class="pagination-nav docusaurus-mt-lg" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/doodle-tutorials/docs/tabstrip"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Animating Tab Strip</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/doodle-tutorials/docs/calculator"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Calculator</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#project-setup" class="table-of-contents__link toc-highlight">Project Setup</a></li><li><a href="#the-application" class="table-of-contents__link toc-highlight">The Application</a><ul><li><a href="#async-assets" class="table-of-contents__link toc-highlight">Async Assets</a></li><li><a href="#theming" class="table-of-contents__link toc-highlight">Theming</a></li><li><a href="#routing" class="table-of-contents__link toc-highlight">Routing</a></li><li><a href="#responsive-layout" class="table-of-contents__link toc-highlight">Responsive Layout</a></li></ul></li><li><a href="#main-views" class="table-of-contents__link toc-highlight">Main Views</a><ul><li><a href="#header" class="table-of-contents__link toc-highlight">Header</a></li><li><a href="#contact-list" class="table-of-contents__link toc-highlight">Contact List</a></li><li><a href="#contact-creation" class="table-of-contents__link toc-highlight">Contact Creation</a></li><li><a href="#contact-view" class="table-of-contents__link toc-highlight">Contact View</a></li><li><a href="#contact-editing" class="table-of-contents__link toc-highlight">Contact Editing</a></li></ul></li></ul></div></div></div></div></main></div></div></div><footer class="footer"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2024 Nacular</div></div></div></footer></div>
 </body>
