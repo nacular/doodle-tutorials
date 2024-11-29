@@ -3,7 +3,7 @@ ktorVersion                      = { strictly = "2.3.8"  }
 slf4jVersion                     = { strictly = "2.0.9"  }
 mockkVersion                     = { strictly = "1.13.7" }
 kotlinVersion                    = { strictly = "1.9.25" }
-doodleVersion                    = { strictly = "0.10.3" } # Latest Doodle version
+doodleVersion                    = { strictly = "0.10.4" } # Latest Doodle version
 jupiterVersion                   = { strictly = "5.10.0" }
 logbackVersion                   = { strictly = "1.4.11" }
 coroutinesVersion                = { strictly = "1.8.0"  }
