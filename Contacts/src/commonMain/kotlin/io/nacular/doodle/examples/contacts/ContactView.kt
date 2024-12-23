@@ -3,13 +3,11 @@ package io.nacular.doodle.examples.contacts
 import io.nacular.doodle.controls.buttons.Button
 import io.nacular.doodle.controls.buttons.HyperLink
 import io.nacular.doodle.controls.icons.PathIcon
-import io.nacular.doodle.controls.modal.ModalManager
 import io.nacular.doodle.controls.text.Label
 import io.nacular.doodle.controls.theme.CommonTextButtonBehavior
 import io.nacular.doodle.core.Behavior
 import io.nacular.doodle.core.Layout.Companion.simpleLayout
 import io.nacular.doodle.core.container
-import io.nacular.doodle.core.then
 import io.nacular.doodle.drawing.Canvas
 import io.nacular.doodle.drawing.Stroke
 import io.nacular.doodle.drawing.TextMetrics
@@ -19,7 +17,6 @@ import io.nacular.doodle.geometry.path
 import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.text.invoke
 import io.nacular.doodle.theme.native.NativeHyperLinkStyler
-import io.nacular.doodle.utils.Dimension.Width
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlin.math.max
@@ -59,12 +56,11 @@ class ContactView(
         }
 
         val details = container {
-            this += Label("Contact Details").apply {
+            + Label("Contact Details").apply {
                 font    = assets.small
-                height  = 24.0
-                fitText = setOf(Width)
+                suggestHeight(24.0)
             }
-            this += HyperLink(
+            + HyperLink(
                 url  = "tel:${contact.phoneNumber}",
                 text = contact.phoneNumber,
                 icon = PathIcon(path = path(assets.phoneIcon)!!, pathMetrics = pathMetrics, fill = assets.phoneNumber),
@@ -79,14 +75,14 @@ class ContactView(
                         val iconSize = icon!!.size(view)
 
                         // Ensure link's size includes icon and text
-                        size = Size(textPosition(view).x + textSize.width, max(iconSize.height, textSize.height))
+                        suggestSize(Size(textPosition(view).x + textSize.width, max(iconSize.height, textSize.height)))
                     }
 
                     override fun render(view: HyperLink, canvas: Canvas) {
                         icon!!.render(view, canvas, at = iconPosition(view, icon = icon!!))
 
                         // Styled text with phoneNumberLink color and link's font
-                        canvas.text(assets.phoneNumberLink.invoke { view.font(view.text) }, at = textPosition(view))
+                        canvas.text(assets.phoneNumberLink.invoke { view.font { view.text } }, at = textPosition(view))
                     }
                 }) as Behavior<Button>
             }
@@ -105,8 +101,10 @@ class ContactView(
 
         setDetail(details)
 
-        layout = simpleLayout { layoutCommonItems() }.then {
-            idealSize = Size(spacer.width + 2 * INSET, details.bounds.bottom + INSET)
+        layout = simpleLayout { items, min, current, max, insets ->
+            layoutCommonItems(items, min, current, max, insets)
+
+            Size(spacer.bounds.width + 2 * INSET, details.bounds.bottom + INSET)
         }
     }
 }

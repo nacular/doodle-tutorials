@@ -116,8 +116,11 @@ fun showcase(
 
                 display += object: Container() {
                     init {
-                        size               = Size(display.width - 2 * inset, display.height - 2 * inset)
-                        position           = display.center - Point(width / 2, height / 2)
+                        suggestBounds(Rectangle(
+                            position = display.center - Point(width / 2, height / 2),
+                            size     = Size(display.width - 2 * inset, display.height - 2 * inset)
+                        ))
+
                         clipCanvasToBounds = false
 
                         Resizer(this).apply { movable = false }
@@ -136,17 +139,19 @@ fun showcase(
                     }
                 }
 
-                display.layout = Layout.simpleLayout {
-                    it.children[0].apply {
-                        val x = max(inset, x)
-                        val y = max(inset, y)
-                        bounds = Rectangle(
+                display.layout = Layout.simpleLayout { views, min, current, max, insets ->
+                    views.first().apply {
+                        val x = max(inset, bounds.x)
+                        val y = max(inset, bounds.y)
+                        updateBounds(Rectangle(
                             x,
                             y,
-                            min(display.width  - inset - x, width),
-                            min(display.height - inset - y, height)
-                        )
+                            min(display.width  - inset - x, bounds.width ),
+                            min(display.height - inset - y, bounds.height)
+                        ))
                     }
+
+                    current
                 }
             }
         }

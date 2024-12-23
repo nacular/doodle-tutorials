@@ -10,8 +10,6 @@ import io.nacular.doodle.controls.carousel.CarouselBehavior
 import io.nacular.doodle.controls.carousel.dampedTransitioner
 import io.nacular.doodle.controls.itemVisualizer
 import io.nacular.doodle.core.Display
-import io.nacular.doodle.core.center
-import io.nacular.doodle.core.then
 import io.nacular.doodle.drawing.FontLoader
 import io.nacular.doodle.drawing.TextMetrics
 import io.nacular.doodle.event.KeyCode.Companion.ArrowLeft
@@ -120,23 +118,19 @@ class TimedCardsApp(
             display += carousel
             display += buttonControls
 
-            display.layout = constrain(carousel, buttonControls) { carousel_, controls ->
-                (carousel_.width  eq CAROUSEL_MAX_WIDTH                  )..Strong
-                carousel_.height eq carousel_.width  * MAIN_ASPECT_RATIO
-                carousel_.width  eq carousel_.height / MAIN_ASPECT_RATIO
+            display.layout = constrain(carousel, display.children[1]) { carousel_, controls ->
+                carousel_.width  eq     CAROUSEL_MAX_WIDTH strength Strong
+                carousel_.height eq     carousel_.width  * MAIN_ASPECT_RATIO
+                carousel_.width  eq     carousel_.height / MAIN_ASPECT_RATIO
 
                 carousel_.width  lessEq parent.width
                 carousel_.height lessEq parent.height
                 carousel_.center eq     parent.center
 
-                controls.height eq CONTROLS_HEIGHT
-                controls.bottom eq carousel_.bottom
-            }.then {
-                // done after Carousel's size is properly determined in previous block, otherwise itemSize(carousel.size)
-                // won't be accurate since it will use a captured value before the size is updated
-                // by the constraint.
-                buttonControls.x     = carousel.center.x - itemSize(carousel.size).width / 2
-                buttonControls.width = carousel.bounds.right - display.children[1].x
+                controls.left    eq     carousel_.left + (carousel_.width - itemSize(carousel.size).width) / 2
+                controls.height  eq     CONTROLS_HEIGHT
+                controls.right   eq     carousel_.right
+                controls.bottom  eq     carousel_.bottom
             }
 
             focusManager.requestFocus(carousel)

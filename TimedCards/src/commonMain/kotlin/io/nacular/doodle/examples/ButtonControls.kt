@@ -74,25 +74,25 @@ class ButtonControls(carousel: Carousel<*, *>, textMetrics: TextMetrics, private
 //sampleEnd
 
         layout = constrain(children[0], children[1], children[2], children[3]) { left, right, progress, text ->
-            left.left    eq 0
-            left.width   eq left.height
-            left.height  eq 45
-            left.centerY eq parent.centerY
+            left.left        eq 0
+            left.width       eq left.height
+            left.height      eq 45
+            left.centerY     eq parent.centerY
 
-            right.left    eq left.right + 10
-            right.width   eq left.width
-            right.height  eq left.height
-            right.centerY eq left.centerY
+            right.left       eq left.right + 10
+            right.width      eq left.width
+            right.height     eq left.height
+            right.centerY    eq left.centerY
 
             progress.left    eq right.right   + 20
             progress.right   eq text.left - 20
             progress.height  eq 1.5
             progress.centerY eq right.centerY
 
-            text.top    eq 0
-            text.width  eq 40
-            text.right  eq parent.right - 20
-            text.height eq parent.height
+            text.top         eq 0
+            text.width       eq 40
+            text.right       eq parent.right - 20
+            text.height      eq parent.height
         }
     }
 

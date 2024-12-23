@@ -28,7 +28,8 @@ class AppButtonsImpl(
             pathData    = path,
             pathMetrics = pathMetrics
         ).apply {
-            size            = Size(28)
+            suggestSize(Size(28))
+
             cursor          = Pointer
             foregroundColor = Color.Black
             fired += {
@@ -42,7 +43,8 @@ class AppButtonsImpl(
     override fun delete(background: Color, foreground: Color) = simpleButton("Delete", background, text = foreground)
 
     private fun simpleButton(name: String, background: Color, text: Color) = PushButton(name).apply {
-        size          = Size(113, 40)
+        suggestSize(Size(113, 40))
+
         cursor        = Pointer
         acceptsThemes = false
         behavior      = simpleTextButtonRenderer(textMetrics) { button, canvas ->

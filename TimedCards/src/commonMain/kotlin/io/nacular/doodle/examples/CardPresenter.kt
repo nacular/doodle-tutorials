@@ -39,7 +39,7 @@ class CardPresenter<T>(private val spacing: Double = 20.0, private val itemSize:
             // Image is outset by 10, and grows as we progress to the next frame
             it.bounds       = mainBounds.inset(Insets(-progressToNext * itemSize.width * 0.5))
             it.zOrder       = zOrder++
-            currentPosition = currentPosition?.next
+            currentPosition = currentPosition.next
 
             results += it
         }
@@ -63,7 +63,7 @@ class CardPresenter<T>(private val spacing: Double = 20.0, private val itemSize:
 
             // next item is shifted over towards this slot as progress increases
             currentBounds   = bounds.run { at(x - progressToNext * (width + spacing)) }
-            currentPosition = currentPosition?.next
+            currentPosition = currentPosition.next
 
             results += item
         }
@@ -86,7 +86,7 @@ class CardPresenter<T>(private val spacing: Double = 20.0, private val itemSize:
         } while (
             // continue until there are no more items to show
             (currentBounds?.right ?: 0.0) + spacing < carousel.size.width &&
-            currentPosition?.next?.also { currentPosition = it } != null
+            currentPosition.next?.also { currentPosition = it } != null
         )
 
         return Presentation(items = results)

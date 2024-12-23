@@ -14,6 +14,7 @@ import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeTextFieldBehav
 import org.kodein.di.DI.Module
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
+import kotlin.random.Random
 
 fun main() {
     application(modules = listOf(
@@ -30,6 +31,14 @@ fun main() {
             }
     )) {
         // load app
-        PhotosApp(instance(), instance(), instance(), instance(), instance(), instance())
+        PhotosApp(
+            theme        = instance(),
+            images       = instance(),
+            random       = Random,
+            display      = instance(),
+            animate      = instance(),
+            themeManager = instance(),
+            focusManager = instance()
+        )
     }
 }

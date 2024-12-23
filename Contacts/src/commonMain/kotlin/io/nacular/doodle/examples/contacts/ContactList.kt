@@ -11,7 +11,6 @@ import io.nacular.doodle.controls.table.DynamicTable
 import io.nacular.doodle.controls.text.Label
 import io.nacular.doodle.controls.theme.CommonLabelBehavior
 import io.nacular.doodle.core.View
-import io.nacular.doodle.core.then
 import io.nacular.doodle.drawing.Canvas
 import io.nacular.doodle.drawing.Color.Companion.blackOrWhiteContrast
 import io.nacular.doodle.drawing.TextMetrics
@@ -58,6 +57,7 @@ class ContactList(
     // Specifies alignment for the table's cells
     val alignment: ConstraintDslContext.(Bounds) -> Unit = {
         it.left    eq INSET
+        it.size    eq it.idealSize
         it.centerY eq parent.centerY
     }
 
@@ -89,9 +89,9 @@ class ContactList(
         }
     }
 
-    column(Label("Name"        ), { name        }, nameVisualizer   ) { cellAlignment = alignment; headerAlignment = alignment                        }
+    column(Label("Name"        ), { name        }, nameVisualizer     ) { cellAlignment = alignment; headerAlignment = alignment                        }
     column(Label("Phone Number"), { phoneNumber }, StringVisualizer() ) { cellAlignment = alignment; headerAlignment = alignment                        }
-    column(null,                                   toolsVisualizer  ) { cellAlignment = fill(Insets(top = 20.0, bottom = 20.0, right = 20.0), Strong) }
+    column(null,                                   toolsVisualizer    ) { cellAlignment = fill(Insets(top = 20.0, bottom = 20.0, right = 20.0), Strong) }
 }) {
     init {
         font = assets.small
@@ -127,24 +127,27 @@ private class NameCell(private val textMetrics: TextMetrics, value: String): Vie
     fun update(value: String) {
         if (children.isEmpty()) {
             children += Label("${value.first()}").apply {
-                size          = Size(36)
-                fitText       = emptySet()
                 acceptsThemes = false
             }
 
             children += Label(value)
 
             layout = constrain(children[0], children[1]) { icon, name ->
+                icon.left    eq 0
+                icon.size    eq Size(36)
                 icon.centerY eq parent.centerY
+
                 name.left    eq icon.right + INSET
+                name.size    eq name.idealSize
                 name.centerY eq icon.centerY
-            }.then {
-                size = Size(children[1].bounds.right, children[0].height)
+
+                parent.width  eq name.right
+                parent.height eq icon.bottom
             }
         }
         (children[0] as Label).apply {
             val circleColor = value.toColor()
-            styledText      = blackOrWhiteContrast(circleColor)("${value.first()}")
+            styledText      = (blackOrWhiteContrast(circleColor)) { "${value.first()}" }
             behavior        = object: CommonLabelBehavior(textMetrics) {
                 override fun render(view: Label, canvas: Canvas) {
                     canvas.circle(Circle(radius = min(width, height) / 2, center = Point(width / 2, height / 2)), fill = circleColor.paint)
@@ -166,7 +169,8 @@ private class ToolCell(private val assets: AppConfig, private val pathMetrics: P
     }
 
     private fun createButton(path: String) = PathIconButton(pathData = path, pathMetrics = pathMetrics).apply {
-        size            = Size(24)
+        suggestSize(Size(24))
+
         foregroundColor = assets.tool
         pointerChanged  += object: PointerListener {
             override fun entered(event: PointerEvent) { foregroundColor = assets.toolHighlight }

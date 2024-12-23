@@ -11,7 +11,6 @@ import io.nacular.doodle.controls.theme.CommonLabelBehavior
 import io.nacular.doodle.core.Layout.Companion.simpleLayout
 import io.nacular.doodle.core.View
 import io.nacular.doodle.core.renderProperty
-import io.nacular.doodle.core.then
 import io.nacular.doodle.drawing.Canvas
 import io.nacular.doodle.drawing.Color.Companion.Transparent
 import io.nacular.doodle.drawing.TextMetrics
@@ -66,6 +65,8 @@ class Header(
         private val searchIcon     = PathIcon<View>(path(assets.searchIcon)!!, fill = assets.search, pathMetrics = pathMetrics)
         private val searchIconSize = searchIcon.size(this)
 
+        val minWidth = searchIconSize.width + 40.0
+
         val textField = TextField().apply {
             placeHolder      = "Search"
             borderVisible    = false
@@ -80,11 +81,11 @@ class Header(
 
         init {
             cursor             = Text
-            minimumSize        = Size(searchIconSize.width + 40.0, 0.0)
             clipCanvasToBounds = false
 
             val clearButton = PathIconButton(pathData = assets.deleteIcon, pathMetrics = pathMetrics).apply {
-                height          = 44.0
+                suggestHeight(44.0)
+
                 cursor          = Pointer
                 visible         = textField.text.isNotBlank()
                 foregroundColor = assets.search
@@ -111,7 +112,7 @@ class Header(
                 textField.height  eq parent.height
                 textField.centerY eq parent.centerY
                 clear.width       eq 22
-                (clear.right       eq parent.right - 20) .. Strong
+                (clear.right      eq parent.right - 20) strength Strong
                 clear.centerY     eq textField.centerY
             }
 
@@ -145,33 +146,30 @@ class Header(
     }
 
     init {
-        children += Photo(assets.logo).apply { size = Size(40) }
+        children += Photo(assets.logo).apply { suggestSize(Size(40)) }
         children += Label("Phonebook").apply {
             font            = assets.large
             behavior        = CommonLabelBehavior(textMetrics)
             acceptsThemes   = false
             foregroundColor = assets.header
         }
-        children += FilterBox().apply { size = Size(300, 45); font = assets.medium }.also { filterBox = it }
+        children += FilterBox().apply { suggestSize(Size(300, 45)); font = assets.medium }.also { filterBox = it }
 
         val filterNaturalWidth = 300.0
 
-        layout = simpleLayout { container ->
-            val logo   = container.children[0]
-            val label  = container.children[1]
-            val filter = container.children[2]
+        layout = simpleLayout { items, min, current, max, insets ->
+            val (logo, label, filter) = items.toList()
 
-            logo.position  = Point(2 * INSET, (naturalHeight - logo.height) / 2)
-            label.position = Point(logo.bounds.right + 10, logo.bounds.center.y - label.height / 2)
+            logo.updatePosition(2 * INSET, (naturalHeight - logo.bounds.height) / 2)
+            label.updatePosition(logo.bounds.right + 10, logo.bounds.center.y - label.bounds.height / 2)
 
-            filter.bounds = when {
-                container.width > filterCenterAboveWidth -> Rectangle((container.width - filterNaturalWidth) / 2,        logo.bounds.center.y - filter.height / 2, filterNaturalWidth, filter.height)
-                container.width > filterRightAboveWidth  -> Rectangle( container.width - filterNaturalWidth - 2 * INSET, logo.bounds.center.y - filter.height / 2, filterNaturalWidth, filter.height)
-                else                                     -> Rectangle(logo.x, logo.bounds.bottom + INSET, max(filter.minimumSize.width, container.width - 4 * INSET), filter.height)
-            }
-        }.then {
-            minimumSize = Size(width, filterBox.bounds.bottom + 8)
-            idealSize   = minimumSize
+            filter.updateBounds(when {
+                current.width > filterCenterAboveWidth -> Rectangle((current.width - filterNaturalWidth) / 2,        logo.bounds.center.y - filter.bounds.height / 2, filterNaturalWidth, filter.bounds.height)
+                current.width > filterRightAboveWidth  -> Rectangle( current.width - filterNaturalWidth - 2 * INSET, logo.bounds.center.y - filter.bounds.height / 2, filterNaturalWidth, filter.bounds.height)
+                else                                   -> Rectangle(logo.bounds.x, logo.bounds.bottom + INSET, max(filterBox.minWidth, current.width - 4 * INSET), filter.bounds.height)
+            })
+
+            Size(width, filterBox.bounds.bottom + 8)
         }
 
         // Custom cursor when pointer in the "clickable" region
