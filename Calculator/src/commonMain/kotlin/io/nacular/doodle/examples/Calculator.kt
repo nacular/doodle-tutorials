@@ -317,7 +317,7 @@ class Calculator(
         appScope.launch {
             loadFonts()
 
-            ButtonGroup(allowDeselectAll = true, buttons = arrayOf(times, times, minus, plus))
+            ButtonGroup(allowDeselectAll = true, buttons = arrayOf(div, times, minus, plus))
 
             val outputHeight  = 100.0
             val buttonSpacing =  10.0
