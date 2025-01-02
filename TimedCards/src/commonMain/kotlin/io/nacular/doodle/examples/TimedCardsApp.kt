@@ -89,8 +89,8 @@ class TimedCardsApp(
 
                 keyChanged += pressed {
                     when (it.code) {
-                        ArrowLeft  -> next    () // Move Carousel forward one
-                        ArrowRight -> previous() // Move Carousel back one
+                        ArrowLeft  -> previous() // Move Carousel back one
+                        ArrowRight -> next    () // Move Carousel forward one
                     }
                 }
 
