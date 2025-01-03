@@ -11,7 +11,7 @@ plugins {
 kotlin {
     js     { browser { binaries.executable() } } // Web     (JS  ) executable
     wasmJs { browser { binaries.executable()     // Web     (WASM) executable
-        applyBinaryen {}                         // Binary size optimization
+//        applyBinaryen {}                         // Binary size optimization disabled due to https://youtrack.jetbrains.com/issue/KT-66111
     } }
     jvm    {                                     // Desktop (JVM ) executable
         compilations.all {
