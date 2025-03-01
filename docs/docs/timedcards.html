@@ -11,7 +11,7 @@
 
 
 <script src="https://unpkg.com/kotlin-playground@1"></script><link rel="stylesheet" href="/doodle-tutorials/assets/css/styles.59830250.css">
-<script src="/doodle-tutorials/assets/js/runtime~main.b07ed42f.js" defer="defer"></script>
+<script src="/doodle-tutorials/assets/js/runtime~main.d6a27ed7.js" defer="defer"></script>
 <script src="/doodle-tutorials/assets/js/main.07e0e7d6.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -199,8 +199,8 @@ class TimedCardsApp(
 
                 keyChanged += pressed {
                     when (it.code) {
-                        ArrowLeft  -&gt; next    () // Move Carousel forward one
-                        ArrowRight -&gt; previous() // Move Carousel back one
+                        ArrowLeft  -&gt; previous() // Move Carousel back one
+                        ArrowRight -&gt; next    () // Move Carousel forward one
                     }
                 }
 
