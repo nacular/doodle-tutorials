@@ -2,15 +2,19 @@
 ktorVersion                      = { strictly = "2.3.8"  }
 slf4jVersion                     = { strictly = "2.0.9"  }
 mockkVersion                     = { strictly = "1.13.7" }
-kotlinVersion                    = { strictly = "1.9.25" }
-doodleVersion                    = { strictly = "0.10.4" } # Latest Doodle version
+kotlinVersion                    = { strictly = "2.1.10" }
+doodleVersion                    = { strictly = "0.11.0" } # Latest Doodle version
+kodeinVersion                    = { strictly = "7.21.1" }
 jupiterVersion                   = { strictly = "5.10.0" }
 logbackVersion                   = { strictly = "1.4.11" }
+dateTimeVersion                  = { strictly = "0.6.1"  }
+kxBrowserVersion                 = { strictly = "0.3"    }
 coroutinesVersion                = { strictly = "1.8.0"  }
 serializationVersion             = { strictly = "1.6.3"  }
 
 [libraries]
 # Doodle ------------------------------------------------------------------------------------------------------------------------------
+kodein-di                        = { module = "org.kodein.di:kodein-di",                          version.ref = "kodeinVersion"        }
 doodle-themes                    = { module = "io.nacular.doodle:themes",                         version.ref = "doodleVersion"        }
 doodle-browser                   = { module = "io.nacular.doodle:browser",                        version.ref = "doodleVersion"        }
 doodle-controls                  = { module = "io.nacular.doodle:controls",                       version.ref = "doodleVersion"        }
@@ -30,6 +34,12 @@ ktor-serialization-json          = { module = "io.ktor:ktor-serialization-kotlin
 # Coroutines, Serialization (Todo App) ------------------------------------------------------------------------------------------------
 coroutines-core                  = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core",    version.ref = "coroutinesVersion"    }
 serialization-json               = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serializationVersion" }
+
+# Kotlinx Browser APIs (Contacts, Todo) -----------------------------------------------------------------------------------------------
+kotlinx-browser                  = { module = "org.jetbrains.kotlinx:kotlinx-browser",             version.ref = "kxBrowserVersion"    }
+
+# Date Time (Weather) -----------------------------------------------------------------------------------------------------------------
+date-time                        = { module = "org.jetbrains.kotlinx:kotlinx-datetime",           version.ref = "dateTimeVersion"      }
 
 # Testing -----------------------------------------------------------------------------------------------------------------------------
 mockk                            = { module = "io.mockk:mockk",                                   version.ref = "mockkVersion"         }

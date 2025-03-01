@@ -45,6 +45,7 @@ import io.nacular.doodle.layout.Insets
 import io.nacular.doodle.layout.constraints.Strength.Companion.Strong
 import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.layout.constraints.fill
+import io.nacular.doodle.layout.constraints.plus
 import io.nacular.doodle.theme.ThemeManager
 import io.nacular.doodle.theme.adhoc.DynamicTheme
 import io.nacular.doodle.theme.basic.list.BasicListBehavior
@@ -52,7 +53,6 @@ import io.nacular.doodle.theme.basic.list.BasicVerticalListPositioner
 import io.nacular.doodle.theme.basic.list.TextEditOperation
 import io.nacular.doodle.theme.basic.list.basicItemGenerator
 import io.nacular.doodle.theme.native.NativeHyperLinkStyler
-import io.nacular.doodle.utils.Dimension.Height
 import io.nacular.doodle.utils.Encoder
 import io.nacular.doodle.utils.diff.Delete
 import io.nacular.doodle.utils.diff.Insert
@@ -62,7 +62,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlin.Result.Companion.success
-import kotlin.math.min
 
 /**
  * This app is designed to run both top-level and nested. The filter buttons use hyperlinks in the spec,
@@ -191,7 +190,7 @@ private class TodoView(
                 }
 
                 // List containing Tasks. It is mutable since items can be edited
-                list = MutableList(DataStoreListModel(dataStore), itemVisualizer = visualizer, fitContent = setOf(Height)).apply {
+                list = MutableList(DataStoreListModel(dataStore), itemVisualizer = visualizer).apply {
                     val rowHeight = 58.0
                     font          = config.listFont
                     cellAlignment = fill
@@ -253,14 +252,19 @@ private class TodoView(
 
                 layout = constrain(children[0], children[1], children[2]) { input, panel, filter ->
                     listOf(input, panel, filter).forEach { it.width eq parent.width }
+
                     input.top     eq 0
                     input.height.preserve
+
                     panel.top     eq input.bottom
+                    panel.height  eq panel.idealHeight strength Strong + 3
 
                     if (children[2].visible) {
                         filter.top    eq panel.bottom
-                        filter.bottom eq parent.bottom
                         filter.height.preserve
+                        parent.height eq filter.bottom
+                    } else {
+                        parent.height eq input.bottom
                     }
                 }
             }
@@ -285,19 +289,18 @@ private class TodoView(
 
         layout = constrain(header, taskList, footer) { header, body, footer ->
             listOf(header, body, footer).forEach { it.centerX eq parent.centerX }
-            header.top    eq        9
+
+            header.top eq 9
             header.height.preserve
 
-            val minHeight = taskList.children[0].height + (taskList.children[2].takeIf { it.visible }?.height ?: 0.0)
+            body.top      eq     header.bottom + 5
+            body.width    lessEq parent.width - 10
+            body.width    eq     550    strength Strong
+            body.height   eq     body.idealHeight
 
-            body.top    eq header.bottom + 5
-            body.width  eq min(550.0, parent.width - 10)
-            body.height eq minHeight + list.height
-
-            footer.top   eq body.bottom + 65
-            footer.width eq body.width
-            footer.height.preserve
-            (footer.bottom lessEq parent.bottom) .. Strong
+            footer.top    eq     body.bottom.readOnly + 65
+            footer.width  eq     body.width
+            footer.height eq     footer.idealHeight
         }
     }
 }

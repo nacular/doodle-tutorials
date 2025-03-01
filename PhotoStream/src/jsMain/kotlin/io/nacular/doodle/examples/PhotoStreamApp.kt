@@ -7,6 +7,7 @@ import io.nacular.doodle.controls.list.DynamicList
 import io.nacular.doodle.controls.panels.ScrollPanel
 import io.nacular.doodle.core.Display
 import io.nacular.doodle.image.ImageLoader
+import io.nacular.doodle.layout.constraints.Strength.Companion.Strong
 import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.layout.constraints.fill
 import io.nacular.doodle.theme.ThemeManager
@@ -52,9 +53,10 @@ class PhotoStreamApp(
         }
 
         display.layout = constrain(display.children[0]) {
-            it.width   eq min(parent.width, imageHeight)
-            it.height  eq parent.height
-            it.centerX eq parent.centerX
+            it.width   eq     parent.width strength Strong
+            it.width   lessEq imageHeight
+            it.height  eq     parent.height
+            it.centerX eq     parent.centerX
         }
     }
 

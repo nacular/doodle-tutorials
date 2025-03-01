@@ -22,15 +22,10 @@ class CalculatorApp(
     init {
         val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
-        display += Calculator(fonts, appScope, textMetrics, numberFormatter).apply {
-            sizePreferencesChanged += { _,_,_ ->
-                display.relayout()
-            }
-        }
+        display += Calculator(fonts, appScope, textMetrics, numberFormatter)
 
-        display.layout = constrain(display.children[0]) {
-            it.width  eq (display.children.firstOrNull()?.idealSize?.width  ?: 0.0)
-            it.height eq (display.children.firstOrNull()?.idealSize?.height ?: 0.0)
+        display.layout = constrain(display.first()) {
+            it.size   eq it.idealSize
             it.center eq parent.center
         }
     }

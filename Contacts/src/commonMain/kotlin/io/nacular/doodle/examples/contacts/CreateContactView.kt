@@ -2,7 +2,6 @@ package io.nacular.doodle.examples.contacts
 
 import io.nacular.doodle.controls.text.Label
 import io.nacular.doodle.core.View
-import io.nacular.doodle.core.then
 import io.nacular.doodle.core.view
 import io.nacular.doodle.drawing.Canvas
 import io.nacular.doodle.drawing.Stroke
@@ -12,10 +11,9 @@ import io.nacular.doodle.geometry.PathMetrics
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.image.Image
+import io.nacular.doodle.layout.constraints.Strength.Companion.Strong
 import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.theme.native.NativeTextFieldStyler
-import io.nacular.doodle.utils.Dimension.Width
-import kotlin.math.max
 import kotlin.math.min
 
 /**
@@ -55,12 +53,11 @@ class CreateContactView(
 
         val label = Label("Create Contact").apply {
             font    = assets.medium
-            height  = 28.0
-            fitText = setOf(Width)
+            suggestHeight(28.0)
         }
 
         val back   = buttons.back  (assets.backIcon)
-        val avatar = DynamicAvatar (assets.blankAvatar).apply { size = Size(176); font = assets.medium }
+        val avatar = DynamicAvatar (assets.blankAvatar).apply { suggestSize(Size(176)); font = assets.medium }
         val button = buttons.create(assets.buttonBackground, assets.buttonForeground).apply {
             font     = assets.small
             enabled  = false
@@ -71,7 +68,8 @@ class CreateContactView(
         }
 
         val spacer = view {
-            height = 64.0
+            suggestHeight(64.0)
+
             render = {
                 line(Point(0.0, height / 2), Point(width, height / 2), stroke = Stroke(assets.outline))
             }
@@ -105,18 +103,20 @@ class CreateContactView(
             spacer.top   eq avatar.bottom.readOnly
             spacer.left  eq back.left
             spacer.right eq parent.right - INSET
+            spacer.height.preserve
 
-            form.top   eq spacer.bottom
-            form.left  eq back.left
-            form.width eq min(parent.width - 2 * INSET, 520.0)
+            form.top    eq spacer.bottom
+            form.left   eq back.left
+            form.width  eq parent.width - 2 * INSET strength Strong
+            form.width  lessEq 520.0
+            form.height eq form.idealHeight
 
-            button.top  eq form.bottom + 2 * INSET
-            button.left eq back.left
-        }.then {
-            idealSize = Size(spacer.width + 2 * INSET, button.bounds.bottom + INSET)
+            button.top    eq form.bottom + 2 * INSET
+            button.left   eq back.left
+            button.height eq button.idealHeight
+            button.bottom eq parent.bottom - INSET
+
+            parent.width  eq spacer.width + 2 * INSET
         }
     }
-
-    // Helper to use constrain with 6 items
-    private operator fun <T> List<T>.component6() = this[5]
 }

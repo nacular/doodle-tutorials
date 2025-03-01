@@ -1,6 +1,7 @@
 package io.nacular.doodle.examples.contacts
 
 import io.nacular.doodle.controls.text.Label
+import io.nacular.doodle.core.Positionable
 import io.nacular.doodle.core.View
 import io.nacular.doodle.core.view
 import io.nacular.doodle.drawing.Stroke
@@ -8,11 +9,12 @@ import io.nacular.doodle.drawing.TextMetrics
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Rectangle
 import io.nacular.doodle.geometry.Size
+import io.nacular.doodle.layout.Insets
+import io.nacular.doodle.layout.Insets.Companion.None
 import io.nacular.doodle.utils.observable
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlin.math.max
 import kotlin.math.min
 
 /**
@@ -36,9 +38,8 @@ abstract class ContactCommon(
 
     protected val back   = buttons.back(assets.backIcon)
     protected val name   = Label (contact.name).apply { font = assets.xLarge }
-    protected val avatar = Avatar(textMetrics, contact.name).apply { size = Size(176); font = assets.medium }
+    protected val avatar = Avatar(textMetrics, contact.name).apply { suggestSize(Size(176)); font = assets.medium }
     protected val edit   = buttons.edit(assets.buttonBackground, assets.buttonForeground).apply { font = assets.small }
-
     protected val delete = buttons.delete(assets.deleteBackground, assets.buttonForeground).apply {
         font = assets.small
         fired += {
@@ -52,7 +53,8 @@ abstract class ContactCommon(
     }
 
     protected val spacer = view {
-        height = 64.0
+        suggestHeight(64.0)
+
         render = {
             line(Point(0.0, height / 2), Point(width, height / 2), stroke = Stroke(assets.outline))
         }
@@ -64,35 +66,35 @@ abstract class ContactCommon(
         children += listOf(back, avatar, name, spacer, edit, delete)
     }
 
-    private operator fun <T> List<T>.component6() = this[5]
-
     protected fun setDetail(view: View) {
         details   = view
         children += view
     }
 
-    protected fun layoutCommonItems() {
-        back.position   = Point(INSET, 2 * INSET)
-        avatar.position = Point(back.bounds.right + 2 * INSET, back.y)
-        name.position   = Point(avatar.bounds.right + 2 * INSET, avatar.bounds.center.y - name.height / 2)
+    protected fun layoutCommonItems(views: Sequence<Positionable>, min: Size, current: Size, max: Size, insets: Insets = None) {
+        val (back, avatar, name, spacer, edit, delete, details) = views.toList()
 
-        val idealDeleteX = width - INSET - delete.width
-        val idealEditX   = idealDeleteX - (edit.width + INSET)
+        back.updatePosition  (INSET, 2 * INSET)
+        avatar.updatePosition(back.bounds.right + 2 * INSET, back.bounds.y)
+        name.updatePosition  (avatar.bounds.right + 2 * INSET, avatar.bounds.center.y - name.bounds.height / 2)
+
+        val idealDeleteX = width - INSET - delete.bounds.width
+        val idealEditX   = idealDeleteX - (edit.bounds.width + INSET)
 
         when {
             idealEditX < name.bounds.right + INSET -> {
-                avatar.position = Point((width - avatar.width) / 2, back.y)
-                name.position   = Point(avatar.bounds.center.x - name.width / 2, avatar.bounds.bottom + INSET)
-                delete.position = Point(width / 2 + INSET / 2, name.bounds.bottom + INSET)
-                edit.position   = Point(delete.x - (edit.width + INSET), delete.y)
+                avatar.updatePosition((width - avatar.bounds.width) / 2, back.bounds.y)
+                name.updatePosition  (avatar.bounds.center.x - name.bounds.width / 2, avatar.bounds.bottom + INSET)
+                delete.updatePosition(width / 2 + INSET / 2, name.bounds.bottom + INSET)
+                edit.updatePosition  (delete.bounds.x - (edit.bounds.width + INSET), delete.bounds.y)
             }
             else                                   -> {
-                delete.position = Point(idealDeleteX, avatar.bounds.bottom - delete.height)
-                edit.position   = Point(idealEditX,   delete.y                            )
+                delete.updatePosition(idealDeleteX, avatar.bounds.bottom - delete.bounds.height)
+                edit.updatePosition  (idealEditX,   delete.bounds.y                            )
             }
         }
 
-        spacer.bounds  = Rectangle(back.x, delete.bounds.bottom, width - 2 * INSET, spacer.height)
-        details.bounds = Rectangle(spacer.x, spacer.bounds.bottom, min(520.0, spacer.width), 98.0)
+        spacer.updateBounds (Rectangle(back.bounds.x, delete.bounds.bottom, width - 2 * INSET, spacer.bounds.height))
+        details.updateBounds(Rectangle(spacer.bounds.x, spacer.bounds.bottom, min(520.0, spacer.bounds.width), 98.0))
     }
 }

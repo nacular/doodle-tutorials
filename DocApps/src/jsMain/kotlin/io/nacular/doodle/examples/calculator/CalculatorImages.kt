@@ -7,6 +7,7 @@ import io.nacular.doodle.core.view
 import io.nacular.doodle.drawing.Color.Companion.Transparent
 import io.nacular.doodle.drawing.Color.Companion.White
 import io.nacular.doodle.drawing.FontLoader
+import io.nacular.doodle.drawing.FrostedGlassPaint
 import io.nacular.doodle.drawing.TextMetrics
 import io.nacular.doodle.drawing.paint
 import io.nacular.doodle.examples.Calculator
@@ -21,11 +22,10 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 class CalculatorImages(
-    display          : Display,
-    fonts            : FontLoader,
-    textMetrics      : TextMetrics,
-    numberFormatter  : NumberFormatter,
-    glassPanelFactory: GlassPanelFactory,
+    display        : Display,
+    fonts          : FontLoader,
+    textMetrics    : TextMetrics,
+    numberFormatter: NumberFormatter,
 ): Application {
     init {
         val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -39,12 +39,6 @@ class CalculatorImages(
 
             val (calculator1, calculator2) = (0..1).map {
                 Calculator(fonts, appScope, textMetrics, numberFormatter).apply {
-                    // layout the Display whenever the Calculator's size preferences are updated.
-                    // this allows us to constrain its size to match its ideal size (which it sets).
-                    sizePreferencesChanged += { _, _, _ ->
-                        display.relayout()
-                    }
-
                     enabled = false
                 }
             }
@@ -60,11 +54,14 @@ class CalculatorImages(
                         val text     = if (n == 0) "Output" else "GridPanel"
                         val textSize = textMetrics.size(text, font)
 
-                        children += glassPanelFactory(Transparent, 5.0)
+                        children += view {
+                            render = {
+                                rect(bounds.atOrigin, fill = FrostedGlassPaint(Transparent, blurRadius = 5.0))
+                            }
+                        }
                         children += view {
 
-                            size = textSize.run { Size(width + 3, height + 3) }
-
+                            suggestSize(textSize.run { Size(width + 3, height + 3) })
                             render = {
                                 outerShadow(blurRadius = 3.0) {
                                     text(

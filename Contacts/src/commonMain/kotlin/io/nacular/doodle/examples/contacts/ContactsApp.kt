@@ -1,20 +1,20 @@
+@file:Suppress("LocalVariableName")
+
 package io.nacular.doodle.examples.contacts
 
 import io.nacular.doodle.application.Application
 import io.nacular.doodle.controls.panels.ScrollPanel
 import io.nacular.doodle.core.Display
-import io.nacular.doodle.core.Layout
-import io.nacular.doodle.core.Positionable
-import io.nacular.doodle.core.PositionableContainer
 import io.nacular.doodle.core.View
 import io.nacular.doodle.drawing.paint
 import io.nacular.doodle.geometry.Size
+import io.nacular.doodle.layout.constraints.Strength.Companion.Strong
+import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.theme.ThemeManager
 import io.nacular.doodle.theme.adhoc.DynamicTheme
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlin.math.max
 
 /**
  * Simple contacts app based on https://phonebook-pi.vercel.app/
@@ -101,7 +101,8 @@ class ContactsApp(
 //sampleEnd
 
     private fun scrollPanel(content: View) = ScrollPanel(content).apply {
-        contentWidthConstraints = { it eq width - verticalScrollBarWidth }
+        contentWidthConstraints  = { it eq width - verticalScrollBarWidth }
+        contentHeightConstraints = { it eq it.idealValue                  }
     }
 
     private fun setMainView(display: Display, view: View) {
@@ -114,46 +115,32 @@ class ContactsApp(
     }
 
     private fun updateLayout(display: Display, appAssets: AppConfig) {
-        display.layout = if (display.children.size < 3) null else object: Layout {
-            // Header needs to be sized based on its minimumSize, so this layout should respond to any changes to it.
-            override fun requiresLayout(
-                child: Positionable,
-                of   : PositionableContainer,
-                old  : View.SizePreferences,
-                new  : View.SizePreferences
-            ) = new.minimumSize != old.minimumSize
+        display.layout = if (display.children.size < 3) null else constrain(header, display.children[1], display.children[2]) { header_, mainView, button ->
+            header_.top     eq 0
+            header_.width   eq parent.width
+            header_.height  eq header_.idealHeight
 
-            private val delegate = io.nacular.doodle.layout.constraints.constrain(header, display.children[1], display.children[2]) { header_, mainView, button ->
-                header_.top     eq 0
-                header_.width   eq parent.width
-                header_.height  eq header.minimumSize.height
+            mainView.top    eq header_.height
+            mainView.left   eq INSET
+            mainView.width  eq header_.width - 2 * INSET
+            mainView.bottom eq parent.bottom
 
-                mainView.top    eq header_.height
-                mainView.left   eq INSET
-                mainView.width  eq header_.width - 2 * INSET
-                mainView.height eq parent.height - header_.height
+            lateinit var buttonSize: Size
 
-                lateinit var buttonSize: Size
-
-                when {
-                    header.filterCentered -> {
-                        buttonSize = appAssets.createButtonLargeSize
-                        button.top eq (header.naturalHeight - buttonSize.height) / 2
-                    }
-                    else                  -> {
-                        buttonSize = appAssets.createButtonSmallSize
-                        button.bottom eq parent.bottom - 40
-                    }
+            when {
+                header.filterCentered -> {
+                    buttonSize = appAssets.createButtonLargeSize
+                    button.top eq (header.naturalHeight - buttonSize.height) / 2
                 }
-
-                button.left   eq max(20.0, parent.width - buttonSize.width - 20)
-                button.width  eq buttonSize.width
-                button.height eq buttonSize.height
+                else                  -> {
+                    buttonSize = appAssets.createButtonSmallSize
+                    button.bottom eq parent.bottom - 40
+                }
             }
 
-            override fun layout(container: PositionableContainer) {
-                delegate.layout(container)
-            }
+            button.left  greaterEq 20
+            button.right eq        parent.right - 20 strength Strong
+            button.size  eq        buttonSize
         }
     }
 

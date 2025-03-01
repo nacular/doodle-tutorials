@@ -67,7 +67,7 @@ fun editForm(
     }
 }.apply {
     font   = assets.small
-    layout = verticalLayout(this, spacing = 32.0, itemHeight = 33.0)
+    layout = verticalLayout(spacing = 32.0, itemHeight = 33.0)
 }
 
 /**
@@ -113,11 +113,7 @@ private fun <T> iconField(pathMetrics: PathMetrics, path: String, visualizer: ()
         focusable       = false
         foregroundColor = Black
 
-        this += visualizer()(this@field).also {
-            it.sizePreferencesChanged += { _, _, _ ->
-                relayout()
-            }
-        }
+        + visualizer()(this@field)
 
         render = {
             icon.render(this@container, this, at = Point(0.0, (height - iconSize.height) / 2))
@@ -125,10 +121,13 @@ private fun <T> iconField(pathMetrics: PathMetrics, path: String, visualizer: ()
 
         layout = constrain(children[0]) {
             it.edges eq parent.edges + Insets(left = iconSize.width + 24)
-//            fill(Insets(left = iconSize.width + 24))(it)
         }
     }
 }
 
 /** Inset used for various UI elements */
 const val INSET = 16.0
+
+operator fun <T> List<T>.component6() = this[5]
+
+operator fun <T> List<T>.component7() = this[6]

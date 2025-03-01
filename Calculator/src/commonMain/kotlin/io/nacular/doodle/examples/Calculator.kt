@@ -5,8 +5,6 @@ import io.nacular.doodle.controls.buttons.ButtonGroup
 import io.nacular.doodle.controls.buttons.PushButton
 import io.nacular.doodle.controls.buttons.ToggleButton
 import io.nacular.doodle.controls.panels.GridPanel
-import io.nacular.doodle.core.Layout
-import io.nacular.doodle.core.PositionableContainer
 import io.nacular.doodle.core.View
 import io.nacular.doodle.drawing.AffineTransform.Companion.Identity
 import io.nacular.doodle.drawing.Canvas
@@ -54,7 +52,7 @@ class Calculator(
         private val defaultWidth get() = textMetrics.width("0", font)
 
         // Text inset from the left/right edge of the output
-        private val inset by lazy { (clear.width - defaultWidth) / 2 }
+        private val inset: Double get() = (clear.width - defaultWidth) / 2
 
         // Transform used to scale text down as it grows beyond window width
         private var textTransform = Identity
@@ -88,7 +86,7 @@ class Calculator(
         override fun render(canvas: Canvas) {
             val textPosition = textMetrics.size(text, font).let {
                 val x = when {
-                    textTransform.isIdentity -> width - it.width - inset
+                    textTransform.isIdentity ->  width - it.width - inset
                     else                     -> (width - it.width) / 2
                 }
 
@@ -165,6 +163,13 @@ class Calculator(
             output.number = 0.0
             clearInternalState()
         }
+
+        // Ensure Output inset is updated based on new size
+        boundsChanged += { _,old,new ->
+            if (old.size != new.size) {
+                output.rerender()
+            }
+        }
     }
     val negate = func("+/-").apply {
         fired += {
@@ -240,7 +245,8 @@ class Calculator(
     }
 
     private fun configure(button: Button, background: Color, foreground: Color) = button.apply {
-        size            = Size(60)
+        suggestSize(Size(60))
+
         cursor          = Pointer
         behavior        = CalcButtonBehavior(textMetrics)
         foregroundColor = foreground
@@ -340,7 +346,7 @@ class Calculator(
             val insets = 10.0
 
             // Place Output outside grid so the height can be more easily controlled
-            val constraints = constrain(output, gridPanel) { output, grid ->
+            layout = constrain(output, gridPanel) { output, grid ->
                 output.top    eq insets
                 output.left   eq insets
                 output.right  eq parent.right - insets
@@ -350,18 +356,7 @@ class Calculator(
                 grid.left     eq output.left
                 grid.right    eq output.right
                 grid.bottom   eq parent.bottom - insets
-            }
-
-            layout = object: Layout by constraints {
-                // Set total height to grid panel's ideal width and height, plus output and spacing
-                override fun idealSize(container: PositionableContainer, default: Size?) = gridPanel.idealSize?.let {
-                    Size(it.width + 2 * insets, it.height + outputHeight + buttonSpacing + 2 * insets)
-                }
-            }
-
-            // Force idealSize when gridPanel is laid out
-            gridPanel.sizePreferencesChanged += { _,_,new ->
-                idealSize = new.idealSize?.let { Size(it.width + 2 * insets, it.height + outputHeight + buttonSpacing + 2 * insets) }
+                grid.size     eq grid.idealSize
             }
         }
     }

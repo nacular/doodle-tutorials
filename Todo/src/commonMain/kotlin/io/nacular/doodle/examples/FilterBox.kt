@@ -39,7 +39,7 @@ class FilterBox(private val config              : TodoConfig,
             super.install(view)
 
             // Pad each button
-            view.size = textMetrics.size(view.text, config.filterFont).run { Size(width + widthInset, height + 8.0) }
+            view.suggestSize(textMetrics.size(view.text, config.filterFont).run { Size(width + widthInset, height + 8.0) })
         }
 
         override fun render(view: Button, canvas: Canvas) {
@@ -74,7 +74,7 @@ class FilterBox(private val config              : TodoConfig,
             val font  = font(view)
             when {
                 // Create styled text by nesting decoration, color, and font
-                model.pointerOver -> canvas.text(UnderLine { color { font(view.text) } }, textPosition(view))
+                model.pointerOver -> canvas.text(UnderLine { color { font { view.text } } }, textPosition(view))
                 else              -> canvas.text(view.text, font, textPosition(view), color.paint)
             }
         }
@@ -96,7 +96,7 @@ class FilterBox(private val config              : TodoConfig,
         val completed = filterButton("Completed", Completed)
         dataStore.changed += { update() }
         font      = config.filterFont
-        height    = 41.0
+        suggestHeight(41.0)
         children += listOf(itemsLeft, all, active, completed, clearAll)
         layout    = constrain(itemsLeft, all, active, completed, clearAll) { label, all_, active_, completed_, clearAll ->
             listOf(label, all_, active_, completed_, clearAll).forEach { it.centerY eq parent.centerY }
@@ -106,10 +106,10 @@ class FilterBox(private val config              : TodoConfig,
             label.width.preserve
 
             clearAll.width.preserve
-            (clearAll.right eq parent.right) .. Strong
+            clearAll.right eq parent.right strength Strong
             clearAll.height eq parent.height
 
-            (all_.left eq (parent.width - (all_.width + active_.width + completed_.width + spacing * 2)) / 2) .. Strong
+            all_.left eq (parent.width - (all_.width + active_.width + completed_.width + spacing * 2)) / 2 strength Strong
             all_.width.preserve
 
             active_.left    eq all_.right    + spacing

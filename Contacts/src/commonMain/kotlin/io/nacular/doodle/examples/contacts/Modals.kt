@@ -10,7 +10,6 @@ import io.nacular.doodle.controls.modal.ModalManager.Modal
 import io.nacular.doodle.controls.text.Label
 import io.nacular.doodle.controls.theme.simpleTextButtonRenderer
 import io.nacular.doodle.core.View
-import io.nacular.doodle.core.then
 import io.nacular.doodle.drawing.Canvas
 import io.nacular.doodle.drawing.Color
 import io.nacular.doodle.drawing.Color.Companion.Black
@@ -50,7 +49,8 @@ class ModalsImpl(
 ): Modals {
 
     private fun button(text: String, foreground: Color) = PushButton(text).apply {
-        size          = Size(113, 40)
+        suggestSize(Size(113, 40))
+
         cursor        = Pointer
         acceptsThemes = false
         behavior      = simpleTextButtonRenderer(textMetrics) { button, canvas ->
@@ -80,9 +80,9 @@ class ModalsImpl(
                     childrenClipPath   = clipPath
                     clipCanvasToBounds = false
 
-                    children += Label ("Delete contact?").apply { font = assets.medium }
+                    children += Label ("Delete contact?"                ).apply { font   = assets.medium        }
                     children += button("Cancel", assets.createButtonText).apply { fired += { completed(false) } }
-                    children += button("Ok", assets.deleteBackground).apply { fired += { completed(true) } }
+                    children += button("Ok",     assets.deleteBackground).apply { fired += { completed(true ) } }
 
                     boundsChanged += { _,old,new ->
                         if (new.size != old.size) {
@@ -92,18 +92,20 @@ class ModalsImpl(
 
                     layout = constrain(children[0], children[1], children[2]) { text, cancel, ok ->
                         text.top     eq 20
-                        text.height  eq text.height.readOnly
+                        text.size    eq text.idealSize
                         text.centerX eq parent.centerX
 
-                        ok.top   eq text.bottom + INSET
-                        ok.right eq parent.right
-                        ok.width eq parent.width / 2
+                        ok.top       eq text.bottom + INSET
+                        ok.right     eq parent.right
+                        ok.width     eq parent.width / 2
+                        ok.height    eq ok.idealHeight
 
                         cancel.top   eq ok.top
                         cancel.left  eq 0
                         cancel.width eq ok.width
-                    }.then {
-                        size = Size(300.0, children[2].bounds.bottom)
+
+                        parent.width  eq 300
+                        parent.height eq ok.bottom
                     }
                 }
 
@@ -113,6 +115,9 @@ class ModalsImpl(
                     }
                 }
             }
-        )
+        ) {
+            it.size   eq it.idealSize
+            it.center eq parent.center
+        }
     }
 }

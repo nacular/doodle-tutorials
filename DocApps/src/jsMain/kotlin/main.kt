@@ -32,7 +32,6 @@ import io.nacular.doodle.examples.TimedCardsApp
 import io.nacular.doodle.examples.TodoApp
 import io.nacular.doodle.examples.TrivialRouter
 import io.nacular.doodle.examples.calculator.CalculatorImages
-import io.nacular.doodle.examples.calculator.GlassPanelFactoryImpl
 import io.nacular.doodle.examples.contacts.AppConfig
 import io.nacular.doodle.examples.contacts.AppConfigImpl
 import io.nacular.doodle.examples.contacts.Contact
@@ -65,6 +64,7 @@ import org.kodein.di.bindSingleton
 import org.kodein.di.factory
 import org.kodein.di.instance
 import org.w3c.dom.HTMLElement
+import kotlin.random.Random
 
 @JsExport
 fun calculator(element: HTMLElement) {
@@ -79,11 +79,10 @@ fun calculatorImages(element: HTMLElement) {
     application(root = element, modules = listOf(FontModule, PointerModule, Modules.HtmlElementViewModule)) {
         // load app
         CalculatorImages(
-            display           = instance(),
-            fonts             = instance(),
-            textMetrics       = instance(),
-            numberFormatter   = NumberFormatterImpl(),
-            glassPanelFactory = GlassPanelFactoryImpl(instance())
+            display         = instance(),
+            fonts           = instance(),
+            textMetrics     = instance(),
+            numberFormatter = NumberFormatterImpl(),
         )
     }
 }
@@ -111,7 +110,19 @@ fun todo(element: HTMLElement) {
             }
     )) {
         // load app
-        TodoApp(instance(), Dispatchers.UI, instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance(), instance())
+        TodoApp(
+            display              = instance(),
+            uiDispatcher         = Dispatchers.UI,
+            fonts                = instance(),
+            theme                = instance(),
+            themes               = instance(),
+            images               = instance(),
+            dataStore            = instance(),
+            linkStyler           = instance(),
+            textMetrics          = instance(),
+            focusManager         = instance(),
+            filterButtonProvider = instance()
+        )
     }
 }
 
@@ -131,7 +142,15 @@ fun photos(element: HTMLElement) {
             }
     )) {
         // load app
-        PhotosApp(instance(), instance(), instance(), instance(), instance(), instance())
+        PhotosApp(
+            theme        = instance(),
+            random       = Random,
+            images       = instance(),
+            animate      = instance(),
+            display      = instance(),
+            focusManager = instance(),
+            themeManager = instance()
+        )
     }
 }
 

@@ -13,9 +13,9 @@ import io.nacular.doodle.geometry.Rectangle
 import io.nacular.doodle.layout.Insets
 import io.nacular.doodle.layout.constraints.Strength.Companion.Strong
 import io.nacular.doodle.layout.constraints.constrain
-import io.nacular.doodle.text.TextDecoration
+import io.nacular.doodle.text.TextDecoration.Companion.LineThrough
 import io.nacular.doodle.text.invoke
-import io.nacular.doodle.utils.HorizontalAlignment.Left
+import io.nacular.doodle.utils.TextAlignment.Start
 import kotlin.properties.Delegates.observable
 
 /**
@@ -31,7 +31,7 @@ class TaskRow(config: TodoConfig, dataStore: DataStore, task: Task): View() {
     var task: Task by observable(task) { _, _, new ->
         check.selected = new.completed
         when {
-            new.completed -> label.styledText = (config.taskCompletedColor) { TextDecoration.LineThrough(new.text) }
+            new.completed -> label.styledText = (config.taskCompletedColor) { LineThrough { new.text } }
             else          -> label.text       = new.text
         }
     }
@@ -53,7 +53,7 @@ class TaskRow(config: TodoConfig, dataStore: DataStore, task: Task): View() {
     }
 
     // Displays the task's text
-    private val label = Label(task.text, horizontalAlignment = Left).apply { fitText = emptySet(); foregroundColor = config.labelForeground }
+    private val label = Label(task.text, horizontalAlignment = Start).apply { foregroundColor = config.labelForeground }
 
     // Deletion button
     private val delete = PushButton().apply {
@@ -82,7 +82,7 @@ class TaskRow(config: TodoConfig, dataStore: DataStore, task: Task): View() {
             check.left   eq 0
             label.left   eq check.right
             label.right  eq delete.left
-            (delete.right eq parent.right) .. Strong
+            delete.right eq parent.right strength Strong
         }
 
         // Used to show/hide the delete button

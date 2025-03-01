@@ -17,7 +17,7 @@ class TabStripApp(display: Display, animator: Animator, pathMetrics: PathMetrics
         // creat and display a single TabStrip
         with(display) {
             this += TabStrip(animator, pathMetrics).apply {
-                size = Size(375, 100)
+                suggestSize(Size(375, 100))
             }
 
             layout = constrain(first(), center)

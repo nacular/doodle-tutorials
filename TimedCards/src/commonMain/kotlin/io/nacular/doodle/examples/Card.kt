@@ -5,11 +5,10 @@ import io.nacular.doodle.controls.carousel.CarouselItem
 import io.nacular.doodle.controls.text.Label
 import io.nacular.doodle.core.View
 import io.nacular.doodle.core.container
-import io.nacular.doodle.core.then
 import io.nacular.doodle.core.view
 import io.nacular.doodle.drawing.Canvas
-import io.nacular.doodle.drawing.Color
 import io.nacular.doodle.drawing.Color.Companion.Black
+import io.nacular.doodle.drawing.Color.Companion.White
 import io.nacular.doodle.drawing.Font
 import io.nacular.doodle.drawing.opacity
 import io.nacular.doodle.drawing.paint
@@ -19,7 +18,6 @@ import io.nacular.doodle.geometry.lerp
 import io.nacular.doodle.image.Image
 import io.nacular.doodle.image.width
 import io.nacular.doodle.layout.constraints.constrain
-import io.nacular.doodle.utils.Dimension
 import io.nacular.doodle.utils.TextAlignment
 import io.nacular.doodle.utils.observable
 import kotlin.math.min
@@ -46,9 +44,9 @@ class Card(
     private val smallHeader = header(data.header, fonts.smallBoldFont      )
     private val smallTitle  = title(data.title,   fonts.smallBoldFont, -0.8)
     private val largeText   = container {
-        +view { render = { rect(bounds.atOrigin, fill = Color.White.paint) } }
-        +header(data.header, fonts.largeRegularFont   )
-        +title (data.title,  fonts.largeBoldFont, -1.0)
+        + view { render = { rect(bounds.atOrigin, fill = White.paint) } }
+        + header(data.header, fonts.largeRegularFont   )
+        + title (data.title,  fonts.largeBoldFont, -1.0)
 
         layout = constrain(children[0], children[1], children[2]) { block, header, title ->
             block.edges eq Rectangle(15, 3)
@@ -62,8 +60,8 @@ class Card(
             title.left  eq 0
             title.right eq parent.right
             title.height.preserve
-        }.then {
-            this.height = children.last().bounds.bottom
+
+            parent.height eq title.bottom
         }
 
         opacity = 0f
@@ -80,14 +78,15 @@ class Card(
     }
 
     init {
-        size               = data.image.size
+        suggestSize(data.image.size)
+
         enabled            = false
         clipCanvasToBounds = false
 
         children += container {
-            +view { render = { rect(bounds.atOrigin, fill = Color.White.paint) } }
-            +smallHeader
-            +smallTitle
+            + view { render = { rect(bounds.atOrigin, fill = White.paint) } }
+            + smallHeader
+            + smallTitle
 
             layout = constrain(children[0], smallHeader, smallTitle) { bar, header, title ->
                 bar.edges eq Rectangle(7.0, 1.5)
@@ -101,8 +100,8 @@ class Card(
                 title.left  eq 0
                 title.right eq parent.right
                 title.height.preserve
-            }.then {
-                this.height = smallTitle.bounds.bottom
+
+                parent.bottom eq title.bottom
             }
         }
         children += largeText
@@ -111,17 +110,17 @@ class Card(
             smallText.left   eq parent.centerX - itemInitialSize().width / 2 + 10
             smallText.right  eq parent.right  - 10
             smallText.bottom eq parent.bottom - 20 + progress * 800
-            smallText.height.preserve
+            smallText.height eq smallText.idealHeight
 
             val largeTextOffset = when {
                 progress >= 0.5f -> 20 * (1 - (progress - 0.5f) * 2)
                 else             -> 0f
             }
 
-            largeText.left  eq  50
-            largeText.width eq 500
+            largeText.left    eq  50
+            largeText.width   eq 500
+            largeText.height  eq largeText.idealHeight
             largeText.centerY eq parent.centerY + 5 + largeTextOffset
-            largeText.height.preserve
         }
 
         updateProgress()
@@ -172,7 +171,6 @@ class Card(
         wrapsWords         = true
         textAlignment      = TextAlignment.Start
         lineSpacing        = 1.1f
-        fitText            = setOf(Dimension.Height)
     }
 }
 //sampleEnd

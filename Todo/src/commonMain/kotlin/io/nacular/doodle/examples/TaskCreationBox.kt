@@ -7,7 +7,7 @@ import io.nacular.doodle.core.Display
 import io.nacular.doodle.core.View
 import io.nacular.doodle.drawing.TextMetrics
 import io.nacular.doodle.drawing.text
-import io.nacular.doodle.event.KeyCode
+import io.nacular.doodle.event.KeyCode.Companion.Enter
 import io.nacular.doodle.event.KeyListener
 import io.nacular.doodle.event.PointerListener
 import io.nacular.doodle.focus.FocusManager
@@ -15,26 +15,37 @@ import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.layout.constraints.Strength.Companion.Strong
 import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.system.Cursor
-import io.nacular.measured.units.Angle
+import io.nacular.measured.units.Angle.Companion.degrees
 import io.nacular.measured.units.times
 
 /**
  * This is the text-input box with select all. It contains a Button and a TextField.
  */
-class TaskCreationBox(private val focusManager: FocusManager, textMetrics: TextMetrics, config: TodoConfig, dataStore: DataStore): View() {
+class TaskCreationBox(
+    private val focusManager: FocusManager,
+                textMetrics : TextMetrics,
+                config      : TodoConfig,
+                dataStore   : DataStore
+): View() {
     init {
+        suggestHeight(65.0)
         cursor    = Cursor.Text
-        height    = 65.0
         children += PushButton("❯").apply {
+            suggestWidth(60.0)
+
             font     = config.listFont
-            width    = 60.0
             fired   += { dataStore.markAll(completed = dataStore.active.isNotEmpty()) } // toggle all when pressed
             cursor   = Cursor.Default
             visible  = !dataStore.isEmpty
             behavior = simpleTextButtonRenderer(textMetrics) { button, canvas ->
                 // Rotate the text by 90°
-                canvas.rotate(around = Point(button.width/2, button.height/2), by = 90 * Angle.degrees) {
-                    text(button.text, font(button), textPosition(button), if (dataStore.active.isEmpty()) config.selectAllColor else config.placeHolderColor)
+                canvas.rotate(around = Point(button.width/2, button.height/2), by = 90 * degrees) {
+                    text(
+                        text  = button.text,
+                        font  = font(button),
+                        at    = textPosition(button),
+                        color = if (dataStore.active.isEmpty()) config.selectAllColor else config.placeHolderColor
+                    )
                 }
             }
 
@@ -50,10 +61,10 @@ class TaskCreationBox(private val focusManager: FocusManager, textMetrics: TextM
             borderVisible     = false
             foregroundColor   = config.labelForeground
             placeHolderFont   = config.placeHolderFont
-            placeHolderColor  = config.placeHolderColor
             backgroundColor   = config.textFieldBackground
+            placeHolderColor  = config.placeHolderColor
             keyChanged       += KeyListener.released { event ->
-                if (event.code == KeyCode.Enter && text.isNotBlank()) {
+                if (event.code == Enter && text.isNotBlank()) {
                     dataStore.add(Task(text.trim()))
                     text = ""
                 }
@@ -62,10 +73,12 @@ class TaskCreationBox(private val focusManager: FocusManager, textMetrics: TextM
 
         layout = constrain(children[0], children[1]) { button, textField ->
             listOf(button, textField).forEach { it.height eq parent.height }
+
             button.left     eq 0
             button.width.preserve
-            textField.left   eq button.right
-            (textField.right eq parent.right) .. Strong
+
+            textField.left  eq button.right
+            textField.right eq parent.right strength Strong
         }
 
         // Ensure TextField has focus when bar is clicked (happens if toggle invisible)

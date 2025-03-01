@@ -5,23 +5,25 @@ import io.nacular.doodle.animation.invoke
 import io.nacular.doodle.animation.transition.easeOutBack
 import io.nacular.doodle.animation.tweenFloat
 import io.nacular.doodle.application.Application
+import io.nacular.doodle.controls.Photo
 import io.nacular.doodle.controls.buttons.PushButton
 import io.nacular.doodle.controls.itemVisualizer
 import io.nacular.doodle.controls.range.CircularSlider
-import io.nacular.doodle.controls.spinner.MutableIntSpinButtonModel
-import io.nacular.doodle.controls.spinner.MutableSpinButton
-import io.nacular.doodle.controls.spinner.SpinButton
-import io.nacular.doodle.controls.spinner.SpinButtonModel
-import io.nacular.doodle.controls.spinner.spinButtonEditor
+import io.nacular.doodle.controls.spinbutton.MutableIntSpinButtonModel
+import io.nacular.doodle.controls.spinbutton.MutableSpinButton
+import io.nacular.doodle.controls.spinbutton.SpinButton
+import io.nacular.doodle.controls.spinbutton.SpinButtonModel
+import io.nacular.doodle.controls.spinbutton.spinButtonEditor
 import io.nacular.doodle.controls.text.Label
 import io.nacular.doodle.controls.theme.simpleButtonRenderer
 import io.nacular.doodle.core.Container
 import io.nacular.doodle.core.Display
 import io.nacular.doodle.core.View
+import io.nacular.doodle.core.View.SizeAuditor.Companion.preserveAspect
 import io.nacular.doodle.core.center
 import io.nacular.doodle.core.container
 import io.nacular.doodle.core.height
-import io.nacular.doodle.core.then
+import io.nacular.doodle.core.width
 import io.nacular.doodle.datatransport.Files
 import io.nacular.doodle.datatransport.dragdrop.DropEvent
 import io.nacular.doodle.datatransport.dragdrop.DropReceiver
@@ -46,26 +48,25 @@ import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.geometry.times
 import io.nacular.doodle.image.Image
 import io.nacular.doodle.image.ImageLoader
+import io.nacular.doodle.image.aspectRatio
 import io.nacular.doodle.image.height
 import io.nacular.doodle.image.width
 import io.nacular.doodle.layout.Insets
 import io.nacular.doodle.layout.ListLayout
 import io.nacular.doodle.layout.WidthSource.Parent
-import io.nacular.doodle.layout.constraints.Bounds
-import io.nacular.doodle.layout.constraints.ConstraintDslContext
 import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.layout.constraints.fill
 import io.nacular.doodle.system.Cursor.Companion.Text
 import io.nacular.doodle.theme.ThemeManager
 import io.nacular.doodle.theme.adhoc.DynamicTheme
 import io.nacular.doodle.theme.basic.range.BasicCircularSliderBehavior
-import io.nacular.doodle.theme.basic.spinner.SpinButtonTextEditOperation
-import io.nacular.doodle.utils.Dimension.Width
+import io.nacular.doodle.theme.basic.spinbutton.SpinButtonTextEditOperation
 import io.nacular.doodle.utils.PropertyObserver
 import io.nacular.doodle.utils.PropertyObservers
 import io.nacular.doodle.utils.Resizer
 import io.nacular.doodle.utils.SetPool
 import io.nacular.doodle.utils.ToStringIntEncoder
+import io.nacular.doodle.utils.lerp
 import io.nacular.measured.units.Angle
 import io.nacular.measured.units.Angle.Companion.atan2
 import io.nacular.measured.units.Angle.Companion.degrees
@@ -81,6 +82,7 @@ import kotlinx.coroutines.launch
 import kotlin.properties.Delegates.observable
 import kotlin.random.Random
 import kotlin.reflect.KMutableProperty0
+import kotlin.reflect.KProperty0
 import io.nacular.doodle.datatransport.Image as ImageType
 
 /**
@@ -89,21 +91,41 @@ import io.nacular.doodle.datatransport.Image as ImageType
 private class PropertyPanel(private val focusManager: FocusManager): Container() {
     private val spinButtonHeight = 24.0
 
+    private interface Settable<T> {
+        val name: String
+        fun get(): T
+        fun set(value: T)
+    }
+
     /**
      * Simple View with a [MutableSpinButton] and [Label] that displays a numeric property.
      */
     private inner class Property(
-        private val property  : KMutableProperty0<Double>,
+        private val property  : Settable<Double>,
         private val updateWhen: PropertyObservers<Any, Any>,
                     suffix    : String = ""
     ): View() {
+        constructor(
+            property: KMutableProperty0<Double>,
+            updateWhen: PropertyObservers<Any, Any>,
+            suffix    : String = ""
+        ): this(
+            object : Settable<Double> {
+                override val name get() = property.name
+
+                override fun get(             ) = property.get()
+                override fun set(value: Double) { property.set(value) }
+            },
+            updateWhen,
+            suffix
+        )
+
         private fun <T, M: SpinButtonModel<T>> spinButtonVisualizer(suffix: String = "") = itemVisualizer { item: Int, previous: View?, context: SpinButton<T, M> ->
             when (previous) {
                 is Label -> previous.also { it.text = "$item$suffix" }
                 else     -> Label("$item$suffix").apply {
                     font            = previous?.font
                     cursor          = Text
-                    fitText         = emptySet()
                     foregroundColor = previous?.foregroundColor
                     backgroundColor = previous?.backgroundColor ?: Transparent
 
@@ -118,7 +140,7 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
         }
 
         private val spinButton = MutableSpinButton(
-            MutableIntSpinButtonModel(Int.MIN_VALUE..Int.MAX_VALUE, property.get().toInt()),
+            MutableIntSpinButtonModel(Int.MIN_VALUE .. Int.MAX_VALUE, property.get().toInt()),
             spinButtonVisualizer(suffix)
         ).apply {
             cellAlignment = fill
@@ -169,7 +191,7 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
      * Simple container created from a [Label] and two property views.
      */
     private fun propertyGroup(name: String, property1: View, property2: View) = container {
-        this += listOf(Label(name).apply { fitText = setOf(Width) }, property1, property2)
+        this += listOf(Label(name), property1, property2)
 
         val spacing = 10.0
 
@@ -177,7 +199,7 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
             label.top     eq second.top
             label.left    eq spacing
             label.height  eq spinButtonHeight
-            first.centerY eq parent.centerY.writable
+            first.centerY eq parent.centerY
             first.right   eq second.left - spacing
             first.width   eq second.width
             first.height  eq 50
@@ -186,7 +208,8 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
             second.right  eq parent.right - spacing
             second.width  eq (parent.width - spacing * 3) / 3
 
-            parent.height.writable eq max(first.bottom, second.bottom) + spacing
+            parent.height greaterEq first.bottom
+            parent.height greaterEq second.bottom
         }
     }
 
@@ -206,19 +229,15 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
 
         new?.also { photo ->
             val photoAngle = object: Any() {
-                var angle by observable(computeAngle(photo) `in` degrees) { _,_,new ->
+                var angle by observable(computeAngle(photo) `in` degrees) { _,old,new ->
                     if ((new * degrees).normalize() != computeAngle(photo).normalize()) {
-                        photo.parent?.let {
-                            val photoCenter = Point(photo.width/2, photo.height/2)
-                            photo.position  = it.toLocal(photoCenter, photo) - photoCenter
-                        }
-                        photo.transform = Identity.rotate(around = photo.center, new * degrees)
+                        photo.transform = photo.transform.rotate(around = photo.center, (new - old) * degrees)
                     }
                 }
             }
 
             val rotationSlider = CircularSlider(0 * degrees .. 360 * degrees).apply {
-                size     = Size(50)
+                suggestSize(Size(50))
                 value    = photoAngle.angle * degrees
                 behavior = BasicCircularSliderBehavior(thickness = 18.0)
                 changed += { _,_,new -> photoAngle.angle = new `in` degrees }
@@ -229,9 +248,9 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
                 rotationSlider.value = photoAngle.angle * degrees
             }
 
-            children += propertyGroup("Size",     Property(photo::width, photoBoundsChanged), Property(photo::height,     photoBoundsChanged                 ))
-            children += propertyGroup("Position", Property(photo::x,     photoBoundsChanged), Property(photo::y,          photoBoundsChanged                 ))
-            children += propertyGroup("Rotation", rotationSlider,                             Property(photoAngle::angle, photoTransformChanged, suffix = "°"))
+            children += propertyGroup("Size",     Property(prop(photo::width, photo::suggestWidth), photoBoundsChanged), Property(prop(photo::height, photo::suggestHeight), photoBoundsChanged                 ))
+            children += propertyGroup("Position", Property(prop(photo::x,     photo::suggestX    ), photoBoundsChanged), Property(prop(photo::y,      photo::suggestY     ), photoBoundsChanged                 ))
+            children += propertyGroup("Rotation", rotationSlider,                                                        Property(photoAngle::angle,                         photoTransformChanged, suffix = "°"))
 
             (photoBoundsChanged    as SetPool).forEach { photo.boundsChanged    += it }
             (photoTransformChanged as SetPool).forEach { photo.transformChanged += it }
@@ -239,38 +258,32 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
     }
 
     init {
+        clipCanvasToBounds = false
+
         insets = Insets(top = 48.0, left = 20.0, right = 20.0)
-        layout = ListLayout(widthSource = Parent).then { height = (children.lastOrNull()?.bounds?.bottom ?: 280.0) + insets.left + 8 }
-        width  = 300.0 + insets.left
-        height = 280.0 + insets.left + 8
+        layout = ListLayout(widthSource = Parent)
+
+        suggestWidth(300.0 + insets.left)
     }
 
     override fun render(canvas: Canvas) {
         canvas.outerShadow(blurRadius = 8.0, color = Black opacity 0.3f) {
-            canvas.rect(bounds.atOrigin.inset(insets.left), radius = 10.0, color = White)
+            rect(bounds.atOrigin.inset(Insets(top = 20.0)), radius = 20.0, color = White)
         }
+    }
+
+    private fun prop(prop: KProperty0<Double>, set: (Double) -> Unit) = object: Settable<Double> {
+        override val name get() = prop.name
+        override fun get() = prop.get()
+        override fun set(value: Double) { set(value) }
     }
 }
 
 /**
  * Simple View that displays an image and ensures its aspect ratio.
  */
-private class FixedAspectPhoto(private var image: Image): View() {
-    private val aspectRation = image.width / image.height
-
-    init {
-        size = image.size
-        boundsChanged += { _,old,_ ->
-            when {
-                old.width  != width  -> size = Size(width, width / aspectRation  )
-                old.height != height -> size = Size(height * aspectRation, height)
-            }
-        }
-    }
-
-    override fun render(canvas: Canvas) {
-        canvas.image(image, destination = bounds.atOrigin)
-    }
+private fun fixedAspectPhoto(image: Image) = Photo(image).apply {
+    sizeAuditor = preserveAspect(image.width, image.height)
 }
 
 /**
@@ -281,6 +294,7 @@ class PhotosApp(display     : Display,
                 themeManager: ThemeManager,
                 theme       : DynamicTheme,
                 animate     : Animator,
+    private val random      : Random,
     private val images      : ImageLoader): Application {
 
     init {
@@ -288,27 +302,16 @@ class PhotosApp(display     : Display,
 
         themeManager.selected = theme
 
-        val buttonInset  = 20.0
-        var panelVisible = false
+        val buttonInset          = 20.0
+        var panelVisibleFraction = 0f
 
         // Contains controls to show/update photo properties
         val propertyPanel = PropertyPanel(focusManager).apply { opacity = 0f }
 
-        // Helper for constraining property panel layout
-        val panelConstraints: ConstraintDslContext.(Bounds) -> Unit = {
-            when {
-                panelVisible -> it.bottom eq parent.bottom - buttonInset / 2
-                else         -> it.top    eq parent.bottom - buttonInset * 2
-            }
-
-            it.height  eq it.height.readOnly
-            it.centerX eq parent.centerX
-        }
-
         // Used to show/hide panel
         val panelToggle = PushButton().apply {
-            y        = display.height - buttonInset / 2
-            height   = 50.0
+            suggestY(display.height - buttonInset / 2)
+            suggestHeight(50.0)
             behavior = simpleButtonRenderer { _, canvas ->
                 val color = when {
                     model.pointerOver -> Gray
@@ -320,29 +323,33 @@ class PhotosApp(display     : Display,
             }
 
             fired += {
-                val start = if (panelVisible) 1f else 0f
-                val end   = if (panelVisible) 0f else 1f
-
-                // removing layout constraints from panel when it is animating
-                display.layout = (display.layout as io.nacular.doodle.layout.constraints.ConstraintLayout).unconstrain(propertyPanel, panelConstraints)
+                val start = panelVisibleFraction
+                val end   = if (panelVisibleFraction > 0f) 0f else 1f
 
                 // Animate property panel show/hide
                 animate(start to end, tweenFloat(easeOutBack, 250 * milliseconds)) {
-                    propertyPanel.y       = display.height - buttonInset * 2 - ((propertyPanel.height - 30) * it.toDouble())
+                    propertyPanel.suggestY(display.height - buttonInset * 2 - ((propertyPanel.height - 30) * it.toDouble()))
                     propertyPanel.opacity = it
-                }.completed += {
-                    panelVisible = !panelVisible
-                    (display.layout as io.nacular.doodle.layout.constraints.ConstraintLayout).constrain(propertyPanel, panelConstraints)
+                    panelVisibleFraction  = it
                 }
             }
         }
 
         // Holds images and serves as drop-target
         val mainContainer = container {
-            val import = { photo: View, location: Point ->
-                photo.width     = 400.0
-                photo.position  = location - Point(photo.width / 2, photo.height / 2)
-                photo.transform = Identity.rotate(location, (Random.nextFloat() * 30 - 15) * degrees)
+            val import = { image: Image, location: Point ->
+                // Create fixed-aspect Photo from image
+                val photo  = fixedAspectPhoto(image)
+
+                val width  = display.width * 0.5
+                val height = width / image.aspectRatio
+
+                photo.suggestBounds(Rectangle(location - Point(width, height) / 2, Size(width, height)))
+
+                photo.transform = Identity.rotate(
+                    around = location,
+                    by     = lerp(-15 * degrees, 15 * degrees, random.nextFloat())
+                )
 
                 // Bring photo to foreground and update panel on pointer-down
                 photo.pointerChanged += pressed {
@@ -382,10 +389,10 @@ class PhotosApp(display     : Display,
                         photo.transform = initialTransform.rotate(around = originalCenter, by = transformAngle)
 
                         // Use bounds to keep panel updated
-                        photo.bounds = Rectangle(
+                        photo.suggestBounds(Rectangle(
                             position = originalPosition - ((originalPosition - originalCenter) * (1 - event.scale)),
                             size     = originalSize * event.scale
-                        )
+                        ))
 
                         event.consume() // ensure event is consumed from Resizer
                     }
@@ -398,6 +405,8 @@ class PhotosApp(display     : Display,
                 Resizer(photo) // Use to handle edge resizing and movement with single pointer
 
                 children += photo
+
+                photo
             }
 
             dropReceiver = object: DropReceiver {
@@ -408,8 +417,7 @@ class PhotosApp(display     : Display,
                 override fun dropOver         (event: DropEvent) = allowed(event)
                 override fun dropActionChanged(event: DropEvent) = allowed(event)
                 override fun drop             (event: DropEvent) = event.bundle[allowedFileTypes]?.let { files ->
-                    // Load images as FixedAspectPhotos
-                    val photos = files.map { appScope.async { images.load(it)?.let { FixedAspectPhoto(it) } } }
+                    val photos = files.map { appScope.async { images.load(it) } }
 
                     // Import images
                     appScope.launch {
@@ -422,10 +430,8 @@ class PhotosApp(display     : Display,
             // Load default images
             appScope.launch {
                 listOf("tetons.jpg", "earth.jpg").forEachIndexed { index, file ->
-                    images.load(file)?.let { FixedAspectPhoto(it) }?.let {
-                        import(it, display.center + Point(y = index * 50.0))
-
-                        propertyPanel.photo = it
+                    images.load(file)?.let {
+                        propertyPanel.photo = import(it, display.center + Point(y = index * 50.0))
                     }
                 }
             }
@@ -434,13 +440,17 @@ class PhotosApp(display     : Display,
         display += listOf(mainContainer, propertyPanel, panelToggle)
 
         display.layout = constrain(mainContainer, panelToggle, propertyPanel) { main, toggle, panel ->
-            main.edges eq parent.edges
+            main.edges     eq parent.edges
 
             toggle.width   eq panel.width - 24
             toggle.height  eq 50
-            toggle.centerX eq panel.centerX
             toggle.bottom  eq panel.top + 22 + 40
-        }.constrain(propertyPanel, panelConstraints)
+            toggle.centerX eq panel.centerX
+
+            panel.top      eq parent.bottom - buttonInset * 2 - panelVisibleFraction * (panel.height - buttonInset)
+            panel.height   eq panel.idealHeight
+            panel.centerX  eq parent.centerX
+        }
 
         display.relayout()
     }

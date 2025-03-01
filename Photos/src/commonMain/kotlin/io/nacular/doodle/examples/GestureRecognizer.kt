@@ -65,9 +65,9 @@ class GestureRecognizer(private val view: View): PointerListener, PointerMotionL
         interactions.firstOrNull { it.pointer == second?.pointer }?.let { second = null; newSecond = it }
 
         if (newFirst != null && newSecond != null) {
-            val scale = (newFirst!!.inParent(view) distanceFrom newSecond!!.inParent(view)) / originalDistance
+            val scale = (newFirst.inParent(view) distanceFrom newSecond.inParent(view)) / originalDistance
 
-            notifyChanged(event, GestureEvent(view, listOf(oldFirst!!, oldSecond!!), listOf(newFirst!!, newSecond!!), originalCenter, scale), End)
+            notifyChanged(event, GestureEvent(view, listOf(oldFirst!!, oldSecond!!), listOf(newFirst, newSecond), originalCenter, scale), End)
         }
     }
 

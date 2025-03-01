@@ -1,6 +1,7 @@
-@file:OptIn(ExperimentalWasmDsl::class)
+@file:Suppress("OPT_IN_USAGE")
 
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
+
 
 //sampleStart
 plugins {
@@ -9,14 +10,10 @@ plugins {
 }
 
 kotlin {
-    js     { browser { binaries.executable() } } // Web     (JS  ) executable
-    wasmJs { browser { binaries.executable()     // Web     (WASM) executable
-//        applyBinaryen {}                         // Binary size optimization disabled due to https://youtrack.jetbrains.com/issue/KT-66111
-    } }
-    jvm    {                                     // Desktop (JVM ) executable
-        compilations.all {
-            kotlinOptions { jvmTarget = "11" }   // JVM 11 is needed for Desktop
-        }
+    js     { browser { binaries.executable() } }  // Web     (JS  ) executable
+    wasmJs { browser { binaries.executable() } }  // Web     (WASM) executable
+    jvm    {                                      // Desktop (JVM ) executable
+        compilerOptions { jvmTarget.set(JVM_11) } // JVM 11 is needed for Desktop
         withJava()
     }
 

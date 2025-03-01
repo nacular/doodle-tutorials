@@ -3,7 +3,6 @@ package io.nacular.doodle.examples.contacts
 import io.nacular.doodle.controls.IndexedItem
 import io.nacular.doodle.controls.ItemVisualizer
 import io.nacular.doodle.controls.SimpleIndexedItem
-import io.nacular.doodle.controls.table.AbstractTableBehavior
 import io.nacular.doodle.controls.table.AbstractTableBehavior.FooterCellGenerator
 import io.nacular.doodle.controls.table.AbstractTableBehavior.HeaderCellGenerator
 import io.nacular.doodle.controls.table.AbstractTableBehavior.MetaRowPositioner
@@ -99,9 +98,9 @@ class ContactListBehavior(private val assets: AppConfig, private val navigator: 
 
         // Called whenever the cell needs to be updated with new data
         fun update(table: Table<Contact, *>, cell: T, row: Int) {
-            index       = row
-            children[0] = itemVisualizer(cell, children.firstOrNull(), SimpleIndexedItem(row, table.selected(index)))
-            idealSize   = children[0].idealSize
+            index         = row
+            children[0]   = itemVisualizer(cell, children.firstOrNull(), SimpleIndexedItem(row, table.selected(index)))
+            preferredSize = fixed(children[0].idealSize)
 
             column.cellAlignment?.let { alignment ->
                 layout = constrain(children[0]) {
