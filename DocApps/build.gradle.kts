@@ -17,12 +17,13 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api(project(":Calculator"))
-            api(project(":Todo"      ))
-            api(project(":Photos"    ))
-            api(project(":Contacts"  ))
-            api(project(":TabStrip"  ))
-            api(project(":TimedCards"))
+            api(project(":AnimatingForm"))
+            api(project(":Calculator"   ))
+            api(project(":Todo"         ))
+            api(project(":Photos"       ))
+            api(project(":Contacts"     ))
+            api(project(":TabStrip"     ))
+            api(project(":TimedCards"   ))
         }
 
         jsMain.dependencies {

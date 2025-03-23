@@ -1,6 +1,7 @@
 rootProject.name = "doodle-tutorials"
 
 include(
+    "AnimatingForm",
     "Calculator",
     "DocApps",
     "Photos",

@@ -19,6 +19,7 @@ import io.nacular.doodle.controls.buttons.PushButton
 import io.nacular.doodle.core.Behavior
 import io.nacular.doodle.coroutines.Dispatchers
 import io.nacular.doodle.drawing.Color.Companion.White
+import io.nacular.doodle.examples.AnimatingFormApp
 import io.nacular.doodle.examples.CalculatorApp
 import io.nacular.doodle.examples.DataStore
 import io.nacular.doodle.examples.FilterButtonProvider
@@ -389,6 +390,32 @@ fun timedCards(element: HTMLElement) {
             timer        = instance(),
             scheduler    = instance(),
             uiDispatcher = Dispatchers.UI
+        )
+    }
+}
+
+@JsExport
+fun animatingForm(element: HTMLElement) {
+    application(element, modules = listOf(
+        PointerModule,
+        PathModule,
+        FontModule,
+        basicLabelBehavior(),
+        nativeTextFieldBehavior(),
+        Module(name = "AppModule") {
+            bindSingleton<Animator> { AnimatorImpl(instance(), instance()) }
+        }
+    )) {
+        // load app
+        AnimatingFormApp(
+            fonts           = instance(),
+            theme           = instance(),
+            display         = instance(),
+            animator        = instance(),
+            textMetrics     = instance(),
+            pathMetrics     = instance(),
+            themeManager    = instance(),
+            textFieldStyler = instance()
         )
     }
 }
