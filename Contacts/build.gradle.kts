@@ -7,15 +7,14 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
 plugins {
     kotlin("multiplatform"          )
     alias(libs.plugins.serialization)
-    application
 }
 
 kotlin {
-    js     { browser { binaries.executable() } }  // Web     (JS  ) executable
-    wasmJs { browser { binaries.executable() } }  // Web     (WASM) executable
-    jvm    {                                      // Desktop (JVM ) executable
-        compilerOptions { jvmTarget.set(JVM_11) } // JVM 11 is needed for Desktop
-        withJava()
+    js     { browser { binaries.executable() } }                               // Web     (JS  ) executable
+    wasmJs { browser { binaries.executable() } }                               // Web     (WASM) executable
+    jvm    {                                                                   // Desktop (JVM ) executable
+        compilerOptions { jvmTarget.set(JVM_11) }                              // JVM 11 is needed for Desktop
+        mainRun         { mainClass.set("io.nacular.doodle.examples.MainKt") } // Desktop entry point
     }
 
     sourceSets {
@@ -57,11 +56,6 @@ kotlin {
             }
         }
     }
-}
-
-// Desktop entry point
-application {
-    mainClass.set("io.nacular.doodle.example.MainKt")
 }
 //sampleEnd
 
