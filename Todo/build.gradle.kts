@@ -2,7 +2,6 @@
 
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
 
-
 //sampleStart
 plugins {
     kotlin("multiplatform"          )
@@ -10,11 +9,11 @@ plugins {
 }
 
 kotlin {
-    js     { browser { binaries.executable() } }                               // Web     (JS  ) executable
-    wasmJs { browser { binaries.executable() } }                               // Web     (WASM) executable
-    jvm    {                                                                   // Desktop (JVM ) executable
-        compilerOptions { jvmTarget.set(JVM_11) }                              // JVM 11 is needed for Desktop
-        mainRun         { mainClass.set("io.nacular.doodle.examples.MainKt") } // Desktop entry point
+    js     { browser { binaries.executable() } }    // Web     (JS  ) executable
+    wasmJs { browser { binaries.executable() } }    // Web     (WASM) executable
+    jvm    {                                        // Desktop (JVM ) executable
+        compilerOptions { jvmTarget.set(JVM_11  ) } // JVM 11 is needed for Desktop
+        mainRun         { mainClass.set("MainKt") } // Desktop entry point
     }
 
     sourceSets {

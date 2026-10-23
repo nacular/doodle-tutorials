@@ -45,6 +45,7 @@ import io.nacular.doodle.focus.FocusManager
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Rectangle
 import io.nacular.doodle.geometry.Size
+import io.nacular.doodle.geometry.inset
 import io.nacular.doodle.geometry.times
 import io.nacular.doodle.image.Image
 import io.nacular.doodle.image.ImageLoader
@@ -54,8 +55,11 @@ import io.nacular.doodle.image.width
 import io.nacular.doodle.layout.Insets
 import io.nacular.doodle.layout.ListLayout
 import io.nacular.doodle.layout.WidthSource.Parent
+import io.nacular.doodle.layout.constraints.Strength.Companion.Required
 import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.layout.constraints.fill
+import io.nacular.doodle.layout.constraints.ideal
+import io.nacular.doodle.layout.constraints.minus
 import io.nacular.doodle.system.Cursor.Companion.Text
 import io.nacular.doodle.theme.ThemeManager
 import io.nacular.doodle.theme.adhoc.DynamicTheme
@@ -177,8 +181,8 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
                 spinButton.right  eq parent.right
                 spinButton.height eq spinButtonHeight
                 label.top         eq spinButton.bottom + 2
+                label.height      eq readonly(label.height)
                 label.centerX     eq parent.centerX
-                label.height      eq label.height.readOnly
             }
         }
 
@@ -204,12 +208,11 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
             first.width   eq second.width
             first.height  eq 50
             second.height eq 50
-            second.top    eq first.top.readOnly
-            second.right  eq parent.right - spacing
-            second.width  eq (parent.width - spacing * 3) / 3
+            second.top    eq readonly(first.top)
+            second.right  eq parent.right - spacing strength Required - 1
+            second.width  eq (parent.width - spacing * 3) / 3 strength Required - 1
 
-            parent.height greaterEq first.bottom
-            parent.height greaterEq second.bottom
+            parent.height eq max(first.bottom, second.bottom) strength Required - 1
         }
     }
 
@@ -280,16 +283,10 @@ private class PropertyPanel(private val focusManager: FocusManager): Container()
 }
 
 /**
- * Simple View that displays an image and ensures its aspect ratio.
- */
-private fun fixedAspectPhoto(image: Image) = Photo(image).apply {
-    sizeAuditor = preserveAspect(image.width, image.height)
-}
-
-/**
  * Simple app for displaying images.
  */
 class PhotosApp(display     : Display,
+                appScope    : CoroutineScope,
                 focusManager: FocusManager,
                 themeManager: ThemeManager,
                 theme       : DynamicTheme,
@@ -298,8 +295,6 @@ class PhotosApp(display     : Display,
     private val images      : ImageLoader): Application {
 
     init {
-        val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-
         themeManager.selected = theme
 
         val buttonInset          = 20.0
@@ -339,7 +334,9 @@ class PhotosApp(display     : Display,
         val mainContainer = container {
             val import = { image: Image, location: Point ->
                 // Create fixed-aspect Photo from image
-                val photo  = fixedAspectPhoto(image)
+                val photo = Photo(image).apply {
+                    sizeAuditor = preserveAspect(image.aspectRatio)
+                }
 
                 val width  = display.width * 0.5
                 val height = width / image.aspectRatio
@@ -440,16 +437,17 @@ class PhotosApp(display     : Display,
         display += listOf(mainContainer, propertyPanel, panelToggle)
 
         display.layout = constrain(mainContainer, panelToggle, propertyPanel) { main, toggle, panel ->
-            main.edges     eq parent.edges
+            main.edges     eq      parent.edges
 
-            toggle.width   eq panel.width - 24
-            toggle.height  eq 50
-            toggle.bottom  eq panel.top + 22 + 40
-            toggle.centerX eq panel.centerX
+            toggle.width   eq      panel.width - 24
+            toggle.height  eq      50
+            toggle.bottom  eq      panel.top + 22 + 40
+            toggle.centerX eq      panel.centerX
 
-            panel.top      eq parent.bottom - buttonInset * 2 - panelVisibleFraction * (panel.height - buttonInset)
-            panel.height   eq panel.idealHeight
-            panel.centerX  eq parent.centerX
+            panel.top      eq      parent.bottom - buttonInset * 2 - panelVisibleFraction * (panel.height - buttonInset)
+            panel.height   prefers ideal
+            panel.width    eq      300
+            panel.centerX  eq      parent.centerX
         }
 
         display.relayout()

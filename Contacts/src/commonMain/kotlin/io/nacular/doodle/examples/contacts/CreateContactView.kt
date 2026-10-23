@@ -13,6 +13,7 @@ import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.image.Image
 import io.nacular.doodle.layout.constraints.Strength.Companion.Strong
 import io.nacular.doodle.layout.constraints.constrain
+import io.nacular.doodle.layout.constraints.ideal
 import io.nacular.doodle.theme.native.NativeTextFieldStyler
 import kotlin.math.min
 
@@ -92,29 +93,30 @@ class CreateContactView(
         layout = constrain(label, back, avatar, spacer, form, button) { (label, back, avatar, spacer, form, button) ->
             label.top    eq 2 * INSET
             label.left   eq     INSET
-            label.height eq label.height.readOnly
+            label.height eq readonly(label.height)
 
             back.top  eq label.bottom + 2 * INSET
             back.left eq label.left
+            back.size.preserve
 
             avatar.top  eq label.bottom + 3.0 / 2 * INSET
             avatar.left eq back.right + 2 * INSET
 
-            spacer.top   eq avatar.bottom.readOnly
+            spacer.top   eq readonly(avatar.bottom)
             spacer.left  eq back.left
             spacer.right eq parent.right - INSET
             spacer.height.preserve
 
-            form.top    eq spacer.bottom
-            form.left   eq back.left
-            form.width  eq parent.width - 2 * INSET strength Strong
-            form.width  lessEq 520.0
-            form.height eq form.idealHeight
+            form.top    eq      spacer.bottom
+            form.left   eq      back.left
+            form.width  eq      parent.width - 2 * INSET strength Strong
+            form.width  lessEq  520.0
+            form.height prefers ideal
 
             button.top    eq form.bottom + 2 * INSET
             button.left   eq back.left
-            button.height eq button.idealHeight
             button.bottom eq parent.bottom - INSET
+            button.height.preserve
 
             parent.width  eq spacer.width + 2 * INSET
         }

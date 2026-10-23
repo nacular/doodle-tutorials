@@ -7,10 +7,13 @@ import io.nacular.doodle.application.Modules.Companion.FocusModule
 import io.nacular.doodle.application.Modules.Companion.ImageModule
 import io.nacular.doodle.application.Modules.Companion.KeyboardModule
 import io.nacular.doodle.application.application
+import io.nacular.doodle.coroutines.Dispatchers.UI
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicCircularProgressIndicatorBehavior
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicLabelBehavior
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicMutableSpinButtonBehavior
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeTextFieldBehavior
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import org.kodein.di.DI.Module
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
@@ -37,6 +40,7 @@ fun main() {
             random       = Random,
             display      = instance(),
             animate      = instance(),
+            appScope     = CoroutineScope(SupervisorJob() + UI),
             themeManager = instance(),
             focusManager = instance()
         )

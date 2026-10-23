@@ -10,6 +10,7 @@ import io.nacular.doodle.drawing.paint
 import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.layout.constraints.Strength.Companion.Strong
 import io.nacular.doodle.layout.constraints.constrain
+import io.nacular.doodle.layout.constraints.ideal
 import io.nacular.doodle.theme.ThemeManager
 import io.nacular.doodle.theme.adhoc.DynamicTheme
 import kotlinx.coroutines.CoroutineDispatcher
@@ -101,8 +102,10 @@ class ContactsApp(
 //sampleEnd
 
     private fun scrollPanel(content: View) = ScrollPanel(content).apply {
-        contentWidthConstraints  = { it eq width - verticalScrollBarWidth }
-        contentHeightConstraints = { it eq it.idealValue                  }
+        contentConstraints  = {
+            it.width  eq      width - verticalScrollBarWidth
+            it.height prefers ideal
+        }
     }
 
     private fun setMainView(display: Display, view: View) {
@@ -116,14 +119,14 @@ class ContactsApp(
 
     private fun updateLayout(display: Display, appAssets: AppConfig) {
         display.layout = if (display.children.size < 3) null else constrain(header, display.children[1], display.children[2]) { header_, mainView, button ->
-            header_.top     eq 0
-            header_.width   eq parent.width
-            header_.height  eq header_.idealHeight
+            header_.top     eq      0
+            header_.width   eq      parent.width
+            header_.height  prefers ideal
 
-            mainView.top    eq header_.height
-            mainView.left   eq INSET
-            mainView.width  eq header_.width - 2 * INSET
-            mainView.bottom eq parent.bottom
+            mainView.top    eq      header_.height
+            mainView.left   eq      INSET
+            mainView.width  eq      header_.width - 2 * INSET
+            mainView.bottom eq      parent.bottom
 
             lateinit var buttonSize: Size
 

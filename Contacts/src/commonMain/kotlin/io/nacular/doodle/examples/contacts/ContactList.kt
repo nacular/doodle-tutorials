@@ -89,9 +89,9 @@ class ContactList(
         }
     }
 
-    column(Label("Name"        ), { name        }, nameVisualizer     ) { cellAlignment = alignment; headerAlignment = alignment                        }
-    column(Label("Phone Number"), { phoneNumber }, StringVisualizer() ) { cellAlignment = alignment; headerAlignment = alignment                        }
-    column(null,                                   toolsVisualizer    ) { cellAlignment = fill(Insets(top = 20.0, bottom = 20.0, right = 20.0), Strong) }
+    column(Label("Name"        ), { name        }, nameVisualizer   ) { cellAlignment = alignment; headerAlignment = alignment                        }
+    column(Label("Phone Number"), { phoneNumber }, StringVisualizer ) { cellAlignment = alignment; headerAlignment = alignment                        }
+    column(null,                                   toolsVisualizer  ) { cellAlignment = fill(Insets(top = 20.0, bottom = 20.0, right = 20.0), Strong) }
 }) {
     init {
         font = assets.small
@@ -147,7 +147,7 @@ private class NameCell(private val textMetrics: TextMetrics, value: String): Vie
         }
         (children[0] as Label).apply {
             val circleColor = value.toColor()
-            styledText      = (blackOrWhiteContrast(circleColor)) { "${value.first()}" }
+            annotatedText   = (blackOrWhiteContrast(circleColor)) { "${value.first()}" }
             behavior        = object: CommonLabelBehavior(textMetrics) {
                 override fun render(view: Label, canvas: Canvas) {
                     canvas.circle(Circle(radius = min(width, height) / 2, center = Point(width / 2, height / 2)), fill = circleColor.paint)
@@ -193,8 +193,10 @@ private class ToolCell(private val assets: AppConfig, private val pathMetrics: P
                 children += createButton(assets.trashIcon).apply { fired += { onDelete?.invoke() } }
 
                 layout = constrain(children[0], children[1]) { edit, delete ->
+                    delete.size.preserve
                     delete.centerY eq parent.centerY
                     delete.right   eq parent.right
+                    edit.size.preserve
                     edit.centerY   eq delete.centerY
                     edit.right     eq delete.left - 4
                 }

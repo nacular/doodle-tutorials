@@ -21,6 +21,7 @@ import io.nacular.doodle.drawing.rect
 import io.nacular.doodle.event.PointerEvent
 import io.nacular.doodle.event.PointerListener
 import io.nacular.doodle.geometry.Point
+import io.nacular.doodle.geometry.inset
 import io.nacular.doodle.layout.Insets
 import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.system.Cursor.Companion.Pointer

@@ -5,6 +5,7 @@ import io.nacular.doodle.core.Display
 import io.nacular.doodle.drawing.FontLoader
 import io.nacular.doodle.drawing.TextMetrics
 import io.nacular.doodle.layout.constraints.constrain
+import io.nacular.doodle.layout.constraints.ideal
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -15,18 +16,18 @@ import kotlinx.coroutines.SupervisorJob
 //sampleStart
 class CalculatorApp(
     display        : Display,
-    textMetrics    : TextMetrics,
+    appScope       : CoroutineScope,
     fonts          : FontLoader,
+    textMetrics    : TextMetrics,
     numberFormatter: NumberFormatter
 ): Application {
     init {
-        val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-
         display += Calculator(fonts, appScope, textMetrics, numberFormatter)
 
         display.layout = constrain(display.first()) {
-            it.size   eq it.idealSize
-            it.center eq parent.center
+            it.top  eq      parent.centerY - readonly(it.height) / 2
+            it.left eq      parent.centerX - readonly(it.width ) / 2
+            it.size prefers ideal
         }
     }
 

@@ -10,6 +10,7 @@ import io.nacular.doodle.event.PointerEvent
 import io.nacular.doodle.event.PointerListener
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Rectangle
+import io.nacular.doodle.geometry.inset
 import io.nacular.doodle.layout.Insets
 import io.nacular.doodle.layout.constraints.Strength.Companion.Strong
 import io.nacular.doodle.layout.constraints.constrain
@@ -31,8 +32,8 @@ class TaskRow(config: TodoConfig, dataStore: DataStore, task: Task): View() {
     var task: Task by observable(task) { _, _, new ->
         check.selected = new.completed
         when {
-            new.completed -> label.styledText = (config.taskCompletedColor) { LineThrough { new.text } }
-            else          -> label.text       = new.text
+            new.completed -> label.annotatedText = (config.taskCompletedColor) { LineThrough { new.text } }
+            else          -> label.text          = new.text
         }
     }
 

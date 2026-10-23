@@ -23,13 +23,12 @@ import kotlinx.coroutines.launch
 
 class CalculatorImages(
     display        : Display,
+    appScope       : CoroutineScope,
     fonts          : FontLoader,
     textMetrics    : TextMetrics,
     numberFormatter: NumberFormatter,
 ): Application {
     init {
-        val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-
         appScope.launch {
             val font = fonts {
                 family = "verdana"
@@ -92,25 +91,25 @@ class CalculatorImages(
             display += glass2
 
             display.layout = constrain(calculator1, calculator2, glass1, glass2) { c1, c2, g1, g2 ->
-                c1.right eq parent.centerX - 20
-                c1.width eq (display.children.firstOrNull()?.idealSize?.width ?: 0.0)
-                c1.height eq (display.children.firstOrNull()?.idealSize?.height ?: 0.0)
-                c1.centerY eq parent.centerY
-
-                c2.left eq parent.centerX + 20
-                c2.width eq (display.children.firstOrNull()?.idealSize?.width ?: 0.0)
-                c2.height eq (display.children.firstOrNull()?.idealSize?.height ?: 0.0)
-                c2.centerY eq parent.centerY
-
-                g1.top eq c1.top + 100
-                g1.left eq c1.left + 1//-  10
-                g1.right eq c1.right - 1//+  10
-                g1.bottom eq c1.bottom - 1//+  10
-
-                g2.top eq c2.top + 1//- 10
-                g2.left eq c2.left + 1//- 10
-                g2.right eq c2.right - 1//+ 10
-                g2.bottom eq g1.top
+//                c1.right   eq parent.centerX - 20
+//                c1.width   eq (display.children.firstOrNull()?.idealSize?.width ?: 0.0)
+//                c1.height  eq (display.children.firstOrNull()?.idealSize?.height ?: 0.0)
+//                c1.centerY eq parent.centerY
+//
+//                c2.left    eq parent.centerX + 20
+//                c2.width   eq (display.children.firstOrNull()?.idealSize?.width ?: 0.0)
+//                c2.height  eq (display.children.firstOrNull()?.idealSize?.height ?: 0.0)
+//                c2.centerY eq parent.centerY
+//
+//                g1.top    eq c1.top    + 100
+//                g1.left   eq c1.left   + 1//-  10
+//                g1.right  eq c1.right  - 1//+  10
+//                g1.bottom eq c1.bottom - 1//+  10
+//
+//                g2.top    eq c2.top   + 1//- 10
+//                g2.left   eq c2.left  + 1//- 10
+//                g2.right  eq c2.right - 1//+ 10
+//                g2.bottom eq g1.top
             }
         }
     }

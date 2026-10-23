@@ -15,8 +15,10 @@ import io.nacular.doodle.examples.DataStore.Filter.Active
 import io.nacular.doodle.examples.DataStore.Filter.Completed
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Size
+import io.nacular.doodle.geometry.inset
 import io.nacular.doodle.layout.constraints.Strength.Companion.Strong
 import io.nacular.doodle.layout.constraints.constrain
+import io.nacular.doodle.layout.constraints.ideal
 import io.nacular.doodle.text.TextDecoration.Companion.UnderLine
 import io.nacular.doodle.text.invoke
 
@@ -103,20 +105,20 @@ class FilterBox(private val config              : TodoConfig,
             val spacing = 6.0
 
             label.left eq 15
-            label.width.preserve
+            label.size prefers ideal
 
             clearAll.width.preserve
-            clearAll.right eq parent.right strength Strong
+            clearAll.right  eq parent.right strength Strong
             clearAll.height eq parent.height
 
             all_.left eq (parent.width - (all_.width + active_.width + completed_.width + spacing * 2)) / 2 strength Strong
-            all_.width.preserve
+            all_.size.preserve
 
             active_.left    eq all_.right    + spacing
-            active_.width.preserve
+            active_.size.preserve
 
             completed_.left eq active_.right + spacing
-            completed_.width.preserve
+            completed_.size.preserve
 
             all_.left       greaterEq label.right      + spacing
             active_.left    greaterEq all_.right       + spacing

@@ -21,6 +21,7 @@ import io.nacular.doodle.geometry.Path
 import io.nacular.doodle.geometry.PathMetrics
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Rectangle
+import io.nacular.doodle.geometry.inset
 import io.nacular.doodle.geometry.path
 import io.nacular.doodle.system.Cursor.Companion.Default
 import io.nacular.doodle.system.Cursor.Companion.Pointer

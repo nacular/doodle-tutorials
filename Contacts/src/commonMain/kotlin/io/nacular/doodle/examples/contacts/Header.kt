@@ -160,14 +160,14 @@ class Header(
         layout = simpleLayout { items, min, current, max, insets ->
             val (logo, label, filter) = items.toList()
 
-            logo.updatePosition(2 * INSET, (naturalHeight - logo.bounds.height) / 2)
-            label.updatePosition(logo.bounds.right + 10, logo.bounds.center.y - label.bounds.height / 2)
+            logo.position  = Point(2 * INSET, (naturalHeight - logo.bounds.height) / 2)
+            label.position = Point(logo.bounds.right + 10, logo.bounds.center.y - label.bounds.height / 2)
 
-            filter.updateBounds(when {
+            filter.bounds = when {
                 current.width > filterCenterAboveWidth -> Rectangle((current.width - filterNaturalWidth) / 2,        logo.bounds.center.y - filter.bounds.height / 2, filterNaturalWidth, filter.bounds.height)
                 current.width > filterRightAboveWidth  -> Rectangle( current.width - filterNaturalWidth - 2 * INSET, logo.bounds.center.y - filter.bounds.height / 2, filterNaturalWidth, filter.bounds.height)
                 else                                   -> Rectangle(logo.bounds.x, logo.bounds.bottom + INSET, max(filterBox.minWidth, current.width - 4 * INSET), filter.bounds.height)
-            })
+            }
 
             Size(width, filterBox.bounds.bottom + 8)
         }

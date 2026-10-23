@@ -18,6 +18,7 @@ import io.nacular.doodle.controls.buttons.Button
 import io.nacular.doodle.controls.buttons.PushButton
 import io.nacular.doodle.core.Behavior
 import io.nacular.doodle.coroutines.Dispatchers
+import io.nacular.doodle.coroutines.Dispatchers.UI
 import io.nacular.doodle.drawing.Color.Companion.White
 import io.nacular.doodle.examples.AnimatingFormApp
 import io.nacular.doodle.examples.CalculatorApp
@@ -71,7 +72,13 @@ import kotlin.random.Random
 fun calculator(element: HTMLElement) {
     application(root = element, modules = listOf(FontModule, PointerModule)) {
         // load app
-        CalculatorApp(instance(), instance(), instance(), NumberFormatterImpl())
+        CalculatorApp(
+            fonts           = instance(),
+            display         = instance(),
+            appScope        = CoroutineScope(SupervisorJob() + UI),
+            textMetrics     = instance(),
+            numberFormatter = NumberFormatterImpl()
+        )
     }
 }
 
@@ -80,8 +87,9 @@ fun calculatorImages(element: HTMLElement) {
     application(root = element, modules = listOf(FontModule, PointerModule, Modules.HtmlElementViewModule)) {
         // load app
         CalculatorImages(
-            display         = instance(),
             fonts           = instance(),
+            display         = instance(),
+            appScope        = CoroutineScope(SupervisorJob() + UI),
             textMetrics     = instance(),
             numberFormatter = NumberFormatterImpl(),
         )
@@ -113,7 +121,7 @@ fun todo(element: HTMLElement) {
         // load app
         TodoApp(
             display              = instance(),
-            uiDispatcher         = Dispatchers.UI,
+            uiDispatcher         = UI,
             fonts                = instance(),
             theme                = instance(),
             themes               = instance(),
@@ -149,6 +157,7 @@ fun photos(element: HTMLElement) {
             images       = instance(),
             animate      = instance(),
             display      = instance(),
+            appScope     = CoroutineScope(SupervisorJob() + UI),
             focusManager = instance(),
             themeManager = instance()
         )
@@ -158,7 +167,7 @@ fun photos(element: HTMLElement) {
 @JsExport
 fun contacts(element: HTMLElement) {
     val contacts = SimpleContactsModel(io.nacular.doodle.examples.contacts.LocalStorePersistence())
-    val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
+    val appScope = CoroutineScope(SupervisorJob() + UI)
 
     application (root = element, modules = listOf(
         FontModule,
@@ -172,7 +181,7 @@ fun contacts(element: HTMLElement) {
         nativeTextFieldBehavior  (spellCheck = false),
         nativeHyperLinkBehavior  (),
         nativeScrollPanelBehavior(),
-        appModule(appScope = appScope, contacts = contacts, uiDispatcher = Dispatchers.UI),
+        appModule(appScope = appScope, contacts = contacts, uiDispatcher = UI),
         Module   (name = "PlatformModule") {
             // Platform-specific bindings
             bindInstance<io.nacular.doodle.examples.contacts.Router> { EmbeddedRouter () }
@@ -189,7 +198,7 @@ fun contacts(element: HTMLElement) {
             appScope          = appScope,
             navigator         = instance(),
             ContactList       = factory(),
-            uiDispatcher      = Dispatchers.UI,
+            uiDispatcher      = UI,
             ContactView       = { assets, contact -> factory<Pair<AppConfig, Contact>, ContactView>()(assets to contact) },
             CreateButton      = factory(),
             themeManager      = instance(),
@@ -202,7 +211,7 @@ fun contacts(element: HTMLElement) {
 @JsExport
 fun contactList(element: HTMLElement) {
     val contacts = SimpleContactsModel(NoOpPersistence)
-    val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
+    val appScope = CoroutineScope(SupervisorJob() + UI)
 
     application (root = element, modules = showcaseModules + Module(name = "PlatformModule") {
         bindFactory<AppConfig, ContactList> {
@@ -214,7 +223,7 @@ fun contactList(element: HTMLElement) {
                 navigator    = instance(),
                 textMetrics  = instance(),
                 pathMetrics  = instance(),
-                uiDispatcher = Dispatchers.UI
+                uiDispatcher = UI
             )
         }
     }) {
@@ -232,7 +241,7 @@ fun contactList(element: HTMLElement) {
 
 @JsExport
 fun contactCreation(element: HTMLElement) {
-    val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
+    val appScope = CoroutineScope(SupervisorJob() + UI)
 
     application (root = element, modules = showcaseModules + Module(name = "PlatformModule") {
         bindFactory<AppConfig, CreateContactView> {
@@ -261,7 +270,7 @@ fun contactCreation(element: HTMLElement) {
 
 @JsExport
 fun contactEditing(element: HTMLElement) {
-    val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
+    val appScope = CoroutineScope(SupervisorJob() + UI)
 
     application (root = element, modules = showcaseModules + Module(name = "PlatformModule") {
         bindFactory<Pair<AppConfig, Contact>, EditContactView> { (assets, contact) ->
@@ -275,7 +284,7 @@ fun contactEditing(element: HTMLElement) {
                 navigator       = instance(),
                 pathMetrics     = instance(),
                 textMetrics     = instance(),
-                uiDispatcher    = Dispatchers.UI,
+                uiDispatcher    = UI,
                 textFieldStyler = instance(),
             )
         }
@@ -294,7 +303,7 @@ fun contactEditing(element: HTMLElement) {
 
 @JsExport
 fun contactView(element: HTMLElement) {
-    val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
+    val appScope = CoroutineScope(SupervisorJob() + UI)
 
     application (root = element, modules = showcaseModules + Module(name = "PlatformModule") {
         bindFactory<Pair<AppConfig, Contact>, ContactView> { (assets, contact) ->
@@ -309,7 +318,7 @@ fun contactView(element: HTMLElement) {
                 linkStyler   = instance(),
                 pathMetrics  = instance(),
                 textMetrics  = instance(),
-                uiDispatcher = Dispatchers.UI
+                uiDispatcher = UI
             )
         }
     }) {
@@ -327,7 +336,7 @@ fun contactView(element: HTMLElement) {
 
 @JsExport
 fun contactsHeader(element: HTMLElement) {
-    val appScope = CoroutineScope(SupervisorJob() + kotlinx.coroutines.Dispatchers.Default)
+    val appScope = CoroutineScope(SupervisorJob() + UI)
 
     application(root = element, modules = showcaseModules + Module(name = "PlatformModule") {
         bindFactory<AppConfig, Header> {
@@ -389,7 +398,7 @@ fun timedCards(element: HTMLElement) {
             textMetrics  = instance(),
             timer        = instance(),
             scheduler    = instance(),
-            uiDispatcher = Dispatchers.UI
+            appScope     = CoroutineScope(SupervisorJob() + UI),
         )
     }
 }
@@ -412,6 +421,7 @@ fun animatingForm(element: HTMLElement) {
             theme           = instance(),
             display         = instance(),
             animator        = instance(),
+            appScope        = CoroutineScope(SupervisorJob() + UI),
             textMetrics     = instance(),
             pathMetrics     = instance(),
             themeManager    = instance(),

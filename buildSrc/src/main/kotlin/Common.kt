@@ -2,10 +2,10 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
 import org.gradle.kotlin.dsl.getByName
 import org.gradle.kotlin.dsl.register
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinTargetContainerWithPresetFunctions
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
 import java.util.*
 
 /**
@@ -24,8 +24,8 @@ fun KotlinMultiplatformExtension.jsTargets(executable: Boolean = false) {
 /**
  * Helper to make using wasmJs platform in build.gradle.kts files simpler
  */
-@OptIn(ExperimentalWasmDsl::class)
 fun KotlinMultiplatformExtension.wasmJsTargets(executable: Boolean = false) {
+    @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser {
             if (executable) {
@@ -41,15 +41,13 @@ fun KotlinMultiplatformExtension.wasmJsTargets(executable: Boolean = false) {
 /**
  * Helper to make using jvm platform in build.gradle.kts files simpler
  */
-fun KotlinTargetContainerWithPresetFunctions.jvmPlatform(jvmTarget: String, vararg additoinalFlags: String) {
+fun KotlinTargetContainerWithPresetFunctions.jvmPlatform(jvmTarget: JvmTarget, vararg additionalFlags: String) {
     jvm {
-        withJava()
-        compilations.all {
-            kotlinOptions {
-                this.jvmTarget   = jvmTarget
-                freeCompilerArgs = additoinalFlags.toList()
-            }
+        compilerOptions {
+            this.jvmTarget.set(jvmTarget)
+            freeCompilerArgs.addAll(additionalFlags.toList())
         }
+        withJava()
     }
 }
 

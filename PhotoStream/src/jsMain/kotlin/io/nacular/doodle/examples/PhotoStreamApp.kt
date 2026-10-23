@@ -23,6 +23,7 @@ import kotlinx.coroutines.SupervisorJob
 //sampleStart
 class PhotoStreamApp(
     display    : Display,
+    appScope   : CoroutineScope,
     themes     : ThemeManager,
     theme      : DynamicTheme,
     httpClient : HttpClient,
@@ -32,7 +33,6 @@ class PhotoStreamApp(
         // For scroll panel behavior
         themes.selected = theme
 
-        val appScope    = CoroutineScope(SupervisorJob() + Dispatchers.Default)
         val imageHeight = 400.0
 
         // List to hold images
@@ -49,7 +49,7 @@ class PhotoStreamApp(
 
         display += ScrollPanel(list).apply {
             // Ensure list's width is equal to scroll-panel's
-            contentWidthConstraints = { it eq parent.width - verticalScrollBarWidth }
+            contentConstraints = { it.width eq parent.width - verticalScrollBarWidth }
         }
 
         display.layout = constrain(display.children[0]) {

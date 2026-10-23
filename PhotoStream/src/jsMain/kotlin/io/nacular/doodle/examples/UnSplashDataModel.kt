@@ -93,7 +93,7 @@ class UnSplashDataModel(
         }
     }
 
-    override fun contains(value: Image) = value in loadedImages
+    override fun contains(value: Image           ) = value in loadedImages
     override fun iterator(                       ) = loadedImages.iterator()
     override fun section (range: ClosedRange<Int>) = loadedImages.subList(range.start, range.endInclusive + 1)
 }

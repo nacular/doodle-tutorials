@@ -27,6 +27,7 @@ import kotlinx.coroutines.launch
 //sampleStart
 class AnimatingFormApp(
     display        : Display,
+    appScope       : CoroutineScope,
     fonts          : FontLoader,
     animator       : Animator,
     textMetrics    : TextMetrics,
@@ -39,8 +40,6 @@ class AnimatingFormApp(
 
     init {
         themeManager.selected = theme
-
-        val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
         appScope.launch {
             // creat and display the animating form

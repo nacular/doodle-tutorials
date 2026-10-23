@@ -13,6 +13,7 @@ import io.nacular.doodle.drawing.Stroke
 import io.nacular.doodle.drawing.TextMetrics
 import io.nacular.doodle.geometry.PathMetrics
 import io.nacular.doodle.geometry.Size
+import io.nacular.doodle.geometry.inset
 import io.nacular.doodle.geometry.path
 import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.text.invoke
@@ -94,6 +95,8 @@ class ContactView(
             layout = constrain(children[0], children[1]) { label, link ->
                 label.top  eq INSET
                 label.left eq INSET
+                label.height.preserve
+
                 link.top   eq label.bottom + INSET
                 link.left  eq label.left
             }

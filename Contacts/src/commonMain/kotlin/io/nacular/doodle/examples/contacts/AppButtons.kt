@@ -48,7 +48,7 @@ class AppButtonsImpl(
         cursor        = Pointer
         acceptsThemes = false
         behavior      = simpleTextButtonRenderer(textMetrics) { button, canvas ->
-            val color = background.let { if (enabled) it else it.grayScale() }
+            val color = background.let { if (enabled) it else it.grayScale }
 
             canvas.rect(bounds.atOrigin, radius = 4.0, fill = color.paint)
             canvas.text(button.text, at = textPosition(button, button.text), fill = text.paint, font = font)

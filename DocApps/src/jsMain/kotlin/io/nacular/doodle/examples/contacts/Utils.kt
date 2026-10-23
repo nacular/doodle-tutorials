@@ -139,16 +139,16 @@ fun showcase(
                     }
                 }
 
-                display.layout = Layout.simpleLayout { views, min, current, max, insets ->
+                display.layout = Layout.simpleLayout { views, _, current, _, _ ->
                     views.first().apply {
                         val x = max(inset, bounds.x)
                         val y = max(inset, bounds.y)
-                        updateBounds(Rectangle(
+                        bounds = Rectangle(
                             x,
                             y,
                             min(display.width  - inset - x, bounds.width ),
                             min(display.height - inset - y, bounds.height)
-                        ))
+                        )
                     }
 
                     current

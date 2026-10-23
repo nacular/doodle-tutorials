@@ -47,6 +47,7 @@ import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Point.Companion.Origin
 import io.nacular.doodle.geometry.Rectangle
 import io.nacular.doodle.geometry.Size
+import io.nacular.doodle.geometry.at
 import io.nacular.doodle.geometry.inscribed
 import io.nacular.doodle.geometry.inscribedCircle
 import io.nacular.doodle.geometry.inset
@@ -298,7 +299,10 @@ class AnimatingForm(
             signIn.top      eq 0
             signIn.width    eq parent.width * (1 - minSwitcherWidthFraction)
             signIn.bottom   eq parent.bottom
-            signUp.edges    eq signIn.edges
+            signUp.top      eq signIn.top
+            signUp.left     eq readonly(signIn.left)
+            signUp.width    eq signIn.width
+            signUp.bottom   eq parent.bottom
             switcher.top    eq 0
             switcher.bottom eq parent.bottom
         }
@@ -311,7 +315,7 @@ class AnimatingForm(
             override fun contains(point: Point) = point in bounds.atOrigin
         }
 
-        boundsChanged += { _,_,new ->
+        boundsChanged += { _,_,_ ->
             formSwitcher.updateBounds()
             signIn.suggestX(lerp(minSwitcherWidth, 0.0, animationProgress))
         }
@@ -359,7 +363,7 @@ class AnimatingForm(
 
         cursor = Pointer
 
-        behavior = simpleButtonRenderer<Button> { button, canvas ->
+        behavior = simpleButtonRenderer { button, canvas ->
             val scale           = if (button.model.pressed) 0.9 else 1.0
             val strokeThickness = 1.0
 
@@ -396,12 +400,12 @@ class AnimatingForm(
         }
     })
 
-    private fun formLayout() = simpleLayout { items, min, current, max, insets ->
+    private fun formLayout() = simpleLayout { items, _, current, _, insets ->
         val width  = 300.0
         var bounds = Rectangle((current.width - width) / 2, 0.0, width, 40.0)
 
-        items.forEachIndexed { i, it ->
-            it.updateBounds(bounds)
+        for (it in items) {
+            it.bounds = bounds
 
             bounds = bounds.at(y = bounds.bottom + 10)
         }
@@ -444,13 +448,13 @@ class AnimatingForm(
         }
         + button
 
-        layout = simpleLayout { items, min, current, max, insets ->
+        layout = simpleLayout { items, _, current, _, _ ->
             var yOffset = 100.0
 
             items.forEachIndexed { index, item ->
-                val idealSize = item.idealSize
-                item.updateBounds((current.width - idealSize.width) / 2, yOffset, idealSize.width, idealSize.height)
-                yOffset += idealSize.height + if (index < 2) 40.0 else 20.0
+                item.assumeAnySize(x = 0.0, y = yOffset)
+                item.x = (current.width - item.width) / 2
+                yOffset += item.height + if (index < 2) 40.0 else 20.0
             }
 
             current

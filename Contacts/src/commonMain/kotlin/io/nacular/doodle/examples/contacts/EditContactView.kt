@@ -3,6 +3,7 @@ package io.nacular.doodle.examples.contacts
 import io.nacular.doodle.core.Layout.Companion.simpleLayout
 import io.nacular.doodle.drawing.TextMetrics
 import io.nacular.doodle.geometry.PathMetrics
+import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.theme.native.NativeTextFieldStyler
 import kotlinx.coroutines.CoroutineDispatcher
@@ -77,7 +78,7 @@ class EditContactView(
 
             layoutCommonItems(items, min, current, max, insets)
 
-            edit.updatePosition(form.x, form.bounds.bottom + 2 * INSET)
+            edit.position = Point(form.x, form.bounds.bottom + 2 * INSET)
 
             Size(spacer.width + 2 * INSET, edit.bounds.bottom + INSET)
         }

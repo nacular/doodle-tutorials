@@ -7,9 +7,12 @@ import io.nacular.doodle.application.Modules.Companion.FontModule
 import io.nacular.doodle.application.Modules.Companion.PathModule
 import io.nacular.doodle.application.Modules.Companion.PointerModule
 import io.nacular.doodle.application.application
+import io.nacular.doodle.coroutines.Dispatchers
 import io.nacular.doodle.focus.FocusManager
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicLabelBehavior
 import io.nacular.doodle.theme.native.NativeTheme.Companion.nativeTextFieldBehavior
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import org.kodein.di.DI.Module
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
@@ -35,6 +38,7 @@ fun main() {
             theme           = instance(),
             display         = instance(),
             animator        = instance(),
+            appScope        = CoroutineScope(SupervisorJob() + Dispatchers.UI),
             textMetrics     = instance(),
             pathMetrics     = instance(),
             themeManager    = instance(),

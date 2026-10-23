@@ -4,6 +4,7 @@ import io.nacular.doodle.controls.buttons.Button
 import io.nacular.doodle.controls.buttons.ButtonGroup
 import io.nacular.doodle.controls.buttons.PushButton
 import io.nacular.doodle.controls.buttons.ToggleButton
+import io.nacular.doodle.controls.form.RequiredIndicatorStyle
 import io.nacular.doodle.controls.panels.GridPanel
 import io.nacular.doodle.core.View
 import io.nacular.doodle.drawing.AffineTransform.Companion.Identity
@@ -22,7 +23,10 @@ import io.nacular.doodle.drawing.rect
 import io.nacular.doodle.drawing.text
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Size
+import io.nacular.doodle.layout.constraints.Strength.Companion.Required
 import io.nacular.doodle.layout.constraints.constrain
+import io.nacular.doodle.layout.constraints.ideal
+import io.nacular.doodle.layout.constraints.minus
 import io.nacular.doodle.system.Cursor.Companion.Pointer
 import io.nacular.doodle.utils.roundToNearest
 import kotlinx.coroutines.CoroutineScope
@@ -38,6 +42,7 @@ import kotlin.math.pow
  * @property textMetrics     used to measure text
  * @property numberFormatter used to display number output
  */
+@Suppress("PropertyName")
 class Calculator(
     private val fonts          : FontLoader,
                 appScope       : CoroutineScope,
@@ -347,16 +352,16 @@ class Calculator(
 
             // Place Output outside grid so the height can be more easily controlled
             layout = constrain(output, gridPanel) { output, grid ->
-                output.top    eq insets
-                output.left   eq insets
-                output.right  eq parent.right - insets
-                output.height eq outputHeight
+                output.top    eq      insets
+                output.left   eq      insets
+                output.right  eq      parent.right - insets strength Required - 1
+                output.height eq      outputHeight
 
-                grid.top      eq output.bottom + buttonSpacing
-                grid.left     eq output.left
-                grid.right    eq output.right
-                grid.bottom   eq parent.bottom - insets
-                grid.size     eq grid.idealSize
+                grid.top      eq      output.bottom + buttonSpacing
+                grid.left     eq      output.left
+                grid.right    eq      output.right
+                grid.bottom   eq      parent.bottom - insets strength Required - 1
+                grid.size     prefers ideal
             }
         }
     }

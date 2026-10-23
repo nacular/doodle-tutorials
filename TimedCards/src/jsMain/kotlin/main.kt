@@ -11,6 +11,8 @@ import io.nacular.doodle.application.application
 import io.nacular.doodle.coroutines.Dispatchers
 import io.nacular.doodle.drawing.Color.Companion.White
 import io.nacular.doodle.theme.basic.BasicTheme.Companion.basicLabelBehavior
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import org.kodein.di.DI.Module
 import org.kodein.di.bindSingleton
 import org.kodein.di.instance
@@ -34,6 +36,7 @@ fun main() {
         // load app
         TimedCardsApp(
             display      = instance(),
+            appScope     = CoroutineScope(SupervisorJob() + Dispatchers.UI),
             focusManager = instance(),
             themeManager = instance(),
             theme        = instance(),
@@ -43,7 +46,6 @@ fun main() {
             textMetrics  = instance(),
             timer        = instance(),
             scheduler    = instance(),
-            uiDispatcher = Dispatchers.UI
         )
     }
 }

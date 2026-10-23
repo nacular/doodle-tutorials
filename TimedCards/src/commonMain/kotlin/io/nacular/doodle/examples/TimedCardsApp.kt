@@ -31,13 +31,16 @@ import io.nacular.measured.units.times
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 
 //sampleStart
 class TimedCardsApp(
                 display     : Display,
+                appScope    : CoroutineScope,
                 focusManager: FocusManager,
                 themeManager: ThemeManager,
                 theme       : Theme,
@@ -47,16 +50,14 @@ class TimedCardsApp(
     private val animate     : Animator,
     private val textMetrics : TextMetrics,
     private val scheduler   : AnimationScheduler,
-                uiDispatcher: CoroutineDispatcher,
 ): Application {
 
-    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-
+    private          val job     : Job
     private lateinit var appFonts: Fonts
     private lateinit var carousel: Carousel<CardData, *>
 
     init {
-        appScope.launch(uiDispatcher) {
+        job = appScope.launch {
             themeManager.selected = theme
 
             appFonts = loadFonts(fonts)
@@ -138,7 +139,7 @@ class TimedCardsApp(
     }
 
     override fun shutdown() {
-        appScope.cancel()
+        job.cancel()
     }
 }
 //sampleEnd

@@ -7,6 +7,8 @@ import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Rectangle
 import io.nacular.doodle.geometry.Size
 import io.nacular.doodle.geometry.Vector2D
+import io.nacular.doodle.geometry.at
+import io.nacular.doodle.geometry.inset
 import io.nacular.doodle.geometry.lerp
 import io.nacular.doodle.layout.Insets
 import kotlin.math.abs
@@ -17,6 +19,8 @@ import kotlin.math.min
  */
 //sampleStart
 class CardPresenter<T>(private val spacing: Double = 20.0, private val itemSize: (Size) -> Size): CarouselBehavior.Presenter<T>() {
+    private val maxSpacing = spacing * 3
+
     /**
      * Determines what is shown in the Carousel
      */
@@ -25,7 +29,6 @@ class CardPresenter<T>(private val spacing: Double = 20.0, private val itemSize:
         position         : Position,
         progressToNext   : Float,
         supplementalViews: List<View>,
-        items            : (at: Position) -> Carousel.PresentedItem?
     ): Presentation {
         var zOrder          = 0
         val results         = mutableListOf<Carousel.PresentedItem>()
@@ -35,59 +38,51 @@ class CardPresenter<T>(private val spacing: Double = 20.0, private val itemSize:
         val mainBounds      = Rectangle(carousel.size).inset(-10.0)
 
         // Add selected card
-        currentPosition?.let(items)?.let {
+        carousel.item(at = currentPosition)?.let {
             // Image is outset by 10, and grows as we progress to the next frame
             it.bounds       = mainBounds.inset(Insets(-progressToNext * itemSize.width * 0.5))
             it.zOrder       = zOrder++
-            currentPosition = currentPosition.next
+            currentPosition = currentPosition?.next
 
             results += it
         }
 
         // Add the first small card
-        currentPosition?.let(items)?.let { item ->
+        carousel.item(at = currentPosition)?.let { item ->
             // bounds when exactly at frame
-            val bounds = Rectangle(
-                Point(
-                    (carousel.width - itemSize.width) / 2,
-                    (carousel.height - itemSize.height - CONTROLS_HEIGHT)
-                ),
-                itemSize
+            currentBounds = Rectangle(
+                x      = (carousel.width  - itemSize.width) / 2,
+                y      = (carousel.height - itemSize.height - CONTROLS_HEIGHT),
+                width  = itemSize.width,
+                height = itemSize.height
             )
 
             // bounds gradually grows toward main bounds
-            item.bounds = lerp(bounds, mainBounds, min(1f, progressToNext * 2))
+            item.bounds = lerp(currentBounds, mainBounds, min(1f, progressToNext * 2))
 
             // increase item zOrder so they sort properly
             item.zOrder = zOrder++
 
             // next item is shifted over towards this slot as progress increases
-            currentBounds   = bounds.run { at(x - progressToNext * (width + spacing)) }
-            currentPosition = currentPosition.next
+            currentBounds = currentBounds.run { at(x - progressToNext * (width + spacing)) }
 
             results += item
         }
 
         // add the remaining cards to the right of the first small one
-        do {
-            currentPosition?.let(items)?.let { item ->
-                // each item is offset to the right of the second, with a spacing that varies w/ progress
-                currentBounds = currentBounds?.run {
-                    at(right + spacing + -abs(progressToNext - 0.5f) * 3 * spacing + 3 * spacing / 2)
-                }
+        results += currentPosition?.allNext?.asSequence()?.mapNotNull { carousel.item(it)?.apply {
+            // each item is offset to the right of the second, with a spacing that varies w/ progress
+            currentBounds = currentBounds!!.run {
+                at(right + spacing + -abs(progressToNext - 0.5f) * maxSpacing + maxSpacing / 2)
+            }
 
-                currentBounds?.let { item.bounds = it }
+            this.bounds = currentBounds
 
-                // increase item zOrder so they sort properly
-                item.zOrder = zOrder++
-
-                results += item
-            } ?: break
-        } while (
-            // continue until there are no more items to show
-            (currentBounds?.right ?: 0.0) + spacing < carousel.size.width &&
-            currentPosition.next?.also { currentPosition = it } != null
-        )
+            // increase item zOrder so they sort properly
+            this.zOrder = zOrder++
+        } }?.takeWhile {
+            currentBounds!!.x < carousel.width
+        }?.toList() ?: emptyList()
 
         return Presentation(items = results)
     }
@@ -96,7 +91,6 @@ class CardPresenter<T>(private val spacing: Double = 20.0, private val itemSize:
         carousel: Carousel<T, *>,
         position: Position,
         offset  : Vector2D,
-        items   : (Position) -> Carousel.PresentedItem?
     ): Distance = Distance(Vector2D(x = 1), carousel.width)
 }
 //sampleEnd

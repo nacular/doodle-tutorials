@@ -4,6 +4,7 @@ import io.nacular.doodle.application.Application
 import io.nacular.doodle.controls.IndexedItem
 import io.nacular.doodle.controls.buttons.Button
 import io.nacular.doodle.controls.buttons.HyperLink
+import io.nacular.doodle.controls.form.list
 import io.nacular.doodle.controls.itemVisualizer
 import io.nacular.doodle.controls.list.MutableList
 import io.nacular.doodle.controls.list.listEditor
@@ -39,12 +40,17 @@ import io.nacular.doodle.focus.FocusManager
 import io.nacular.doodle.geometry.Point
 import io.nacular.doodle.geometry.Rectangle
 import io.nacular.doodle.geometry.Size
+import io.nacular.doodle.geometry.inset
 import io.nacular.doodle.image.Image
 import io.nacular.doodle.image.ImageLoader
 import io.nacular.doodle.layout.Insets
+import io.nacular.doodle.layout.constraints.Strength
+import io.nacular.doodle.layout.constraints.Strength.Companion.Required
 import io.nacular.doodle.layout.constraints.Strength.Companion.Strong
 import io.nacular.doodle.layout.constraints.constrain
 import io.nacular.doodle.layout.constraints.fill
+import io.nacular.doodle.layout.constraints.ideal
+import io.nacular.doodle.layout.constraints.minus
 import io.nacular.doodle.layout.constraints.plus
 import io.nacular.doodle.theme.ThemeManager
 import io.nacular.doodle.theme.adhoc.DynamicTheme
@@ -168,139 +174,141 @@ private class TodoView(
     private val filterButtonProvider: FilterButtonProvider
 ): View() {
 
+    private inner class TaskList: Container() {
+        val minHeight get() = children.first().height + children.last().height
+
+        init {
+            clipCanvasToBounds = false
+
+            // Maps tasks to TaskRow and updates them when recycled
+            val visualizer = itemVisualizer<Task, IndexedItem> { item, previous, _ ->
+                when (previous) {
+                    is TaskRow -> previous.also { it.task = item }
+                    else       -> TaskRow(config, dataStore, item)
+                }
+            }
+
+            // List containing Tasks. It is mutable since items can be edited
+            val list = MutableList(DataStoreListModel(dataStore), itemVisualizer = visualizer).apply {
+                val rowHeight = 58.0
+                font          = config.listFont
+                cellAlignment = fill
+                editor        = listEditor { list, row, _, current -> TaskEditOperation(focusManager, list, row, current) }
+                behavior      = BasicListBehavior(focusManager,
+                    basicItemGenerator {
+                        // edit when double-clicked
+                        pointerChanged += released { event ->
+                            if (event.clickCount >= 2) { this@apply.startEditing(index).also { event.consume() } }
+                        }
+                    },
+                    BasicVerticalListPositioner(rowHeight),
+                    PatternPaint(Size(10.0, rowHeight)) {
+                        rect(Rectangle(size = this.size), color = White)
+                        line(Point(y = 1), Point(10, 1), Stroke(config.lineColor))
+                    },
+                )
+
+                itemsChanged += { _, differences ->
+                    // Scroll when a single item added
+                    var numAdded    = 0
+                    var numRemoved  = 0
+                    var indexInList = 0
+
+                    differences.forEach {
+                        when (it) {
+                            is Insert -> {
+                                if (it.items.size > 1) {
+                                    return@forEach
+                                }
+
+                                ++numAdded
+                                ++indexInList
+                            }
+                            is Delete -> {
+                                numRemoved += it.items.size
+                            }
+                            else      -> indexInList += it.items.size
+                        }
+                    }
+
+                    if (numAdded == 1 && numRemoved <= 1) {
+                        scrollTo(indexInList)
+                    }
+                }
+
+                boundsChanged += { _, old, new ->
+                    if (old.width != new.width || old.height != new.height) {
+                        this@TodoView.relayout()
+                    }
+                }
+            }
+
+            children += TaskCreationBox(focusManager, textMetrics, config, dataStore)
+            children += ScrollPanel    (list).apply { contentConstraints = { it.width eq width - verticalScrollBarWidth } }
+            children += FilterBox      (config, dataStore, textMetrics, filterButtonProvider)
+
+            layout = constrain(children[0], children[1], children[2]) { input, panel, filter ->
+                listOf(input, panel, filter).forEach { it.width eq parent.width }
+
+                input.top     eq 0
+                input.height.preserve
+
+                panel.top     eq      input.bottom
+                panel.height  prefers ideal strength Strong + 3
+
+                if (children[2].visible) {
+                    filter.top    eq panel.bottom
+                    filter.height.preserve
+                    parent.height eq filter.bottom strength Required - 1
+                } else {
+                    parent.height eq input.bottom
+                }
+            }
+        }
+
+        override fun render(canvas: Canvas) {
+            canvas.outerShadow(vertical =  2.0, blurRadius =  4.0, color = Black opacity 0.2f) {
+                outerShadow   (vertical = 25.0, blurRadius = 50.0, color = Black opacity 0.1f) {
+                    // Create stacked effect
+                    if (!dataStore.isEmpty) {
+                        rect(bounds.atOrigin.inset(Insets(top = height, left = 8.0, right = 8.0, bottom = -8.0)), color = White)
+                        rect(bounds.atOrigin.inset(Insets(top = height, left = 4.0, right = 4.0, bottom = -4.0)), color = White)
+                    }
+                    rect(bounds.atOrigin, color = White)
+                }
+            }
+        }
+    }
+
     init {
-        val header = Label("todos").apply {
+        val header   = Label("todos").apply {
             font            = config.titleFont
             behavior        = CommonLabelBehavior(textMetrics)
             acceptsThemes   = false
             foregroundColor = config.headerColor
         }
-        lateinit var list: View
         val footer   = Footer(textMetrics, linkStyler, config)
-        val taskList = object: Container() {
-            init {
-                clipCanvasToBounds = false
-
-                // Maps tasks to TaskRow and updates them when recycled
-                val visualizer = itemVisualizer<Task, IndexedItem> { item, previous, _ ->
-                    when (previous) {
-                        is TaskRow -> previous.also { it.task = item }
-                        else       -> TaskRow(config, dataStore, item)
-                    }
-                }
-
-                // List containing Tasks. It is mutable since items can be edited
-                list = MutableList(DataStoreListModel(dataStore), itemVisualizer = visualizer).apply {
-                    val rowHeight = 58.0
-                    font          = config.listFont
-                    cellAlignment = fill
-                    editor        = listEditor { list, row, _, current -> TaskEditOperation(focusManager, list, row, current) }
-                    behavior      = BasicListBehavior(focusManager,
-                        basicItemGenerator {
-                            // edit when double-clicked
-                            pointerChanged += released { event ->
-                                if (event.clickCount >= 2) { this@apply.startEditing(index).also { event.consume() } }
-                            }
-                        },
-                        BasicVerticalListPositioner(rowHeight),
-                        PatternPaint(Size(10.0, rowHeight)) {
-                            rect(Rectangle(size = this.size), color = White)
-                            line(Point(y = 1), Point(10, 1), Stroke(config.lineColor))
-                        },
-                    )
-
-                    itemsChanged += { _, differences ->
-                        // Scroll when a single item added
-                        var numAdded    = 0
-                        var numRemoved  = 0
-                        var indexInList = 0
-
-                        differences.forEach {
-                            when (it) {
-                                is Insert -> {
-                                    if (it.items.size > 1) {
-                                        return@forEach
-                                    }
-
-                                    ++numAdded
-                                    ++indexInList
-                                }
-                                is Delete -> {
-                                    numRemoved += it.items.size
-                                }
-                                else      -> indexInList += it.items.size
-                            }
-                        }
-
-                        if (numAdded == 1 && numRemoved <= 1) {
-                            scrollTo(indexInList)
-                        }
-                    }
-
-                    boundsChanged += { _, old, new ->
-                        if (old.width != new.width || old.height != new.height) {
-                            this@TodoView.relayout()
-                        }
-                    }
-                }
-
-                children += listOf(
-                    TaskCreationBox(focusManager, textMetrics, config, dataStore),
-                    ScrollPanel    (list).apply { contentWidthConstraints = { it eq width - verticalScrollBarWidth } },
-                    FilterBox      (config, dataStore, textMetrics, filterButtonProvider)
-                )
-
-                layout = constrain(children[0], children[1], children[2]) { input, panel, filter ->
-                    listOf(input, panel, filter).forEach { it.width eq parent.width }
-
-                    input.top     eq 0
-                    input.height.preserve
-
-                    panel.top     eq input.bottom
-                    panel.height  eq panel.idealHeight strength Strong + 3
-
-                    if (children[2].visible) {
-                        filter.top    eq panel.bottom
-                        filter.height.preserve
-                        parent.height eq filter.bottom
-                    } else {
-                        parent.height eq input.bottom
-                    }
-                }
-            }
-
-            override fun render(canvas: Canvas) {
-                canvas.outerShadow(vertical =  2.0, blurRadius =  4.0, color = Black opacity 0.2f) {
-                    outerShadow   (vertical = 25.0, blurRadius = 50.0, color = Black opacity 0.1f) {
-                        // Create stacked effect
-                        if (!dataStore.isEmpty) {
-                            rect(bounds.atOrigin.inset(Insets(top = height, left = 8.0, right = 8.0, bottom = -8.0)), color = White)
-                            rect(bounds.atOrigin.inset(Insets(top = height, left = 4.0, right = 4.0, bottom = -4.0)), color = White)
-                        }
-                        rect(bounds.atOrigin, color = White)
-                    }
-                }
-            }
-        }
+        val taskList = TaskList()
 
         children += listOf(header, taskList, footer)
 
-        list.boundsChanged += { _,_,_ -> doLayout() }
-
         layout = constrain(header, taskList, footer) { header, body, footer ->
-            listOf(header, body, footer).forEach { it.centerX eq parent.centerX }
+            header.top     eq       9
+            header.centerX eq       parent.centerX
+            header.size.preserve
 
-            header.top eq 9
-            header.height.preserve
+            body.top       eq        header.bottom + 5
+            body.width     lessEq    parent.width - 10
+            body.width     eq        550    strength Strong
+            body.height    prefers   ideal  strength Strong
+            body.height    greaterEq taskList.minHeight
+            body.centerX   eq        parent.centerX
 
-            body.top      eq     header.bottom + 5
-            body.width    lessEq parent.width - 10
-            body.width    eq     550    strength Strong
-            body.height   eq     body.idealHeight
-
-            footer.top    eq     body.bottom.readOnly + 65
-            footer.width  eq     body.width
-            footer.height eq     footer.idealHeight
+            footer.top     eq        body.bottom + 65
+            footer.width   eq        body.width
+            footer.height  prefers   ideal
+            footer.bottom  lessEq    parent.bottom strength Required - 1
+            footer.centerX eq        parent.centerX
         }
     }
 }
@@ -321,7 +329,7 @@ class TodoApp(display             : Display,
               filterButtonProvider: FilterButtonProvider): Application {
 //sampleStart
     init {
-        val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+        val appScope = CoroutineScope(SupervisorJob())
 
         // Launch coroutine to fetch fonts/images
         appScope.launch(uiDispatcher) {
